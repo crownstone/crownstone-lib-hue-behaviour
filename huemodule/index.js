@@ -51,10 +51,10 @@ var NO_BRIDGES_DISCOVERED = "NO_BRIDGES_DISCOVERED";
 var UNAUTHORIZED_USER = "UNAUTHORIZED_USER";
 var BRIDGE_LINK_BUTTON_UNPRESSED = "BRIDGE_LINK_BUTTON_UNPRESSED";
 var BRIDGE_CONNECTION_FAILED = "BRIDGE_CONNECTION_FAILED";
-var DISCOVERY_URL = "https://discovery.meethue.com/";
 //config locations/names
 var CONF_NAME = "saveConfig.json";
 var CONF_BRIDGE_LOCATION = "bridges";
+var CONF_LIGHT_LOCATION = "lights";
 var Success = /** @class */ (function () {
     function Success(value) {
         this.value = value;
@@ -365,6 +365,7 @@ var CrownstoneHueModule = /** @class */ (function () {
             });
         });
     };
+    //Uses the nupnp export from the library before it gets altered.
     CrownstoneHueModule.prototype.__getBridgesFromDiscoveryUrl = function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
@@ -389,20 +390,16 @@ var CrownstoneHueModule = /** @class */ (function () {
         });
     };
     CrownstoneHueModule.prototype.getConnectedBridge = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, this.api];
-            });
-        });
+        return this.api;
     };
     //Attempts to find- and connect to the bridge
-    CrownstoneHueModule.prototype.findUnreachableBridge = function (unreacheableBridgeIP) {
+    CrownstoneHueModule.prototype.findUnreachableBridge = function (ipAddress) {
         return __awaiter(this, void 0, void 0, function () {
             var unreachableBridge, possibleBridges, result_1, api;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        unreachableBridge = this.configSettings[CONF_BRIDGE_LOCATION][unreacheableBridgeIP];
+                        unreachableBridge = this.configSettings[CONF_BRIDGE_LOCATION][ipAddress];
                         return [4 /*yield*/, this.__getBridgesFromDiscoveryUrl().catch(function (err) {
                                 return exports.failure(err.code);
                             })];
@@ -428,9 +425,7 @@ var CrownstoneHueModule = /** @class */ (function () {
                     case 4:
                         api = _a.sent();
                         if (api.isSuccess()) {
-                            this.configSettings[CONF_BRIDGE_LOCATION][result_1.internalipaddress] = unreachableBridge;
-                            delete this.configSettings[CONF_BRIDGE_LOCATION][unreacheableBridgeIP];
-                            this.updateConfigFile();
+                            this.__replaceBridgeInformation(result_1.internalipaddress, unreachableBridge, ipAddress);
                             return [2 /*return*/, api];
                         }
                         else {
@@ -443,6 +438,11 @@ var CrownstoneHueModule = /** @class */ (function () {
                 }
             });
         });
+    };
+    CrownstoneHueModule.prototype.__replaceBridgeInformation = function (newIpAddress, unreachableBridge, oldIpAddress) {
+        this.configSettings[CONF_BRIDGE_LOCATION][newIpAddress] = unreachableBridge;
+        delete this.configSettings[CONF_BRIDGE_LOCATION][oldIpAddress];
+        this.updateConfigFile();
     };
     return CrownstoneHueModule;
 }());
@@ -461,18 +461,22 @@ function testing() {
                     return [4 /*yield*/, test.init()];
                 case 2:
                     _c.sent();
-                    return [4 /*yield*/, test.getConfiguredBridges().then(function (res) { return res[0]; })];
+                    return [4 /*yield*/, test.getConfiguredBridges().then(function (res) {
+                            return res[0];
+                        })];
                 case 3:
                     firstBridge = _c.sent();
                     return [4 /*yield*/, test.switchToBridge(firstBridge)];
                 case 4:
                     _c.sent();
-                    return [4 /*yield*/, test.getAllLights().then(function (res) { return res; })];
+                    return [4 /*yield*/, test.getAllLights().then(function (res) {
+                            return res;
+                        })];
                 case 5:
                     lights = _c.sent();
                     if (lights.isSuccess()) {
                         lights.value.forEach(function (light) {
-                            console.log(light.id);
+                            console.log(light);
                             test.manipulateLight(light.id, { on: false });
                         });
                     }

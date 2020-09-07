@@ -1,10 +1,7 @@
-import {fetch} from "node-fetch";
+
 import {promises as fs} from 'fs';
-
 import {v3} from "node-hue-api";
-import {getDiscoveryMeetHueHttpsAgent } from "node-hue-api/lib/api/discovery/ca-chain";
 import {nupnp as unalteredNupnp}  from "node-hue-api/lib/api/discovery/nupnp";
-
 const discovery = v3.discovery;
 const hueApi = v3.api;
 
@@ -21,13 +18,25 @@ const UNAUTHORIZED_USER = "UNAUTHORIZED_USER";
 const BRIDGE_LINK_BUTTON_UNPRESSED = "BRIDGE_LINK_BUTTON_UNPRESSED";
 const BRIDGE_CONNECTION_FAILED = "BRIDGE_CONNECTION_FAILED";
 
-const DISCOVERY_URL = "https://discovery.meethue.com/";
+
 
 
 //config locations/names
 const CONF_NAME: string = "saveConfig.json";
 const CONF_BRIDGE_LOCATION: string = "bridges";
+const CONF_LIGHT_LOCATION: string = "lights";
 
+let lights = { "" : {
+        "name": "",
+        "ip-address": "",
+        "mac-address": "",
+        "bridgeip": "",
+        "bridgelightid": "",
+        "states": {
+            "on": "true"
+        }
+    }
+}
 
 export type Either<L, A> = Success<L, A> | Failure<L, A>;
 
@@ -76,7 +85,7 @@ export const failure = <L, A>(a: A): Either<L, A> => {
 
 
 export class CrownstoneHueModule {
-    configSettings: object = {"bridges":"","lights":""};
+    configSettings: object = {"bridges": "", "lights": ""};
     api: any;
 
 
@@ -230,42 +239,28 @@ export class CrownstoneHueModule {
 
     }
 
-    //Returns a list of all lights.
-    async getAllLights() {
-        return await this.api.lights.getAll().then(res => {
-            return success(res)
-        }).catch(err => {
-            return failure(err.code)
-        });
-    }
-
-
-    //Returns   or failure(message)
-    async manipulateLight(id, state) {
-        return await this.api.lights.setLightState(id, state);
-    }
-
-
+    //Uses the nupnp export from the library before it gets altered.
     async __getBridgesFromDiscoveryUrl() {
         return await unalteredNupnp()
             .then(async res => {
-                    return success(res)
+                return success(res)
             }).catch((err) => {
-                if(err.code != undefined){
+                if (err.code != undefined) {
                     return failure(err.code)
-                }else {
-                return failure(err)
+                } else {
+                    return failure(err)
                 }
             });
     }
 
-    async getConnectedBridge() {
+    getConnectedBridge() {
         return this.api;
     }
 
+
     //Attempts to find- and connect to the bridge
-    async findUnreachableBridge(unreacheableBridgeIP) {
-        let unreachableBridge = this.configSettings[CONF_BRIDGE_LOCATION][unreacheableBridgeIP];
+    async findUnreachableBridge(ipAddress) {
+        let unreachableBridge = this.configSettings[CONF_BRIDGE_LOCATION][ipAddress];
         let possibleBridges = await this.__getBridgesFromDiscoveryUrl().catch(err => {
             return failure(err.code)
         });
@@ -286,9 +281,7 @@ export class CrownstoneHueModule {
                         return failure(err.code)
                     });
                     if (api.isSuccess()) {
-                        this.configSettings[CONF_BRIDGE_LOCATION][result.internalipaddress] = unreachableBridge;
-                        delete this.configSettings[CONF_BRIDGE_LOCATION][unreacheableBridgeIP];
-                        this.updateConfigFile();
+                        this.__replaceBridgeInformation(result.internalipaddress, unreachableBridge, ipAddress);
                         return api;
                     } else {
                         return api;
@@ -301,6 +294,28 @@ export class CrownstoneHueModule {
     }
 
 
+    __replaceBridgeInformation(newIpAddress, unreachableBridge, oldIpAddress): void {
+        this.configSettings[CONF_BRIDGE_LOCATION][newIpAddress] = unreachableBridge;
+        delete this.configSettings[CONF_BRIDGE_LOCATION][oldIpAddress];
+        this.updateConfigFile();
+    }
+
+
+    //Returns a list of all lights.
+    async getAllLights() {
+        return await this.api.lights.getAll().then(res => {
+            return success(res)
+        }).catch(err => {
+            return failure(err.code)
+        });
+    }
+
+
+    //Returns   or failure(message)
+    async manipulateLightByBridgeId(id, state) {
+        return await this.api.lights.setLightState(id, state);
+    }
+
 }
 
 
@@ -309,17 +324,22 @@ async function testing() {
     const test = new CrownstoneHueModule();
     console.log(await test.__getBridgesFromDiscoveryUrl());
     await test.init();
-    const firstBridge = await test.getConfiguredBridges().then(res => {return res[0];});
+    const firstBridge = await test.getConfiguredBridges().then(res => {
+        return res[0];
+    });
     await test.switchToBridge(firstBridge);
     // console.log(test.getConnectedBridge());
-    let lights = await test.getAllLights().then(res => {return res});
-    if (lights.isSuccess()){
+    let lights = await test.getAllLights().then(res => {
+        return res
+    });
+    if (lights.isSuccess()) {
         lights.value.forEach(light => {
-            console.log(light.id);
-            test.manipulateLight(light.id, {on:false})
+            console.log(light);
+            test.manipulateLightByBridgeId(light.id, {on: false})
         })
     }
     // await test.switchToBridge(await test.getConfiguredBridges().then(res => {return res[0];}));
     // console.log(await test.getAllLights());
 }
+
 testing();
