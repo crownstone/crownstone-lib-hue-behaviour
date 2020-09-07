@@ -1,10 +1,13 @@
 import {fetch} from "node-fetch";
-import { promises as fs } from 'fs';
+import {promises as fs} from 'fs';
 
 import {v3} from "node-hue-api";
+import {getDiscoveryMeetHueHttpsAgent } from "node-hue-api/lib/api/discovery/ca-chain";
+import {nupnp as unalteredNupnp}  from "node-hue-api/lib/api/discovery/nupnp";
 
 const discovery = v3.discovery;
 const hueApi = v3.api;
+
 
 
 //User signing
@@ -72,9 +75,8 @@ export const failure = <L, A>(a: A): Either<L, A> => {
 //TODO Omvormen naar module.
 
 
-
 export class CrownstoneHueModule {
-    configSettings: object = {};
+    configSettings: object = {"bridges":"","lights":""};
     api: any;
 
 
@@ -87,14 +89,22 @@ export class CrownstoneHueModule {
     }
 
     async getConfigSettings() {
-        await fs.readFile(CONF_NAME, 'utf8').then((data) => {this.configSettings = JSON.parse(data);});
+        await fs.readFile(CONF_NAME, 'utf8').then((data) => {
+            this.configSettings = JSON.parse(data);
+        }).catch(err => {
+            if (err.code === "ENOENT") {
+                this.updateConfigFile();
+            }
+        });
 
     };
 
 
     // Returns either a list of bridges or a errorcode
     async discoverBridges(): Promise<string | Array<object>> {
-        const discoveryResults = await discovery.nupnpSearch().then(res => {return res});
+        const discoveryResults = await discovery.nupnpSearch().then(res => {
+            return res
+        });
         if (discoveryResults.length === 0) {
             return NO_BRIDGES_DISCOVERED;
         } else {
@@ -119,7 +129,9 @@ export class CrownstoneHueModule {
     }
 
     async switchToBridge(ipAddress) {
-        let api = await this.__connectToBridge(ipAddress).then(res => {return res});
+        let api = await this.__connectToBridge(ipAddress).then(res => {
+            return res
+        });
         if (api.isSuccess()) {
             this.api = api.value;
             return success(true);
@@ -139,12 +151,16 @@ export class CrownstoneHueModule {
 
 
     async __connectToBridge(bridgeIpAddress) {
-        let result = await this.__createAuthenticatedApi(bridgeIpAddress, this.configSettings[CONF_BRIDGE_LOCATION][bridgeIpAddress]["username"]).then(res => {return res;});
+        let result = await this.__createAuthenticatedApi(bridgeIpAddress, this.configSettings[CONF_BRIDGE_LOCATION][bridgeIpAddress]["username"]).then(res => {
+            return res;
+        });
         if (result.isSuccess()) {
             return result;
         } else if (result.isFailure()) {
             if (result.value == "ENOTFOUND" || result.value == "ETIMEDOUT") {
-                return await this.findUnreachableBridge(bridgeIpAddress).then(res => {return res;});
+                return await this.findUnreachableBridge(bridgeIpAddress).then(res => {
+                    return res;
+                });
             } else {
                 return result;
             }
@@ -192,7 +208,11 @@ export class CrownstoneHueModule {
 
     //Call this to save configuration to the config file.
     async updateConfigFile() {
-        return await fs.writeFile(CONF_NAME, JSON.stringify(this.configSettings)).then((res) => {return success(true)}).catch((err) => {return failure(err.code)});
+        return await fs.writeFile(CONF_NAME, JSON.stringify(this.configSettings)).then((res) => {
+            return success(true)
+        }).catch((err) => {
+            return failure(err.code)
+        });
     }
 
 
@@ -227,17 +247,19 @@ export class CrownstoneHueModule {
 
 
     async __getBridgesFromDiscoveryUrl() {
-        return await fetch(DISCOVERY_URL, {method: "Get"})
+        return await unalteredNupnp()
             .then(async res => {
-                return await res.json().then(res => {
                     return success(res)
-                });
             }).catch((err) => {
-                return failure(err.code)
+                if(err.code != undefined){
+                    return failure(err.code)
+                }else {
+                return failure(err)
+                }
             });
     }
 
-    async getConnectedBridge(){
+    async getConnectedBridge() {
         return this.api;
     }
 
@@ -285,6 +307,7 @@ export class CrownstoneHueModule {
 async function testing() {
 
     const test = new CrownstoneHueModule();
+    console.log(await test.__getBridgesFromDiscoveryUrl());
     await test.init();
     const firstBridge = await test.getConfiguredBridges().then(res => {return res[0];});
     await test.switchToBridge(firstBridge);
