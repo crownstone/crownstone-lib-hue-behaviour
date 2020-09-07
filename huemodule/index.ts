@@ -94,7 +94,7 @@ export class CrownstoneHueModule {
 
     // Returns either a list of bridges or a errorcode
     async discoverBridges(): Promise<string | Array<object>> {
-        const discoveryResults = await discovery.nupnpSearch();
+        const discoveryResults = await discovery.nupnpSearch().then(res => {return res});
         if (discoveryResults.length === 0) {
             return NO_BRIDGES_DISCOVERED;
         } else {
@@ -117,24 +117,6 @@ export class CrownstoneHueModule {
             return result;
         }
     }
-
-
-    ////Currently only 1 bridge supported, returns an api if connection succesfull, else returns an error code.
-    //async initModule() {
-    //    const result = await this.__getConnectedBridges();
-
-    //    //if (result.isSuccess()) {
-    //    //    let api = await this.__connectToBridge(result.value);
-    //    //    if (api.isSuccess()) {
-    //    //        this.api = api;
-    //    //    } else
-    //    //        return api;
-    //    //} else {
-    //    //    return result;
-    //    //}
-    //    return result;
-    //}
-
 
     async switchToBridge(ipAddress) {
         let api = await this.__connectToBridge(ipAddress).then(res => {return res});
@@ -229,7 +211,7 @@ export class CrownstoneHueModule {
     }
 
     //Returns a list of all lights.
-    async getAllLights(): Promise<object> {
+    async getAllLights() {
         return await this.api.lights.getAll().then(res => {
             return success(res)
         }).catch(err => {
@@ -307,7 +289,13 @@ async function testing() {
     const firstBridge = await test.getConfiguredBridges().then(res => {return res[0];});
     await test.switchToBridge(firstBridge);
     // console.log(test.getConnectedBridge());
-    console.log(test.getAllLights().then(res => {return res}));
+    let lights = await test.getAllLights().then(res => {return res});
+    if (lights.isSuccess()){
+        lights.value.forEach(light => {
+            console.log(light.id);
+            test.manipulateLight(light.id, {on:false})
+        })
+    }
     // await test.switchToBridge(await test.getConfiguredBridges().then(res => {return res[0];}));
     // console.log(await test.getAllLights());
 }

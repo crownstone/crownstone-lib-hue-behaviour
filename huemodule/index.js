@@ -77,7 +77,7 @@ class CrownstoneHueModule {
     // Returns either a list of bridges or a errorcode
     discoverBridges() {
         return __awaiter(this, void 0, void 0, function* () {
-            const discoveryResults = yield discovery.nupnpSearch();
+            const discoveryResults = yield discovery.nupnpSearch().then(res => { return res; });
             if (discoveryResults.length === 0) {
                 return NO_BRIDGES_DISCOVERED;
             }
@@ -102,20 +102,6 @@ class CrownstoneHueModule {
             }
         });
     }
-    ////Currently only 1 bridge supported, returns an api if connection succesfull, else returns an error code.
-    //async initModule() {
-    //    const result = await this.__getConnectedBridges();
-    //    //if (result.isSuccess()) {
-    //    //    let api = await this.__connectToBridge(result.value);
-    //    //    if (api.isSuccess()) {
-    //    //        this.api = api;
-    //    //    } else
-    //    //        return api;
-    //    //} else {
-    //    //    return result;
-    //    //}
-    //    return result;
-    //}
     switchToBridge(ipAddress) {
         return __awaiter(this, void 0, void 0, function* () {
             let api = yield this.__connectToBridge(ipAddress).then(res => { return res; });
@@ -141,13 +127,13 @@ class CrownstoneHueModule {
     }
     __connectToBridge(bridgeIpAddress) {
         return __awaiter(this, void 0, void 0, function* () {
-            let result = yield this.__createAuthenticatedApi(bridgeIpAddress, this.configSettings[CONF_BRIDGE_LOCATION][bridgeIpAddress]["username"]);
+            let result = yield this.__createAuthenticatedApi(bridgeIpAddress, this.configSettings[CONF_BRIDGE_LOCATION][bridgeIpAddress]["username"]).then(res => { return res; });
             if (result.isSuccess()) {
                 return result;
             }
             else if (result.isFailure()) {
                 if (result.value == "ENOTFOUND" || result.value == "ETIMEDOUT") {
-                    return yield this.findUnreachableBridge(bridgeIpAddress);
+                    return yield this.findUnreachableBridge(bridgeIpAddress).then(res => { return res; });
                 }
                 else {
                     return result;
@@ -302,7 +288,14 @@ function testing() {
         yield test.init();
         const firstBridge = yield test.getConfiguredBridges().then(res => { return res[0]; });
         yield test.switchToBridge(firstBridge);
-        console.log(test.getConnectedBridge());
+        // console.log(test.getConnectedBridge());
+        let lights = yield test.getAllLights().then(res => { return res; });
+        if (lights.isSuccess()) {
+            lights.value.forEach(light => {
+                console.log(light.id);
+                test.manipulateLight(light.id, { on: false });
+            });
+        }
         // await test.switchToBridge(await test.getConfiguredBridges().then(res => {return res[0];}));
         // console.log(await test.getAllLights());
     });
