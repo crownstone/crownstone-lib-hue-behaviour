@@ -1,3 +1,0 @@
-D:\Repositories\Development\HueTest\HueTest\obj\Debug\HueTest.njsproj.CoreCompileInputs.cache
-D:\Repositories\Development\HueTest\HueTest\bin\Microsoft.NodejsTools.WebRole.dll
-D:\Repositories\Development\HueTest\HueTest\obj\Debug\HueTest.njsprojAssemblyReference.cache
