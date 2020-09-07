@@ -1,11 +1,10 @@
-//import * as apiModel from "node-hue-api/lib/api/Api";
+import {fetch} from "node-fetch";
+import { promises as fs } from 'fs';
 
-const fetch = require("node-fetch");
-const fs = require('fs');
-const v3 = require('node-hue-api').v3
-    , discovery = v3.discovery
-    , hueApi = v3.api
-;
+import {v3} from "node-hue-api";
+
+const discovery = v3.discovery;
+const hueApi = v3.api;
 
 
 //User signing
@@ -73,19 +72,23 @@ export const failure = <L, A>(a: A): Either<L, A> => {
 //TODO Omvormen naar module.
 
 
+
 export class CrownstoneHueModule {
     configSettings: object = {};
     api: any;
 
 
     constructor() {
-        this.getConfigSettings();
+
     }
 
+    async init() {
+        await this.getConfigSettings();
+    }
 
-    async getConfigSettings(): Promise<void> {
-        const content = await fs.readFileSync(CONF_NAME)
-        this.configSettings = JSON.parse(content);
+    async getConfigSettings() {
+        await fs.readFile(CONF_NAME, 'utf8').then((data) => {this.configSettings = JSON.parse(data);});
+
     };
 
 
@@ -134,16 +137,16 @@ export class CrownstoneHueModule {
 
 
     async switchToBridge(ipAddress) {
-        let api = await this.__connectToBridge(ipAddress);
+        let api = await this.__connectToBridge(ipAddress).then(res => {return res});
         if (api.isSuccess()) {
-            this.api = api;
+            this.api = api.value;
             return success(true);
         } else
             return api;
     }
 
     //Returns a string[] of bridges or an string.
-    async getConfiguredBridges(): Promise<string | Array<string>> {
+    async getConfiguredBridges() {
         const bridges: string[] = Object.keys(this.configSettings["bridges"]);
         if (bridges === undefined || bridges === null || bridges.length === 0) {
             return NO_BRIDGES_IN_CONFIG;
@@ -154,12 +157,12 @@ export class CrownstoneHueModule {
 
 
     async __connectToBridge(bridgeIpAddress) {
-        let result = await this.__createAuthenticatedApi(bridgeIpAddress, this.configSettings[CONF_BRIDGE_LOCATION][bridgeIpAddress]["username"]);
+        let result = await this.__createAuthenticatedApi(bridgeIpAddress, this.configSettings[CONF_BRIDGE_LOCATION][bridgeIpAddress]["username"]).then(res => {return res;});
         if (result.isSuccess()) {
             return result;
         } else if (result.isFailure()) {
             if (result.value == "ENOTFOUND" || result.value == "ETIMEDOUT") {
-                return await this.findUnreachableBridge(bridgeIpAddress);
+                return await this.findUnreachableBridge(bridgeIpAddress).then(res => {return res;});
             } else {
                 return result;
             }
@@ -169,12 +172,12 @@ export class CrownstoneHueModule {
     }
 
     async __createAuthenticatedApi(ipaddress: string, username: string) {
-        const api = await hueApi.createLocal(ipaddress).connect(username).then(result => {
-            return success(result)
-        }).catch((err) => {
+        try {
+            const result = await hueApi.createLocal(ipaddress).connect(username);
+            return success(result);
+        } catch (err) {
             return failure(err.code);
-        });
-        return api;
+        }
     }
 
     async __createUnAuthenticatedApi(ipaddress: string) {
@@ -185,9 +188,9 @@ export class CrownstoneHueModule {
         });
     }
 
-    async createUser(bridgeIpAdress) {
+    async createUser(bridgeIpAddress) {
         // Create an unauthenticated instance of the Hue API so that we can create a new user
-        const result = await this.__createUnAuthenticatedApi(bridgeIpAdress);
+        const result = await this.__createUnAuthenticatedApi(bridgeIpAddress);
         if (result.isSuccess()) {
             try {
                 let createdUser = await result.value.users.createUser(APP_NAME, DEVICE_NAME);
@@ -207,13 +210,7 @@ export class CrownstoneHueModule {
 
     //Call this to save configuration to the config file.
     async updateConfigFile() {
-        await fs.writeFile(CONF_NAME, JSON.stringify(this.configSettings), function (err) {
-            if (err) {
-                return failure(err.code);
-            }
-            return success(true);
-        });
-
+        return await fs.writeFile(CONF_NAME, JSON.stringify(this.configSettings)).then((res) => {return success(true)}).catch((err) => {return failure(err.code)});
     }
 
 
@@ -258,6 +255,9 @@ export class CrownstoneHueModule {
             });
     }
 
+    async getConnectedBridge(){
+        return this.api;
+    }
 
     //Attempts to find- and connect to the bridge
     async findUnreachableBridge(unreacheableBridgeIP) {
@@ -300,94 +300,15 @@ export class CrownstoneHueModule {
 }
 
 
-function MacAddressToSerial(macaddress) {
-    return macaddress.replace(':', '');
+async function testing() {
+
+    const test = new CrownstoneHueModule();
+    await test.init();
+    const firstBridge = await test.getConfiguredBridges().then(res => {return res[0];});
+    await test.switchToBridge(firstBridge);
+    // console.log(test.getConnectedBridge());
+    console.log(test.getAllLights().then(res => {return res}));
+    // await test.switchToBridge(await test.getConfiguredBridges().then(res => {return res[0];}));
+    // console.log(await test.getAllLights());
 }
-
-
-//testing purposes \/
-
-
-const readline = require('readline');
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-//
-
-//function printErrorCode(errorCode) {
-//    switch (errorCode) {
-//        case (NO_BRIDGES_DISCOVERED): {
-//            console.log("No bridges found in the network.");
-//            break;
-//        }
-//        case (NO_BRIDGES_IN_CONFIG): {
-//            console.log("No bridges in config file found.");
-//            break;
-//        }
-//        case (UNAUTHORIZED_USER): {
-//            console.log("User not authorized/wrong username.");
-//            break;
-//        }
-//        case (BRIDGE_LINK_BUTTON_UNPRESSED): {
-//            console.log("The Link button on the bridge was not pressed. Please press the Link button and try again.");
-//            break;
-//        }
-//        default:
-//            console.log(errorCode);
-//            break;
-
-
-//    }
-//}
-
-
-async function dev() {
-    let hueModule = new CrownstoneHueModule();
-
-    const bridges = hueModule.getConfiguredBridges();
-    console.log(bridges);
-    //let result = hueModule.initModule();
-    //if (result.isFailure()) {
-    //    if (result.value === NO_BRIDGES_IN_CONFIG) {
-    //        printErrorCode(result.value);
-    //        console.log("Init. bridge discovery");
-    //        const bridges = await hueModule.discoverBridges()
-    //        result = await hueModule.linkBridgeByIp(bridges[0]);
-    //        if (result.isFailure()) {
-    //            printErrorCode(result.value);
-    //            return;
-    //        }
-    //    } else {
-    //        printErrorCode(result.value);
-    //        return;
-    //    }
-    //}
-    //console.log("Bridge connected.");
-
-    ////const authenticatedApi = await hueApi.createLocal(firstBridge).connect(configSettings["bridges"][firstBridge]["username"]);
-    //let res = await hueModule.manipulateLight( 2, { on: true, ct: 500 });
-
-    //await hueModule.getAllLights().then(allLights => {
-    //    console.log(JSON.stringify(allLights.value, null, 2));
-
-    //    rl.question("Man. light?", async function (answer) {
-    //        if (answer != "") {
-    //            allLights.value.forEach(async light => {
-    //                console.log(light.id);
-    //                hueModule.manipulateLight( light.id, { on: true, ct: answer });
-    //            });
-    //        }
-    //        else {
-    //            allLights.value.forEach(async light => {
-    //                console.log(light.id);
-    //                console.log(await hueModule.manipulateLight( light.id, { on: false }).then(res => { res.value }).catch(res => { res.value }));
-    //            });
-    //        }
-    //        //rl.close();
-    //    });
-    //});
-}
-
-
-dev();
+testing();

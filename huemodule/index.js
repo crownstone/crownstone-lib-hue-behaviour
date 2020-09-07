@@ -1,5 +1,4 @@
 "use strict";
-//import * as apiModel from "node-hue-api/lib/api/Api";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,9 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CrownstoneHueModule = exports.failure = exports.success = exports.Failure = exports.Success = void 0;
-const fetch = require("node-fetch");
-const fs = require('fs');
-const v3 = require('node-hue-api').v3, discovery = v3.discovery, hueApi = v3.api;
+const node_fetch_1 = require("node-fetch");
+const fs_1 = require("fs");
+const node_hue_api_1 = require("node-hue-api");
+const discovery = node_hue_api_1.v3.discovery;
+const hueApi = node_hue_api_1.v3.api;
 //User signing
 const APP_NAME = 'node-hue-api';
 const DEVICE_NAME = 'testSuite';
@@ -61,12 +62,15 @@ exports.failure = (a) => {
 class CrownstoneHueModule {
     constructor() {
         this.configSettings = {};
-        this.getConfigSettings();
+    }
+    init() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.getConfigSettings();
+        });
     }
     getConfigSettings() {
         return __awaiter(this, void 0, void 0, function* () {
-            const content = yield fs.readFileSync(CONF_NAME);
-            this.configSettings = JSON.parse(content);
+            yield fs_1.promises.readFile(CONF_NAME, 'utf8').then((data) => { this.configSettings = JSON.parse(data); });
         });
     }
     ;
@@ -114,9 +118,9 @@ class CrownstoneHueModule {
     //}
     switchToBridge(ipAddress) {
         return __awaiter(this, void 0, void 0, function* () {
-            let api = yield this.__connectToBridge(ipAddress);
+            let api = yield this.__connectToBridge(ipAddress).then(res => { return res; });
             if (api.isSuccess()) {
-                this.api = api;
+                this.api = api.value;
                 return exports.success(true);
             }
             else
@@ -156,12 +160,13 @@ class CrownstoneHueModule {
     }
     __createAuthenticatedApi(ipaddress, username) {
         return __awaiter(this, void 0, void 0, function* () {
-            const api = yield hueApi.createLocal(ipaddress).connect(username).then(result => {
+            try {
+                const result = yield hueApi.createLocal(ipaddress).connect(username);
                 return exports.success(result);
-            }).catch((err) => {
+            }
+            catch (err) {
                 return exports.failure(err.code);
-            });
-            return api;
+            }
         });
     }
     __createUnAuthenticatedApi(ipaddress) {
@@ -173,10 +178,10 @@ class CrownstoneHueModule {
             });
         });
     }
-    createUser(bridgeIpAdress) {
+    createUser(bridgeIpAddress) {
         return __awaiter(this, void 0, void 0, function* () {
             // Create an unauthenticated instance of the Hue API so that we can create a new user
-            const result = yield this.__createUnAuthenticatedApi(bridgeIpAdress);
+            const result = yield this.__createUnAuthenticatedApi(bridgeIpAddress);
             if (result.isSuccess()) {
                 try {
                     let createdUser = yield result.value.users.createUser(APP_NAME, DEVICE_NAME);
@@ -199,12 +204,7 @@ class CrownstoneHueModule {
     //Call this to save configuration to the config file.
     updateConfigFile() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield fs.writeFile(CONF_NAME, JSON.stringify(this.configSettings), function (err) {
-                if (err) {
-                    return exports.failure(err.code);
-                }
-                return exports.success(true);
-            });
+            return yield fs_1.promises.writeFile(CONF_NAME, JSON.stringify(this.configSettings)).then((res) => { return exports.success(true); }).catch((err) => { return exports.failure(err.code); });
         });
     }
     saveNewDiscovery(api, user) {
@@ -239,7 +239,7 @@ class CrownstoneHueModule {
     }
     __getBridgesFromDiscoveryUrl() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield fetch(DISCOVERY_URL, { method: "Get" })
+            return yield node_fetch_1.fetch(DISCOVERY_URL, { method: "Get" })
                 .then((res) => __awaiter(this, void 0, void 0, function* () {
                 return yield res.json().then(res => {
                     return exports.success(res);
@@ -247,6 +247,11 @@ class CrownstoneHueModule {
             })).catch((err) => {
                 return exports.failure(err.code);
             });
+        });
+    }
+    getConnectedBridge() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.api;
         });
     }
     //Attempts to find- and connect to the bridge
@@ -291,82 +296,16 @@ class CrownstoneHueModule {
     }
 }
 exports.CrownstoneHueModule = CrownstoneHueModule;
-function MacAddressToSerial(macaddress) {
-    return macaddress.replace(':', '');
-}
-//testing purposes \/
-const readline = require('readline');
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-//
-//function printErrorCode(errorCode) {
-//    switch (errorCode) {
-//        case (NO_BRIDGES_DISCOVERED): {
-//            console.log("No bridges found in the network.");
-//            break;
-//        }
-//        case (NO_BRIDGES_IN_CONFIG): {
-//            console.log("No bridges in config file found.");
-//            break;
-//        }
-//        case (UNAUTHORIZED_USER): {
-//            console.log("User not authorized/wrong username.");
-//            break;
-//        }
-//        case (BRIDGE_LINK_BUTTON_UNPRESSED): {
-//            console.log("The Link button on the bridge was not pressed. Please press the Link button and try again.");
-//            break;
-//        }
-//        default:
-//            console.log(errorCode);
-//            break;
-//    }
-//}
-function dev() {
+function testing() {
     return __awaiter(this, void 0, void 0, function* () {
-        let hueModule = new CrownstoneHueModule();
-        const bridges = hueModule.getConfiguredBridges();
-        console.log(bridges);
-        //let result = hueModule.initModule();
-        //if (result.isFailure()) {
-        //    if (result.value === NO_BRIDGES_IN_CONFIG) {
-        //        printErrorCode(result.value);
-        //        console.log("Init. bridge discovery");
-        //        const bridges = await hueModule.discoverBridges()
-        //        result = await hueModule.linkBridgeByIp(bridges[0]);
-        //        if (result.isFailure()) {
-        //            printErrorCode(result.value);
-        //            return;
-        //        }
-        //    } else {
-        //        printErrorCode(result.value);
-        //        return;
-        //    }
-        //}
-        //console.log("Bridge connected.");
-        ////const authenticatedApi = await hueApi.createLocal(firstBridge).connect(configSettings["bridges"][firstBridge]["username"]);
-        //let res = await hueModule.manipulateLight( 2, { on: true, ct: 500 });
-        //await hueModule.getAllLights().then(allLights => {
-        //    console.log(JSON.stringify(allLights.value, null, 2));
-        //    rl.question("Man. light?", async function (answer) {
-        //        if (answer != "") {
-        //            allLights.value.forEach(async light => {
-        //                console.log(light.id);
-        //                hueModule.manipulateLight( light.id, { on: true, ct: answer });
-        //            });
-        //        }
-        //        else {
-        //            allLights.value.forEach(async light => {
-        //                console.log(light.id);
-        //                console.log(await hueModule.manipulateLight( light.id, { on: false }).then(res => { res.value }).catch(res => { res.value }));
-        //            });
-        //        }
-        //        //rl.close();
-        //    });
-        //});
+        const test = new CrownstoneHueModule();
+        yield test.init();
+        const firstBridge = yield test.getConfiguredBridges().then(res => { return res[0]; });
+        yield test.switchToBridge(firstBridge);
+        console.log(test.getConnectedBridge());
+        // await test.switchToBridge(await test.getConfiguredBridges().then(res => {return res[0];}));
+        // console.log(await test.getAllLights());
     });
 }
-dev();
+testing();
 //# sourceMappingURL=index.js.map
