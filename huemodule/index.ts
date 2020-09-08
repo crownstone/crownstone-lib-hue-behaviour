@@ -1,14 +1,12 @@
-
 import {promises as fs} from 'fs';
 import {v3} from "node-hue-api";
-import {nupnp as unalteredNupnp}  from "node-hue-api/lib/api/discovery/nupnp";
-import Light = require("./node_modules/node-hue-api/lib/model/Light");
+import {nupnp as unalteredNupnp} from "node-hue-api/lib/api/discovery/nupnp";
+import lightModel = require("./node_modules/node-hue-api/lib/model/Light");
 import Api = require("./node_modules/node-hue-api/lib/api/Api");
 
 const discovery = v3.discovery;
 const hueApi = v3.api;
 const model = v3.model;
-
 
 
 //User signing
@@ -23,6 +21,235 @@ const BRIDGE_LINK_BUTTON_UNPRESSED = "BRIDGE_LINK_BUTTON_UNPRESSED";
 const BRIDGE_CONNECTION_FAILED = "BRIDGE_CONNECTION_FAILED";
 
 
+//TODO
+class Light {
+    name: string;
+    uniqueId:string;
+    reachable: boolean = false;
+    state: object;
+    id: string;
+
+    constructor(name:string, uniqueId: string, state: object, id: string, reachable?:boolean){
+        this.name = name;
+        this.uniqueId = uniqueId;
+        this.state = state;
+        this.id = id;
+        this.reachable = reachable;
+    }
+
+
+
+    update(newValues: object) {
+        Object.keys(newValues).forEach(key => {
+            if (typeof (this[key]) !== undefined) {
+                this[key] = newValues[key];
+            }
+
+        });
+    }
+
+
+}
+
+class Bridge {
+    lights: Light[];
+    api: any;
+    name: string;
+    username: string;
+    clientKey: string;
+    macAddress: string;
+    ipAddress: string;
+    bridgeId: string
+    reachable: boolean = false;
+
+    framework: Framework;
+
+    constructor(name: string, username: string, clientKey: string, macAddress: string, ipAddress: string, bridgeId: string, framework:Framework) {
+        this.name = name;
+        this.username = username;
+        this.ipAddress = ipAddress;
+        this.clientKey = clientKey;
+        this.macAddress = macAddress;
+        this.bridgeId = bridgeId;
+
+        //temp fix??
+        this.framework = framework;
+    }
+
+    async init() {
+        if (this.username == "") {
+            let result = await this.link();
+            if (result.isFailure()) {
+                return result;
+            }
+        } else {
+            await this.connect();
+        }
+    }
+
+    async link(): Promise<Either<boolean, string>> {
+        const result = await this.createUser()
+        if (result.isSuccess()) {
+            await this.connect();
+            const bridgeConfig = await this.api.configuration.getConfiguration();
+            this.update({
+                "bridgeId": bridgeConfig.bridgeId,
+                "name": bridgeConfig.name,
+                "macAddress": bridgeConfig.mac,
+                "reachable": true
+            })
+            return success(true);
+        } else {
+            return result;
+        }
+    }
+
+    async connect(): Promise<Either<boolean, string>> {
+        let result = await this.createAuthenticatedApi().then(res => {
+            return res;
+        });
+        if (result.isSuccess()) {
+            return result;
+        } else if (result.isFailure()) {
+            if (result.value == "ENOTFOUND" || result.value == "ETIMEDOUT") {
+                return await this._rediscoverMyself().then(res => {
+                    return res;
+                });
+            } else {
+                return result;
+            }
+        } else {
+            return failure("UNEXPECTED ERROR");
+        }
+    }
+
+
+    async getConnectedLights(): Promise<Light[]> {
+        return this.lights;
+    }
+
+    async createAuthenticatedApi(): Promise<Either<boolean, string>> {
+        try {
+            const result = await hueApi.createLocal(this.ipAddress).connect(this.username);
+            this.api = result;
+            this.reachable = true;
+            return success(true)
+        } catch (err) {
+            return failure(err.code);
+        }
+    }
+
+    async createUnAuthenticatedApi(): Promise<Either<boolean, string>> {
+        try {
+            const result = await hueApi.createLocal(this.ipAddress);
+            this.api = result;
+            this.reachable = true;
+            return success(true);
+        } catch (err) {
+            return failure(err.code);
+        }
+    }
+
+    //User should press link button before this is called.
+    async createUser(): Promise<Either<boolean, string>> {
+        const result = await this.createUnAuthenticatedApi().then(res => {
+            return res;
+        });
+
+        if (result.isSuccess()) {
+            try {
+                let createdUser = await this.api.value.users.createUser(APP_NAME, DEVICE_NAME);
+                this.update({"username": createdUser.username, "clientKey": createdUser.clientkey})
+                return success(true);
+            } catch (err) {
+                if (err.getHueErrorType() === 101) {
+                    return failure(BRIDGE_LINK_BUTTON_UNPRESSED);
+                } else {
+                    return failure(err.code);
+                }
+            }
+        } else {
+            return result;
+        }
+    }
+
+
+    //Attempts to find- and connect to the bridge
+    async _rediscoverMyself(): Promise<Either<any, string>> {
+        let possibleBridges = await this._getBridgesFromDiscoveryUrl().catch(err => {
+            return failure(err.code)
+        });
+        if (possibleBridges.isSuccess()) {
+            if (possibleBridges.value.length === 0) {
+                return failure(NO_BRIDGES_DISCOVERED);
+            } else {
+
+                let result = {id: "", internalipaddress: ""};
+                for(const item of possibleBridges.value){
+                    if (this.bridgeId.toLowerCase() === item.id.toLowerCase()) {
+                        result = item;
+                        break;
+                    }
+                }
+
+                if (typeof (result) === "object") {
+                    const oldIpAddress = this.ipAddress;
+                    this.ipAddress = result.internalipaddress;
+                    let api = await this.createAuthenticatedApi().catch(err => {
+                        return failure(err.code)
+                    });
+                    if (api.isSuccess()) {
+                        await this.framework.saveBridgeInformation(this,oldIpAddress);
+                        return api;
+                    } else {
+                        return api;
+                    }
+                }
+            }
+        } else {
+            return possibleBridges;
+        }
+    }
+
+    //Uses the nupnp export from the library before it gets altered. ?Move outside class??
+    async _getBridgesFromDiscoveryUrl(): Promise<Either<object[], string>> {
+        return await unalteredNupnp()
+            .then(async res => {
+                return success(res)
+            }).catch((err) => {
+                if (err.code != undefined) {
+                    return failure(err.code)
+                } else {
+                    return failure(err)
+                }
+            });
+    }
+
+    update(newValues: object) {
+        Object.keys(newValues).forEach(key => {
+            if (typeof (this[key]) !== undefined) {
+                this[key] = newValues[key];
+            }
+        });
+        this.framework.saveBridgeInformation(this);
+    }
+
+    async getAllLightsOnBridge(): Promise<Either<lightModel[], string>> {
+        return await this.api.lights.getAll().then(res => {
+            return success(res)
+        }).catch(err => {
+            return failure(err.code)
+        });
+    }
+
+    async setLightState(id: string, state: object) {
+        return await this.api.lights.setLightState(id, state);
+    }
+
+    getInfo(): object{
+        return {name : this.name, ipAddress: this.ipAddress, macAddress: this.macAddress,  username : this.username, clientKey: this.clientKey, bridgeId: this.bridgeId, reachable: this.reachable};
+    }
+}
 
 
 //config locations/names
@@ -73,21 +300,29 @@ export const failure = <L, A>(a: A): Either<L, A> => {
 };
 
 
-
-export class CrownstoneHueModule {
+export class Framework {
     configSettings: object = {"bridges": "", "lights": ""};
-    api: any;
+    connectedBridges: Bridge[] = new Array();
 
 
     constructor() {
-
     }
 
     async init() {
         await this.getConfigSettings();
+        const result = await this.getConfiguredBridges();
+        if(result.isSuccess()){
+            let bridges = new Array();
+            for (const ip of result.value) {
+                bridges.push(await this.createBridgeFromConfig(ip));
+            }
+            return bridges;
+        } else {
+            return result;
+        }
     }
 
-    async getConfigSettings() {
+    async getConfigSettings(): Promise<void> {
         await fs.readFile(CONF_NAME, 'utf8').then((data) => {
             this.configSettings = JSON.parse(data);
         }).catch(err => {
@@ -99,7 +334,7 @@ export class CrownstoneHueModule {
     };
 
 
-    // Returns either a list of bridges or a errorcode
+    // Returns either a list of bridges or a errorcode TODO: map result to Bridge
     async discoverBridges(): Promise<string | Array<object>> {
         const discoveryResults = await discovery.nupnpSearch().then(res => {
             return res
@@ -107,106 +342,50 @@ export class CrownstoneHueModule {
         if (discoveryResults.length === 0) {
             return NO_BRIDGES_DISCOVERED;
         } else {
+            let bridges: Bridge[] = new Array();
+            discoveryResults.forEach(item => {
+                bridges.push(new Bridge(
+                    item.name,
+                    "",
+                    "",
+                    "",
+                    item.ipaddress,
+                    "",
+                    this
+                ))
+            })
             return discoveryResults;
         }
     }
 
 
-    async linkBridgeByIp(ipaddress:string): Promise<Either<boolean,string>> {
-        const result = await this.createUser(ipaddress)
-        if (result.isSuccess()) {
-            const api = await this.__createAuthenticatedApi(ipaddress, result.value.username);
-
-            //TODO Check if this succeeded.
-            await this.saveNewDiscovery(api, result.value);
-            await this.updateConfigFile();
-            this.api = api;
-            return success(true);
-        } else {
-            return result;
-        }
-    }
-
-    async switchToBridge(ipAddress:string):Promise<Either<boolean,string>> {
-        let api = await this.__connectToBridge(ipAddress).then(res => {
-            return res
-        });
-        if (api.isSuccess()) {
-            this.api = api.value;
-            return success(true);
-        } else
-            return api;
-    }
-
     //Returns a string[] of bridges or an string.
-    async getConfiguredBridges(): Promise<string[] | string> {
+    async getConfiguredBridges(): Promise<Either<string[] , string>> {
         const bridges: string[] = Object.keys(this.configSettings["bridges"]);
         if (bridges === undefined || bridges === null || bridges.length === 0) {
-            return NO_BRIDGES_IN_CONFIG;
+            return failure(NO_BRIDGES_IN_CONFIG);
         } else {
-            return bridges;
+            return success(bridges);
         }
     }
 
-
-    async __connectToBridge(bridgeIpAddress: string) : Promise<Either<Api,string>> {
-        let result = await this.__createAuthenticatedApi(bridgeIpAddress, this.configSettings[CONF_BRIDGE_LOCATION][bridgeIpAddress]["username"]).then(res => {
-            return res;
-        });
-        if (result.isSuccess()) {
-            return result;
-        } else if (result.isFailure()) {
-            if (result.value == "ENOTFOUND" || result.value == "ETIMEDOUT") {
-                return await this.findUnreachableBridge(bridgeIpAddress).then(res => {
-                    return res;
-                });
-            } else {
-                return result;
-            }
-        } else {
-            return failure("UNEXPECTED ERROR");
+    //Temp???
+    async saveBridgeInformation(bridge: Bridge, oldIpAddress?: string): Promise<void> {
+        let config = bridge.getInfo();
+        let ipAddress = config["ipAddress"];
+        delete config["reachable"];
+        delete config["ipAddress"];
+        this.configSettings[CONF_BRIDGE_LOCATION][ipAddress] = config;
+        if(oldIpAddress !== undefined){
+        delete this.configSettings[CONF_BRIDGE_LOCATION][oldIpAddress];
         }
-    }
-
-    async __createAuthenticatedApi(ipaddress: string, username: string): Promise<Either<Api,string>> {
-        try {
-            const result = await hueApi.createLocal(ipaddress).connect(username);
-            return success(result);
-        } catch (err) {
-            return failure(err.code);
-        }
-    }
-
-    async __createUnAuthenticatedApi(ipaddress: string): Promise<any> {
-        return await hueApi.createLocal(ipaddress).connect().then(result => {
-            return success(result);
-        }).catch((err) => {
-            return failure(err.code);
-        });
-    }
-
-    //User should press link button before this is called.
-    async createUser(bridgeIpAddress:string): Promise<any> {
-        const result = await this.__createUnAuthenticatedApi(bridgeIpAddress);
-        if (result.isSuccess()) {
-            try {
-                let createdUser = await result.value.users.createUser(APP_NAME, DEVICE_NAME);
-                return success(createdUser);
-
-            } catch (err) {
-                if (err.getHueErrorType() === 101) {
-                    return failure(BRIDGE_LINK_BUTTON_UNPRESSED);
-                } else {
-                    failure(err.code);
-                }
-            }
-        } else {
-            return result;
-        }
+        await this.updateConfigFile();
     }
 
     //Call this to save configuration to the config file.
     async updateConfigFile(): Promise<any> {
+
+
         return await fs.writeFile(CONF_NAME, JSON.stringify(this.configSettings)).then((res) => {
             return success(true)
         }).catch((err) => {
@@ -214,96 +393,14 @@ export class CrownstoneHueModule {
         });
     }
 
-
-    async saveNewDiscovery(api: any, user: any): Promise<void> {
-        const bridgeConfig = await api.configuration.getConfiguration();
-        if (!(bridgeConfig.ipaddress in this.configSettings[CONF_BRIDGE_LOCATION])) {
-            this.configSettings[CONF_BRIDGE_LOCATION][bridgeConfig.ipaddress] = {
-                "username": user.username,
-                "clientkey": user.clientkey,
-                "mac-address": bridgeConfig.mac,
-                "name": bridgeConfig.name,
-                "bridgeid": bridgeConfig.bridgeid
-            }
-        }
-
+    getConnectedBridges() {
+        return this.connectedBridges;
     }
 
-    //Uses the nupnp export from the library before it gets altered.
-    async __getBridgesFromDiscoveryUrl(): Promise<Either<object[],string>> {
-        return await unalteredNupnp()
-            .then(async res => {
-                return success(res)
-            }).catch((err) => {
-                if (err.code != undefined) {
-                    return failure(err.code)
-                } else {
-                    return failure(err)
-                }
-            });
-    }
-
-    getConnectedBridge() {
-        return this.api;
-    }
-
-
-    //Attempts to find- and connect to the bridge
-    async findUnreachableBridge(ipAddress : string): Promise<Either<any,string>> {
-        let unreachableBridge = this.configSettings[CONF_BRIDGE_LOCATION][ipAddress];
-        let possibleBridges = await this.__getBridgesFromDiscoveryUrl().catch(err => {
-            return failure(err.code)
-        });
-        if (possibleBridges.isSuccess()) {
-            if (possibleBridges.value.length === 0) {
-                return failure(NO_BRIDGES_DISCOVERED);
-            } else {
-                let result = {id: "", internalipaddress: ""};
-                await possibleBridges.value.forEach(function (item) {
-                    if (unreachableBridge["bridgeid"].toLowerCase() === item.id.toLowerCase()) {
-                        result = item;
-                        return;
-                    }
-                });
-
-                if (typeof (result) === "object") {
-                    let api = await this.__createAuthenticatedApi(result.internalipaddress, unreachableBridge["username"]).catch(err => {
-                        return failure(err.code)
-                    });
-                    if (api.isSuccess()) {
-                        this.__replaceBridgeInformation(result.internalipaddress, unreachableBridge, ipAddress);
-                        return api;
-                    } else {
-                        return api;
-                    }
-                }
-            }
-        } else {
-            return possibleBridges;
-        }
-    }
-
-
-    __replaceBridgeInformation(newIpAddress: string, unreachableBridge: object, oldIpAddress: string): void {
-        this.configSettings[CONF_BRIDGE_LOCATION][newIpAddress] = unreachableBridge;
-        delete this.configSettings[CONF_BRIDGE_LOCATION][oldIpAddress];
-        this.updateConfigFile();
-    }
-
-
-    //Returns a list of all lights.
-    async getAllLights(): Promise<Either<Light[],string>> {
-        return await this.api.lights.getAll().then(res => {
-            return success(res)
-        }).catch(err => {
-            return failure(err.code)
-        });
-    }
-
-
-    //Returns   or failure(message)
-    async manipulateLightByBridgeId(id: number, state: object): Promise<void> {
-        return await this.api.lights.setLightState(id, state);
+    createBridgeFromConfig(ipAddress) {
+        let bridge = new Bridge(this.configSettings[CONF_BRIDGE_LOCATION][ipAddress].name, this.configSettings[CONF_BRIDGE_LOCATION][ipAddress].username, this.configSettings[CONF_BRIDGE_LOCATION][ipAddress].clientKey, this.configSettings[CONF_BRIDGE_LOCATION][ipAddress].macAddress, ipAddress, this.configSettings[CONF_BRIDGE_LOCATION][ipAddress].bridgeId,this);
+        this.connectedBridges.push(bridge);
+        return bridge;
     }
 
 }
@@ -311,23 +408,21 @@ export class CrownstoneHueModule {
 
 async function testing() {
 
-    const test = new CrownstoneHueModule();
-    console.log(await test.__getBridgesFromDiscoveryUrl());
-    await test.init();
-    const firstBridge = await test.getConfiguredBridges().then(res => {
-        return res[0];
+    const test = new Framework();
+    const bridges = await test.init();
+    const discoveredBridges =   await test.discoverBridges();
+    // console.log(await discoveredBridges[0].init())
+    console.log(bridges);
+    await bridges[0].init()
+    bridges[0].update({"name": "Philips Hue"});
+    console.log(await bridges[0].getInfo());
+    console.log(bridges);
+
+    const lights = await bridges[0].getAllLightsOnBridge();
+    lights.value.forEach(light => {
+        bridges[0].setLightState(light.id,{on:false});
     });
-    await test.switchToBridge(firstBridge);
-    let lights = await test.getAllLights().then(res => {
-        return res
-    });
-    console.log(lights);
-    if (lights.isSuccess()) {
-        lights.value.forEach(light => {
-            console.log(light);
-            test.manipulateLightByBridgeId(light.id, {on: false})
-        })
-    }
+
 }
 
 testing();

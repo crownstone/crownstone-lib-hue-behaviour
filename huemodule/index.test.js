@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-const hueModule = require('./index').CrownstoneHueModule;
+const hueModule = require('./index').Framework;
 const hue = new hueModule();
 
 test('Returns the amount of bridges.', async () => {
