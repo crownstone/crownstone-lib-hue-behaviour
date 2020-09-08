@@ -1,6 +1,9 @@
+/**
+ * @jest-environment node
+ */
+
 const hueModule = require('./index').CrownstoneHueModule;
 const hue = new hueModule();
-
 
 test('Returns the amount of bridges.', async () => {
      await hue.init();
@@ -14,5 +17,7 @@ test('Returns discovery result bridges.', async () => {
 
 test('Switch to bridge', async () => {
     await hue.init();
-    return await hue.switchToBridge(await hue.getConfiguredBridges().then(res => {return res[0]})).then(data => {expect(data.value).toBeTruthy() });
-});
+    const bridgeIp = await hue.getConfiguredBridges().then(res => {return res[0]});
+    const result = await hue.switchToBridge(bridgeIp).then(data => {return data.value});
+    expect(result).toBe(true);
+}); 

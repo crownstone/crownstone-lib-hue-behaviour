@@ -42,6 +42,7 @@ var node_hue_api_1 = require("node-hue-api");
 var nupnp_1 = require("node-hue-api/lib/api/discovery/nupnp");
 var discovery = node_hue_api_1.v3.discovery;
 var hueApi = node_hue_api_1.v3.api;
+var model = node_hue_api_1.v3.model;
 //User signing
 var APP_NAME = 'node-hue-api';
 var DEVICE_NAME = 'testSuite';
@@ -87,7 +88,6 @@ exports.success = function (l) {
 exports.failure = function (a) {
     return new Failure(a);
 };
-//TODO Omvormen naar module.
 var CrownstoneHueModule = /** @class */ (function () {
     function CrownstoneHueModule() {
         this.configSettings = { "bridges": "", "lights": "" };
@@ -270,6 +270,7 @@ var CrownstoneHueModule = /** @class */ (function () {
             });
         });
     };
+    //User should press link button before this is called.
     CrownstoneHueModule.prototype.createUser = function (bridgeIpAddress) {
         return __awaiter(this, void 0, void 0, function () {
             var result, createdUser, err_2;
@@ -335,32 +336,6 @@ var CrownstoneHueModule = /** @class */ (function () {
                             };
                         }
                         return [2 /*return*/];
-                }
-            });
-        });
-    };
-    //Returns a list of all lights.
-    CrownstoneHueModule.prototype.getAllLights = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.api.lights.getAll().then(function (res) {
-                            return exports.success(res);
-                        }).catch(function (err) {
-                            return exports.failure(err.code);
-                        })];
-                    case 1: return [2 /*return*/, _a.sent()];
-                }
-            });
-        });
-    };
-    //Returns   or failure(message)
-    CrownstoneHueModule.prototype.manipulateLight = function (id, state) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.api.lights.setLightState(id, state)];
-                    case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
@@ -444,6 +419,32 @@ var CrownstoneHueModule = /** @class */ (function () {
         delete this.configSettings[CONF_BRIDGE_LOCATION][oldIpAddress];
         this.updateConfigFile();
     };
+    //Returns a list of all lights.
+    CrownstoneHueModule.prototype.getAllLights = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.api.lights.getAll().then(function (res) {
+                            return exports.success(res);
+                        }).catch(function (err) {
+                            return exports.failure(err.code);
+                        })];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    //Returns   or failure(message)
+    CrownstoneHueModule.prototype.manipulateLightByBridgeId = function (id, state) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.api.lights.setLightState(id, state)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
     return CrownstoneHueModule;
 }());
 exports.CrownstoneHueModule = CrownstoneHueModule;
@@ -474,10 +475,11 @@ function testing() {
                         })];
                 case 5:
                     lights = _c.sent();
+                    console.log(lights);
                     if (lights.isSuccess()) {
                         lights.value.forEach(function (light) {
                             console.log(light);
-                            test.manipulateLight(light.id, { on: false });
+                            test.manipulateLightByBridgeId(light.id, { on: false });
                         });
                     }
                     return [2 /*return*/];
