@@ -34,7 +34,7 @@ export class Light {
     //     });
     // }
 
-    async updateStateFromBridge(): Promise<void> {
+    async renewState(): Promise<void> {
         this.state = await this.connectedBridge.api.lights.getLightState(this.id);
     }
 

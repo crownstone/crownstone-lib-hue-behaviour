@@ -76,7 +76,7 @@ var Bridge = /** @class */ (function () {
                     case 3:
                         _a.sent();
                         _a.label = 4;
-                    case 4: return [4 /*yield*/, this.populateLights()];
+                    case 4: return [4 /*yield*/, this.createLightsFromConfig()];
                     case 5:
                         _a.sent();
                         return [2 /*return*/];
@@ -116,6 +116,9 @@ var Bridge = /** @class */ (function () {
                         return [4 /*yield*/, this.framework.saveBridgeInformation(this)];
                     case 6:
                         _a.sent();
+                        return [4 /*yield*/, this.framework.updateConfigFile()];
+                    case 7:
+                        _a.sent();
                         return [2 /*return*/];
                 }
             });
@@ -148,6 +151,16 @@ var Bridge = /** @class */ (function () {
     };
     Bridge.prototype.getConnectedLights = function () {
         return this.lights;
+    };
+    Bridge.prototype.getAllLightsFromBridge = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.api.lights.getAll()];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
     };
     Bridge.prototype.createAuthenticatedApi = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -211,6 +224,35 @@ var Bridge = /** @class */ (function () {
                         lights.forEach(function (light) {
                             _this.lights.push(new Light_1.Light(light.name, light.uniqueid, light.state, light.id, _this.bridgeId, light.capabilities.control, light.getSupportedStates(), _this));
                         });
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    Bridge.prototype.createLightsFromConfig = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var lightsInConfig, lightIds, _i, lightIds_1, uniqueId, light, lightInfo;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        lightsInConfig = this.framework.getConfigSettings()["Bridges"][this.bridgeId]["lights"];
+                        lightIds = Object.keys(lightsInConfig);
+                        _i = 0, lightIds_1 = lightIds;
+                        _a.label = 1;
+                    case 1:
+                        if (!(_i < lightIds_1.length)) return [3 /*break*/, 4];
+                        uniqueId = lightIds_1[_i];
+                        light = lightsInConfig[uniqueId];
+                        return [4 /*yield*/, this.api.lights.getLight(light.id)];
+                    case 2:
+                        lightInfo = _a.sent();
+                        this.lights.push(new Light_1.Light(light.name, uniqueId, lightInfo.state, light.id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this));
+                        _a.label = 3;
+                    case 3:
+                        _i++;
+                        return [3 /*break*/, 1];
+                    case 4:
+                        ;
                         return [2 /*return*/];
                 }
             });

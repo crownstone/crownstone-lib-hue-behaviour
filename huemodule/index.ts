@@ -14,14 +14,14 @@ async function testing() {
         const bridge2 = bridges[0];
         await bridge.init()
         await bridge2.init()
-        // await test.saveAllLightsFromConnectedBridges();
         // //
         const lights = bridge2.getConnectedLights()
-        // // console.log(lights[0].getInfo());
-        console.log(await lights[0].setState({on: true, bri: 80}));
-        const light = bridge2.getLightById("00:17:88:01:10:25:5d:16-0b");
-        // await light.updateStateFromBridge();
-        // await test.saveLightInfo(light)
+        console.log(lights);
+        console.log(lights[0].getInfo());
+        console.log(await lights[0].setState({on: false}));
+        // const light = bridge2.getLightById("00:17:88:01:10:25:5d:16-0b");
+        // // await light.updateStateFromBridge();
+        // // await test.saveLightInfo(light)
 
     } catch (err) {
         console.log(err);

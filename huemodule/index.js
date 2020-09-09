@@ -40,7 +40,7 @@ var Framework_1 = require("./Framework");
 ;
 function testing() {
     return __awaiter(this, void 0, void 0, function () {
-        var test, bridges, bridge, bridge2, lights, _a, _b, light, err_1;
+        var test, bridges, bridge, bridge2, lights, _a, _b, err_1;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
@@ -55,19 +55,17 @@ function testing() {
                 case 2:
                     _c.sent();
                     return [4 /*yield*/, bridge2.init()
-                        // await test.saveAllLightsFromConnectedBridges();
                         // //
                     ];
                 case 3:
                     _c.sent();
                     lights = bridge2.getConnectedLights();
-                    // // console.log(lights[0].getInfo());
+                    console.log(lights);
+                    console.log(lights[0].getInfo());
                     _b = (_a = console).log;
-                    return [4 /*yield*/, lights[0].setState({ on: true, bri: 80 })];
+                    return [4 /*yield*/, lights[0].setState({ on: false })];
                 case 4:
-                    // // console.log(lights[0].getInfo());
                     _b.apply(_a, [_c.sent()]);
-                    light = bridge2.getLightById("00:17:88:01:10:25:5d:16-0b");
                     return [3 /*break*/, 6];
                 case 5:
                     err_1 = _c.sent();

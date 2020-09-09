@@ -56,7 +56,7 @@ var Light = /** @class */ (function () {
     //
     //     });
     // }
-    Light.prototype.updateStateFromBridge = function () {
+    Light.prototype.renewState = function () {
         return __awaiter(this, void 0, void 0, function () {
             var _a;
             return __generator(this, function (_b) {

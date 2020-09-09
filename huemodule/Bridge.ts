@@ -53,7 +53,7 @@ export class Bridge {
         } else {
             await this.connect();
         }
-        await this.populateLights();
+        await this.createLightsFromConfig();
     }
 
     async link(): Promise<void> {
@@ -70,6 +70,7 @@ export class Bridge {
         //TODO Different solution?
         await this.framework.connectedBridges.push(this);
         await this.framework.saveBridgeInformation(this);
+        await this.framework.updateConfigFile();
     }
 
     async connect(): Promise<void> {
@@ -78,8 +79,8 @@ export class Bridge {
         } catch (err) {
             if (err.code == "ENOTFOUND" || err.code == "ETIMEDOUT") {
                 await this._rediscoverMyself()
-            }else {
-            throw err;
+            } else {
+                throw err;
             }
 
         }
@@ -87,6 +88,10 @@ export class Bridge {
 
     getConnectedLights(): Light[] {
         return this.lights;
+    }
+
+    async getAllLightsFromBridge() {
+        return await this.api.lights.getAll();
     }
 
     async createAuthenticatedApi(): Promise<void> {
@@ -110,8 +115,19 @@ export class Bridge {
     async populateLights(): Promise<void> {
         let lights = await this.api.lights.getAll();
         lights.forEach(light => {
-            this.lights.push(new Light(light.name, light.uniqueid, light.state, light.id,this.bridgeId, light.capabilities.control, light.getSupportedStates(), this))
+            this.lights.push(new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this))
         });
+    }
+
+    async createLightsFromConfig(): Promise<void> {
+        let lightsInConfig = this.framework.getConfigSettings()["Bridges"][this.bridgeId]["lights"];
+        const lightIds: string[] = Object.keys(lightsInConfig);
+
+        for(const uniqueId of lightIds){
+            const light = lightsInConfig[uniqueId];
+            const lightInfo = await this.api.lights.getLight(light.id);
+            this.lights.push(new Light(light.name, uniqueId, lightInfo.state, light.id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this))
+        };
     }
 
     //Attempts to find- and connect to the bridge
@@ -139,8 +155,8 @@ export class Bridge {
     }
 
     getLightById(uniqueId: string): Light {
-        for(const light of this.lights){
-            if(light.uniqueId === uniqueId){
+        for (const light of this.lights) {
+            if (light.uniqueId === uniqueId) {
                 return light;
             }
         }
