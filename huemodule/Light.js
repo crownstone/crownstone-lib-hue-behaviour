@@ -38,12 +38,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Light = void 0;
 var Light = /** @class */ (function () {
-    function Light(name, uniqueId, state, id, api) {
+    function Light(name, uniqueId, state, id, capabilities, supportedStates, connectedBridge) {
         this.name = name;
         this.uniqueId = uniqueId;
         this.state = state;
         this.id = id;
-        this.api = api;
+        this.capabilities = capabilities;
+        this.connectedBridge = connectedBridge;
+        this.supportedStates = supportedStates;
     }
     Light.prototype.update = function (newValues) {
         var _this = this;
@@ -65,7 +67,7 @@ var Light = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var result;
             return __generator(this, function (_a) {
-                result = this.api.setLightState(this.id.toString(), state);
+                result = this.connectedBridge.api.lights.setLightState(this.id.toString(), state);
                 if (result) {
                     this.updateState(state);
                 }
@@ -74,7 +76,7 @@ var Light = /** @class */ (function () {
         });
     };
     Light.prototype.getInfo = function () {
-        return { name: this.name, uniqueId: this.uniqueId, state: this.state, id: this.id };
+        return { name: this.name, uniqueId: this.uniqueId, state: this.state, id: this.id, capabilities: this.capabilities };
     };
     return Light;
 }());

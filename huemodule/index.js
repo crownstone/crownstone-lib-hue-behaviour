@@ -198,58 +198,29 @@ function testing() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 5, , 6]);
+                    _a.trys.push([0, 4, , 5]);
                     test = new Framework();
                     return [4 /*yield*/, test.init()];
                 case 1:
                     bridges = _a.sent();
                     bridge2 = bridges[0];
                     // await bridge.init()
-                    return [4 /*yield*/, bridge2.init()
-                        // console.log(test.connectedBridges)
-                        // bridges[0].update({"name": "Philips Hue"});
-                        // console.log(await discoveredBridges[1].getInfo());
-                        // console.log(bridges);
-                        //
-                        // const lights = await bridge.getAllLightsOnBridge();
-                        // lights.value.forEach(light => {
-                        //     bridge.setLightState(light.id, {on: false });
-                        // });
-                    ];
+                    return [4 /*yield*/, bridge2.init()];
                 case 2:
                     // await bridge.init()
                     _a.sent();
-                    // console.log(test.connectedBridges)
-                    // bridges[0].update({"name": "Philips Hue"});
-                    // console.log(await discoveredBridges[1].getInfo());
-                    // console.log(bridges);
-                    //
-                    // const lights = await bridge.getAllLightsOnBridge();
-                    // lights.value.forEach(light => {
-                    //     bridge.setLightState(light.id, {on: false });
-                    // });
-                    return [4 /*yield*/, bridge2.populateLights()];
-                case 3:
-                    // console.log(test.connectedBridges)
-                    // bridges[0].update({"name": "Philips Hue"});
-                    // console.log(await discoveredBridges[1].getInfo());
-                    // console.log(bridges);
-                    //
-                    // const lights = await bridge.getAllLightsOnBridge();
-                    // lights.value.forEach(light => {
-                    //     bridge.setLightState(light.id, {on: false });
-                    // });
-                    _a.sent();
+                    console.log(test.connectedBridges);
                     lights = bridge2.getConnectedLights();
+                    console.log(lights);
                     return [4 /*yield*/, lights[0].setState({ on: true })];
-                case 4:
+                case 3:
                     _a.sent();
-                    return [3 /*break*/, 6];
-                case 5:
+                    return [3 /*break*/, 5];
+                case 4:
                     err_1 = _a.sent();
                     console.log(err_1);
-                    return [3 /*break*/, 6];
-                case 6: return [2 /*return*/];
+                    return [3 /*break*/, 5];
+                case 5: return [2 /*return*/];
             }
         });
     });

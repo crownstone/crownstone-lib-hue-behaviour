@@ -2,7 +2,6 @@ import {promises as fs} from 'fs';
 import {Bridge} from "./Bridge";
 
 const fetch = require('node-fetch');
-import States = require("node-hue-api/lib/model/lightstate/States");
 import {v3} from "node-hue-api";
 
 const discovery = v3.discovery;
@@ -132,22 +131,17 @@ async function testing() {
     const bridges = await test.init();
     // const discoveredBridges = await test.discoverBridges();
     // console.log(await discoveredBridges[0].init());
-    // const bridge = bridges[1];B
+    // const bridge = bridges[1];
     const bridge2 = bridges[0];
     // await bridge.init()
     await bridge2.init()
-    // console.log(test.connectedBridges)
-    // bridges[0].update({"name": "Philips Hue"});
-    // console.log(await discoveredBridges[1].getInfo());
-    // console.log(bridges);
-    //
-    // const lights = await bridge.getAllLightsOnBridge();
-    // lights.value.forEach(light => {
-    //     bridge.setLightState(light.id, {on: false });
-    // });
-    await bridge2.populateLights();
+    console.log(test.connectedBridges)
+
+
     const lights = bridge2.getConnectedLights()
+        console.log(lights);
     await lights[0].setState({on: true});
+
 
     } catch(err){
         console.log(err);

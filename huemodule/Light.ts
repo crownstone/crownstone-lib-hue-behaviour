@@ -3,16 +3,23 @@ import {Bridge} from "./Bridge";
 export class Light {
     name: string;
     uniqueId: string;
+    // TODO Look into state objects
     state: object;
     id: number;
-    api: Bridge;
+    //TODO Look if only api.lights is sufficient.
+    connectedBridge: Bridge;
+    capabilities: object;
+    supportedStates:object;
 
-    constructor(name: string, uniqueId: string, state: object, id: number, api: any) {
+    constructor(name: string, uniqueId: string, state: object, id: number,capabilities: object,supportedStates: object, connectedBridge: any) {
         this.name = name;
         this.uniqueId = uniqueId;
         this.state = state;
         this.id = id;
-        this.api = api;
+        this.capabilities = capabilities;
+        this.connectedBridge = connectedBridge;
+        this.supportedStates = supportedStates;
+
     }
 
 
@@ -34,7 +41,7 @@ export class Light {
     }
 
     async setState(state): Promise<boolean> {
-        const result = this.api.setLightState(this.id.toString(), state);
+        const result = this.connectedBridge.api.lights.setLightState(this.id.toString(), state);
         if (result) {
             this.updateState(state);
         }
@@ -42,7 +49,7 @@ export class Light {
     }
 
     getInfo(): object {
-        return {name: this.name, uniqueId: this.uniqueId, state: this.state, id: this.id};
+        return {name: this.name, uniqueId: this.uniqueId, state: this.state, id: this.id, capabilities : this.capabilities};
     }
 
 }
