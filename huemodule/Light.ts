@@ -20,11 +20,10 @@ export class Light {
         this.id = id;
         this.bridgeId = bridgeId;
         this.capabilities = capabilities;
-        this.connectedBridge = connectedBridge;
         this.supportedStates = supportedStates;
+        this.connectedBridge = connectedBridge;
 
     }
-
 
     // update(newValues: object) {
     //     Object.keys(newValues).forEach(key => {
@@ -35,11 +34,11 @@ export class Light {
     //     });
     // }
 
-    async updateStateFromBridge() {
+    async updateStateFromBridge(): Promise<void> {
         this.state = await this.connectedBridge.api.lights.getLightState(this.id);
     }
 
-    _isAllowedStateType(state) {
+    _isAllowedStateType(state):boolean {
         if (state === 'on' || state === 'hue' ||
             state === 'bri' || state === 'sat' ||
             state === 'effect' || state === 'xy' ||
@@ -50,7 +49,7 @@ export class Light {
         }
     }
 
-    updateState(state) {
+    updateState(state): void{
         Object.keys(state).forEach(key => {
             if (this._isAllowedStateType(key)) {
                 this.state[key] = state[key];

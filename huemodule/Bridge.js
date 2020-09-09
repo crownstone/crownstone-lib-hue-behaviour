@@ -127,20 +127,21 @@ var Bridge = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 5]);
+                        _a.trys.push([0, 2, , 6]);
                         return [4 /*yield*/, this.createAuthenticatedApi()];
                     case 1:
                         _a.sent();
-                        return [3 /*break*/, 5];
+                        return [3 /*break*/, 6];
                     case 2:
                         err_1 = _a.sent();
                         if (!(err_1.code == "ENOTFOUND" || err_1.code == "ETIMEDOUT")) return [3 /*break*/, 4];
                         return [4 /*yield*/, this._rediscoverMyself()];
                     case 3:
                         _a.sent();
-                        _a.label = 4;
+                        return [3 /*break*/, 5];
                     case 4: throw err_1;
-                    case 5: return [2 /*return*/];
+                    case 5: return [3 /*break*/, 6];
+                    case 6: return [2 /*return*/];
                 }
             });
         });
@@ -218,7 +219,7 @@ var Bridge = /** @class */ (function () {
     //Attempts to find- and connect to the bridge
     Bridge.prototype._rediscoverMyself = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var possibleBridges, result, _i, possibleBridges_1, item, oldIpAddress;
+            var possibleBridges, result, _i, possibleBridges_1, item;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this._getBridgesFromDiscoveryUrl()];
@@ -236,12 +237,11 @@ var Bridge = /** @class */ (function () {
                             }
                         }
                         if (!(typeof (result) === "object")) return [3 /*break*/, 5];
-                        oldIpAddress = this.ipAddress;
                         this.ipAddress = result.internalipaddress;
                         return [4 /*yield*/, this.createAuthenticatedApi()];
                     case 3:
                         _a.sent();
-                        return [4 /*yield*/, this.framework.saveBridgeInformation(this, oldIpAddress)];
+                        return [4 /*yield*/, this.framework.saveBridgeInformation(this)];
                     case 4:
                         _a.sent();
                         _a.label = 5;
@@ -274,7 +274,6 @@ var Bridge = /** @class */ (function () {
                         })];
                     case 1:
                         result = _a.sent();
-                        console.log(result);
                         return [2 /*return*/, result];
                 }
             });

@@ -45,8 +45,8 @@ var Light = /** @class */ (function () {
         this.id = id;
         this.bridgeId = bridgeId;
         this.capabilities = capabilities;
-        this.connectedBridge = connectedBridge;
         this.supportedStates = supportedStates;
+        this.connectedBridge = connectedBridge;
     }
     // update(newValues: object) {
     //     Object.keys(newValues).forEach(key => {

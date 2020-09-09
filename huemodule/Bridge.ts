@@ -1,4 +1,4 @@
-import {Framework} from "./index";
+import {Framework} from "./Framework";
 import {Light} from "./Light"
 import lightModel = require("./node_modules/node-hue-api/lib/model/Light");
 import {v3} from "node-hue-api";
@@ -47,7 +47,7 @@ export class Bridge {
         this.framework = framework;
     }
 
-    async init() {
+    async init(): Promise<void> {
         if (this.username == "") {
             await this.link();
         } else {
@@ -78,8 +78,9 @@ export class Bridge {
         } catch (err) {
             if (err.code == "ENOTFOUND" || err.code == "ETIMEDOUT") {
                 await this._rediscoverMyself()
-            }
+            }else {
             throw err;
+            }
 
         }
     }
@@ -127,10 +128,9 @@ export class Bridge {
                 }
             }
             if (typeof (result) === "object") {
-                const oldIpAddress = this.ipAddress;
                 this.ipAddress = result.internalipaddress;
                 await this.createAuthenticatedApi()
-                await this.framework.saveBridgeInformation(this, oldIpAddress);
+                await this.framework.saveBridgeInformation(this);
             }
             if (result.id === "") {
                 throw Error(BRIDGE_NOT_DISCOVERED)
@@ -151,7 +151,6 @@ export class Bridge {
         const result = await fetch(DISCOVERY_URL, {method: "Get"}).then(res => {
             return res.json()
         });
-        console.log(result);
         return result;
     }
 

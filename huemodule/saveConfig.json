@@ -1,18 +1,18 @@
 {
   "bridges": {
-    "10.27.8.229": {
+    "001788FFFE292AF4": {
       "name": "Philips Hue",
+      "ipAddress": "10.27.8.229",
       "macAddress": "00:17:88:29:2a:f4",
       "username": "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo",
-      "clientKey": "F713C35839453184BA3B148E5504C74B",
-      "bridgeId": "001788FFFE292AF4"
+      "clientKey": "F713C35839453184BA3B148E5504C74B"
     },
-    "10.27.8.188": {
+    "ECB5FAFFFE068F8B": {
       "name": "Philips hue",
+      "ipAddress": "10.27.8.188",
       "macAddress": "ec:b5:fa:06:8f:8b",
       "username": "iA2t2aVH2ik-X74buEgBQq5xMrfiiGb8L0l0Jw1D",
-      "clientKey": "8669BECD317E3D73033EF138044FE109",
-      "bridgeId": "ECB5FAFFFE068F8B"
+      "clientKey": "8669BECD317E3D73033EF138044FE109"
     }
   },
   "lights": {
