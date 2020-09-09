@@ -1,1 +1,23 @@
-{"bridges":{"192.168.178.26":{"name":"Philips Hue","macAddress":"00:17:88:29:2a:f4","username":"vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo","clientKey":"F713C35839453184BA3B148E5504C74B","bridgeId":"001788FFFE292AF4"}},"lights":{"0":{"name":"","ip-address":"","mac-address":"","bridgeip":"","bridgelightid":"","states":{"on":"true"}}}}
+{
+  "bridges": {
+    "10.27.8.229": {
+      "name": "Philips Hue",
+      "macAddress": "00:17:88:29:2a:f4",
+      "username": "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo",
+      "clientKey": "F713C35839453184BA3B148E5504C74B",
+      "bridgeId": "001788FFFE292AF4"
+    }
+  },
+  "lights": {
+    "0": {
+      "name": "",
+      "ip-address": "",
+      "mac-address": "",
+      "bridgeip": "",
+      "bridgelightid": "",
+      "states": {
+        "on": "true"
+      }
+    }
+  }
+}

@@ -52,6 +52,7 @@ var NO_BRIDGES_DISCOVERED = "NO_BRIDGES_DISCOVERED";
 var UNAUTHORIZED_USER = "UNAUTHORIZED_USER";
 var BRIDGE_LINK_BUTTON_UNPRESSED = "BRIDGE_LINK_BUTTON_UNPRESSED";
 var BRIDGE_CONNECTION_FAILED = "BRIDGE_CONNECTION_FAILED";
+//TODO
 var Light = /** @class */ (function () {
     function Light(name, uniqueId, state, id, reachable) {
         this.reachable = false;
@@ -114,21 +115,29 @@ var Bridge = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.createUser()];
                     case 1:
                         result = _a.sent();
-                        if (!result.isSuccess()) return [3 /*break*/, 4];
+                        if (!result.isSuccess()) return [3 /*break*/, 7];
                         return [4 /*yield*/, this.connect()];
                     case 2:
                         _a.sent();
                         return [4 /*yield*/, this.api.configuration.getConfiguration()];
                     case 3:
                         bridgeConfig = _a.sent();
-                        this.update({
-                            "bridgeId": bridgeConfig.bridgeId,
-                            "name": bridgeConfig.name,
-                            "macAddress": bridgeConfig.mac,
-                            "reachable": true
-                        });
+                        return [4 /*yield*/, this.update({
+                                "bridgeId": bridgeConfig.bridgeId,
+                                "name": bridgeConfig.name,
+                                "macAddress": bridgeConfig.mac,
+                                "reachable": true
+                            })];
+                    case 4:
+                        _a.sent();
+                        return [4 /*yield*/, this.framework.connectedBridges.push(this)];
+                    case 5:
+                        _a.sent();
+                        return [4 /*yield*/, this.framework.saveBridgeInformation(this)];
+                    case 6:
+                        _a.sent();
                         return [2 /*return*/, exports.success(true)];
-                    case 4: return [2 /*return*/, result];
+                    case 7: return [2 /*return*/, result];
                 }
             });
         });
@@ -195,7 +204,7 @@ var Bridge = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, hueApi.createLocal(this.ipAddress)];
+                        return [4 /*yield*/, hueApi.createLocal(this.ipAddress).connect()];
                     case 1:
                         result = _a.sent();
                         this.api = result;
@@ -224,18 +233,18 @@ var Bridge = /** @class */ (function () {
                         _a.label = 2;
                     case 2:
                         _a.trys.push([2, 4, , 5]);
-                        return [4 /*yield*/, this.api.value.users.createUser(APP_NAME, DEVICE_NAME)];
+                        return [4 /*yield*/, this.api.users.createUser(APP_NAME, DEVICE_NAME)];
                     case 3:
                         createdUser = _a.sent();
                         this.update({ "username": createdUser.username, "clientKey": createdUser.clientkey });
                         return [2 /*return*/, exports.success(true)];
                     case 4:
                         err_3 = _a.sent();
-                        if (err_3.getHueErrorType() === 101) {
+                        if (typeof err_3.getHueErrorType !== 'undefined' && typeof err_3.getHueErrorType === 'function' && err_3.getHueErrorType() === 101) {
                             return [2 /*return*/, exports.failure(BRIDGE_LINK_BUTTON_UNPRESSED)];
                         }
                         else {
-                            return [2 /*return*/, exports.failure(err_3.code)];
+                            return [2 /*return*/, exports.failure(err_3)];
                         }
                         return [3 /*break*/, 5];
                     case 5: return [3 /*break*/, 7];
@@ -320,7 +329,6 @@ var Bridge = /** @class */ (function () {
                 _this[key] = newValues[key];
             }
         });
-        this.framework.saveBridgeInformation(this);
     };
     Bridge.prototype.getAllLightsOnBridge = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -347,7 +355,15 @@ var Bridge = /** @class */ (function () {
         });
     };
     Bridge.prototype.getInfo = function () {
-        return { name: this.name, ipAddress: this.ipAddress, macAddress: this.macAddress, username: this.username, clientKey: this.clientKey, bridgeId: this.bridgeId, reachable: this.reachable };
+        return {
+            name: this.name,
+            ipAddress: this.ipAddress,
+            macAddress: this.macAddress,
+            username: this.username,
+            clientKey: this.clientKey,
+            bridgeId: this.bridgeId,
+            reachable: this.reachable
+        };
     };
     return Bridge;
 }());
@@ -538,39 +554,22 @@ var Framework = /** @class */ (function () {
 exports.Framework = Framework;
 function testing() {
     return __awaiter(this, void 0, void 0, function () {
-        var test, bridges, discoveredBridges, _a, _b, _c, _d, lights;
-        return __generator(this, function (_e) {
-            switch (_e.label) {
+        var test, bridges, discoveredBridges, _a, _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
                     test = new Framework();
                     return [4 /*yield*/, test.init()];
                 case 1:
-                    bridges = _e.sent();
+                    bridges = _c.sent();
                     return [4 /*yield*/, test.discoverBridges()];
                 case 2:
-                    discoveredBridges = _e.sent();
-                    // @ts-ignore
+                    discoveredBridges = _c.sent();
                     _b = (_a = console).log;
-                    return [4 /*yield*/, discoveredBridges[0].init()];
+                    return [4 /*yield*/, discoveredBridges[1].init()];
                 case 3:
-                    // @ts-ignore
-                    _b.apply(_a, [_e.sent()]);
+                    _b.apply(_a, [_c.sent()]);
                     console.log(bridges);
-                    return [4 /*yield*/, bridges[0].init()];
-                case 4:
-                    _e.sent();
-                    bridges[0].update({ "name": "Philips Hue" });
-                    _d = (_c = console).log;
-                    return [4 /*yield*/, bridges[0].getInfo()];
-                case 5:
-                    _d.apply(_c, [_e.sent()]);
-                    console.log(bridges);
-                    return [4 /*yield*/, bridges[0].getAllLightsOnBridge()];
-                case 6:
-                    lights = _e.sent();
-                    lights.value.forEach(function (light) {
-                        bridges[0].setLightState(light.id, { on: false });
-                    });
                     return [2 /*return*/];
             }
         });

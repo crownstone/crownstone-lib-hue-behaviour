@@ -24,19 +24,18 @@ const BRIDGE_CONNECTION_FAILED = "BRIDGE_CONNECTION_FAILED";
 //TODO
 class Light {
     name: string;
-    uniqueId:string;
+    uniqueId: string;
     reachable: boolean = false;
     state: object;
     id: string;
 
-    constructor(name:string, uniqueId: string, state: object, id: string, reachable?:boolean){
+    constructor(name: string, uniqueId: string, state: object, id: string, reachable?: boolean) {
         this.name = name;
         this.uniqueId = uniqueId;
         this.state = state;
         this.id = id;
         this.reachable = reachable;
     }
-
 
 
     update(newValues: object) {
@@ -64,7 +63,7 @@ class Bridge {
 
     framework: Framework;
 
-    constructor(name: string, username: string, clientKey: string, macAddress: string, ipAddress: string, bridgeId: string, framework:Framework) {
+    constructor(name: string, username: string, clientKey: string, macAddress: string, ipAddress: string, bridgeId: string, framework: Framework) {
         this.name = name;
         this.username = username;
         this.ipAddress = ipAddress;
@@ -92,12 +91,16 @@ class Bridge {
         if (result.isSuccess()) {
             await this.connect();
             const bridgeConfig = await this.api.configuration.getConfiguration();
-            this.update({
+            await this.update({
                 "bridgeId": bridgeConfig.bridgeId,
                 "name": bridgeConfig.name,
                 "macAddress": bridgeConfig.mac,
                 "reachable": true
             })
+
+            //TODO Different solution?
+            await this.framework.connectedBridges.push(this);
+            await this.framework.saveBridgeInformation(this);
             return success(true);
         } else {
             return result;
@@ -141,7 +144,7 @@ class Bridge {
 
     async createUnAuthenticatedApi(): Promise<Either<boolean, string>> {
         try {
-            const result = await hueApi.createLocal(this.ipAddress);
+            const result = await hueApi.createLocal(this.ipAddress).connect();
             this.api = result;
             this.reachable = true;
             return success(true);
@@ -155,17 +158,16 @@ class Bridge {
         const result = await this.createUnAuthenticatedApi().then(res => {
             return res;
         });
-
         if (result.isSuccess()) {
             try {
-                let createdUser = await this.api.value.users.createUser(APP_NAME, DEVICE_NAME);
+                let createdUser = await this.api.users.createUser(APP_NAME, DEVICE_NAME);
                 this.update({"username": createdUser.username, "clientKey": createdUser.clientkey})
                 return success(true);
             } catch (err) {
-                if (err.getHueErrorType() === 101) {
+                if (typeof err.getHueErrorType !== 'undefined' && typeof err.getHueErrorType === 'function' && err.getHueErrorType() === 101) {
                     return failure(BRIDGE_LINK_BUTTON_UNPRESSED);
                 } else {
-                    return failure(err.code);
+                    return failure(err);
                 }
             }
         } else {
@@ -185,7 +187,7 @@ class Bridge {
             } else {
 
                 let result = {id: "", internalipaddress: ""};
-                for(const item of possibleBridges.value){
+                for (const item of possibleBridges.value) {
                     if (this.bridgeId.toLowerCase() === item.id.toLowerCase()) {
                         result = item;
                         break;
@@ -199,7 +201,7 @@ class Bridge {
                         return failure(err.code)
                     });
                     if (api.isSuccess()) {
-                        await this.framework.saveBridgeInformation(this,oldIpAddress);
+                        await this.framework.saveBridgeInformation(this, oldIpAddress);
                         return api;
                     } else {
                         return api;
@@ -231,7 +233,6 @@ class Bridge {
                 this[key] = newValues[key];
             }
         });
-        this.framework.saveBridgeInformation(this);
     }
 
     async getAllLightsOnBridge(): Promise<Either<lightModel[], string>> {
@@ -246,8 +247,16 @@ class Bridge {
         return await this.api.lights.setLightState(id, state);
     }
 
-    getInfo(): object{
-        return {name : this.name, ipAddress: this.ipAddress, macAddress: this.macAddress,  username : this.username, clientKey: this.clientKey, bridgeId: this.bridgeId, reachable: this.reachable};
+    getInfo(): object {
+        return {
+            name: this.name,
+            ipAddress: this.ipAddress,
+            macAddress: this.macAddress,
+            username: this.username,
+            clientKey: this.clientKey,
+            bridgeId: this.bridgeId,
+            reachable: this.reachable
+        };
     }
 }
 
@@ -311,7 +320,7 @@ export class Framework {
     async init() {
         await this.getConfigSettings();
         const result = await this.getConfiguredBridges();
-        if(result.isSuccess()){
+        if (result.isSuccess()) {
             let bridges = new Array();
             for (const ip of result.value) {
                 bridges.push(await this.createBridgeFromConfig(ip));
@@ -335,7 +344,7 @@ export class Framework {
 
 
     // Returns either a list of bridges or a errorcode TODO: map result to Bridge
-    async discoverBridges(): Promise<string | Array<object>> {
+    async discoverBridges(): Promise<any> {
         const discoveryResults = await discovery.nupnpSearch().then(res => {
             return res
         });
@@ -354,13 +363,13 @@ export class Framework {
                     this
                 ))
             })
-            return discoveryResults;
+            return bridges;
         }
     }
 
 
     //Returns a string[] of bridges or an string.
-    async getConfiguredBridges(): Promise<Either<string[] , string>> {
+    async getConfiguredBridges(): Promise<Either<string[], string>> {
         const bridges: string[] = Object.keys(this.configSettings["bridges"]);
         if (bridges === undefined || bridges === null || bridges.length === 0) {
             return failure(NO_BRIDGES_IN_CONFIG);
@@ -376,8 +385,8 @@ export class Framework {
         delete config["reachable"];
         delete config["ipAddress"];
         this.configSettings[CONF_BRIDGE_LOCATION][ipAddress] = config;
-        if(oldIpAddress !== undefined){
-        delete this.configSettings[CONF_BRIDGE_LOCATION][oldIpAddress];
+        if (oldIpAddress !== undefined) {
+            delete this.configSettings[CONF_BRIDGE_LOCATION][oldIpAddress];
         }
         await this.updateConfigFile();
     }
@@ -398,7 +407,7 @@ export class Framework {
     }
 
     createBridgeFromConfig(ipAddress) {
-        let bridge = new Bridge(this.configSettings[CONF_BRIDGE_LOCATION][ipAddress].name, this.configSettings[CONF_BRIDGE_LOCATION][ipAddress].username, this.configSettings[CONF_BRIDGE_LOCATION][ipAddress].clientKey, this.configSettings[CONF_BRIDGE_LOCATION][ipAddress].macAddress, ipAddress, this.configSettings[CONF_BRIDGE_LOCATION][ipAddress].bridgeId,this);
+        let bridge = new Bridge(this.configSettings[CONF_BRIDGE_LOCATION][ipAddress].name, this.configSettings[CONF_BRIDGE_LOCATION][ipAddress].username, this.configSettings[CONF_BRIDGE_LOCATION][ipAddress].clientKey, this.configSettings[CONF_BRIDGE_LOCATION][ipAddress].macAddress, ipAddress, this.configSettings[CONF_BRIDGE_LOCATION][ipAddress].bridgeId, this);
         this.connectedBridges.push(bridge);
         return bridge;
     }
@@ -410,18 +419,18 @@ async function testing() {
 
     const test = new Framework();
     const bridges = await test.init();
-    const discoveredBridges =   await test.discoverBridges();
-    // console.log(await discoveredBridges[0].init())
+    const discoveredBridges = await test.discoverBridges();
+    console.log(await discoveredBridges[1].init());
     console.log(bridges);
-    await bridges[0].init()
-    bridges[0].update({"name": "Philips Hue"});
-    console.log(await bridges[0].getInfo());
-    console.log(bridges);
-
-    const lights = await bridges[0].getAllLightsOnBridge();
-    lights.value.forEach(light => {
-        bridges[0].setLightState(light.id,{on:false});
-    });
+    // await bridges[0].init()
+    // bridges[0].update({"name": "Philips Hue"});
+    // console.log(await discoveredBridges[1].getInfo());
+    // console.log(bridges);
+    //
+    // const lights = await bridges[0].getAllLightsOnBridge();
+    // lights.value.forEach(light => {
+    //     bridges[0].setLightState(light.id, {on: false});
+    // });
 
 }
 
