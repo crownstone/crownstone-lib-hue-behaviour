@@ -16,14 +16,109 @@
     }
   },
   "lights": {
-    "0": {
-      "name": "",
-      "ip-address": "",
-      "mac-address": "",
-      "bridgeip": "",
-      "bridgelightid": "",
-      "states": {
-        "on": "true"
+    "00:17:88:01:10:25:5d:16-0b": {
+      "name": "Hue color lamp 1",
+      "id": 4,
+      "bridgeId": "001788FFFE292AF4",
+      "state": {
+        "on": false,
+        "bri": 10,
+        "hue": 14388,
+        "sat": 169,
+        "effect": "none",
+        "xy": [
+          0.4769,
+          0.4137
+        ],
+        "ct": 400,
+        "alert": "select",
+        "colormode": "ct",
+        "mode": "homeautomation",
+        "reachable": true
+      }
+    },
+    "00:17:88:01:10:4a:cd:c8-0b": {
+      "name": "Hue color lamp 2",
+      "id": 5,
+      "bridgeId": "001788FFFE292AF4",
+      "state": {
+        "on": true,
+        "bri": 20,
+        "hue": 12519,
+        "sat": 226,
+        "effect": "none",
+        "xy": [
+          0.5268,
+          0.4133
+        ],
+        "ct": 500,
+        "alert": "select",
+        "colormode": "ct",
+        "mode": "homeautomation",
+        "reachable": false
+      }
+    },
+    "00:17:88:01:04:71:09:99-0b": {
+      "name": "Hue color lamp 1",
+      "id": 1,
+      "bridgeId": "ECB5FAFFFE068F8B",
+      "state": {
+        "on": false,
+        "bri": 60,
+        "hue": 7208,
+        "sat": 224,
+        "effect": "none",
+        "xy": [
+          0.5253,
+          0.4137
+        ],
+        "ct": 497,
+        "alert": "none",
+        "colormode": "ct",
+        "mode": "homeautomation",
+        "reachable": true
+      }
+    },
+    "00:17:88:01:04:71:09:9c-0b": {
+      "name": "Hue color lamp 2",
+      "id": 2,
+      "bridgeId": "ECB5FAFFFE068F8B",
+      "state": {
+        "on": false,
+        "bri": 60,
+        "hue": 8418,
+        "sat": 140,
+        "effect": "none",
+        "xy": [
+          0.4573,
+          0.41
+        ],
+        "ct": 366,
+        "alert": "none",
+        "colormode": "ct",
+        "mode": "homeautomation",
+        "reachable": true
+      }
+    },
+    "00:17:88:01:04:71:04:39-0b": {
+      "name": "Hue color lamp 3",
+      "id": 3,
+      "bridgeId": "ECB5FAFFFE068F8B",
+      "state": {
+        "on": false,
+        "bri": 60,
+        "hue": 9889,
+        "sat": 24,
+        "effect": "none",
+        "xy": [
+          0.3908,
+          0.3846
+        ],
+        "ct": 265,
+        "alert": "none",
+        "colormode": "ct",
+        "mode": "homeautomation",
+        "reachable": true
       }
     }
   }

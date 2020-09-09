@@ -38,27 +38,54 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Light = void 0;
 var Light = /** @class */ (function () {
-    function Light(name, uniqueId, state, id, capabilities, supportedStates, connectedBridge) {
+    function Light(name, uniqueId, state, id, bridgeId, capabilities, supportedStates, connectedBridge) {
         this.name = name;
         this.uniqueId = uniqueId;
         this.state = state;
         this.id = id;
+        this.bridgeId = bridgeId;
         this.capabilities = capabilities;
         this.connectedBridge = connectedBridge;
         this.supportedStates = supportedStates;
     }
-    Light.prototype.update = function (newValues) {
-        var _this = this;
-        Object.keys(newValues).forEach(function (key) {
-            if (typeof (_this[key]) !== undefined) {
-                _this[key] = newValues[key];
-            }
+    // update(newValues: object) {
+    //     Object.keys(newValues).forEach(key => {
+    //         if (typeof (this[key]) !== undefined) {
+    //             this[key] = newValues[key];
+    //         }
+    //
+    //     });
+    // }
+    Light.prototype.updateStateFromBridge = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = this;
+                        return [4 /*yield*/, this.connectedBridge.api.lights.getLightState(this.id)];
+                    case 1:
+                        _a.state = _b.sent();
+                        return [2 /*return*/];
+                }
+            });
         });
+    };
+    Light.prototype._isAllowedStateType = function (state) {
+        if (state === 'on' || state === 'hue' ||
+            state === 'bri' || state === 'sat' ||
+            state === 'effect' || state === 'xy' ||
+            state === 'ct' || state === 'alert') {
+            return true;
+        }
+        else {
+            return false;
+        }
     };
     Light.prototype.updateState = function (state) {
         var _this = this;
         Object.keys(state).forEach(function (key) {
-            if (typeof (_this[key]) !== undefined) {
+            if (_this._isAllowedStateType(key)) {
                 _this.state[key] = state[key];
             }
         });
@@ -76,7 +103,14 @@ var Light = /** @class */ (function () {
         });
     };
     Light.prototype.getInfo = function () {
-        return { name: this.name, uniqueId: this.uniqueId, state: this.state, id: this.id, capabilities: this.capabilities };
+        return {
+            name: this.name,
+            uniqueId: this.uniqueId,
+            state: this.state,
+            bridgeId: this.bridgeId,
+            id: this.id,
+            capabilities: this.capabilities
+        };
     };
     return Light;
 }());

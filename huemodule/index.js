@@ -103,6 +103,7 @@ var Framework = /** @class */ (function () {
                             if (err.code === "ENOENT") {
                                 _this.updateConfigFile();
                             }
+                            throw err;
                         })];
                     case 1:
                         _a.sent();
@@ -112,7 +113,7 @@ var Framework = /** @class */ (function () {
         });
     };
     ;
-    // Returns either a list of bridges or a errorcode TODO: map result to Bridge
+    // Returns either a list of bridges or a errorcode
     Framework.prototype.discoverBridges = function () {
         return __awaiter(this, void 0, void 0, function () {
             var discoveryResults, bridges_1;
@@ -170,6 +171,44 @@ var Framework = /** @class */ (function () {
             });
         });
     };
+    Framework.prototype.saveAllLightsFromConnectedBridges = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                this.connectedBridges.forEach(function (bridge) {
+                    bridge.getConnectedLights().forEach(function (light) { return __awaiter(_this, void 0, void 0, function () {
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0: return [4 /*yield*/, this.saveLightInfo(light.getInfo())];
+                                case 1:
+                                    _a.sent();
+                                    return [2 /*return*/];
+                            }
+                        });
+                    }); });
+                });
+                return [2 /*return*/];
+            });
+        });
+    };
+    Framework.prototype.saveLightInfo = function (light) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.configSettings[CONF_LIGHT_LOCATION][light.uniqueId] = {};
+                        this.configSettings[CONF_LIGHT_LOCATION][light.uniqueId]["name"] = light.name;
+                        this.configSettings[CONF_LIGHT_LOCATION][light.uniqueId]["id"] = light.id;
+                        this.configSettings[CONF_LIGHT_LOCATION][light.uniqueId]["bridgeId"] = light.bridgeId;
+                        this.configSettings[CONF_LIGHT_LOCATION][light.uniqueId]["state"] = light.state;
+                        return [4 /*yield*/, this.updateConfigFile()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     //Call this to save configuration to the config file.
     Framework.prototype.updateConfigFile = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -194,33 +233,34 @@ var Framework = /** @class */ (function () {
 exports.Framework = Framework;
 function testing() {
     return __awaiter(this, void 0, void 0, function () {
-        var test, bridges, bridge2, lights, err_1;
+        var test, bridges, bridge, bridge2, lights, light, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 4, , 5]);
+                    _a.trys.push([0, 5, , 6]);
                     test = new Framework();
                     return [4 /*yield*/, test.init()];
                 case 1:
                     bridges = _a.sent();
+                    bridge = bridges[1];
                     bridge2 = bridges[0];
-                    // await bridge.init()
-                    return [4 /*yield*/, bridge2.init()];
+                    return [4 /*yield*/, bridge.init()];
                 case 2:
-                    // await bridge.init()
                     _a.sent();
-                    console.log(test.connectedBridges);
-                    lights = bridge2.getConnectedLights();
-                    console.log(lights);
-                    return [4 /*yield*/, lights[0].setState({ on: true })];
+                    return [4 /*yield*/, bridge2.init()];
                 case 3:
                     _a.sent();
-                    return [3 /*break*/, 5];
+                    return [4 /*yield*/, test.saveAllLightsFromConnectedBridges()];
                 case 4:
+                    _a.sent();
+                    lights = bridge2.getConnectedLights();
+                    light = bridge2.getLightById("00:17:88:01:10:25:5d:16-0b");
+                    return [3 /*break*/, 6];
+                case 5:
                     err_1 = _a.sent();
                     console.log(err_1);
-                    return [3 /*break*/, 5];
-                case 5: return [2 /*return*/];
+                    return [3 /*break*/, 6];
+                case 6: return [2 /*return*/];
             }
         });
     });

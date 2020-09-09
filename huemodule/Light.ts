@@ -6,16 +6,19 @@ export class Light {
     // TODO Look into state objects
     state: object;
     id: number;
+    bridgeId: string;
+    capabilities: object;
+    supportedStates: object;
     //TODO Look if only api.lights is sufficient.
     connectedBridge: Bridge;
-    capabilities: object;
-    supportedStates:object;
 
-    constructor(name: string, uniqueId: string, state: object, id: number,capabilities: object,supportedStates: object, connectedBridge: any) {
+
+    constructor(name: string, uniqueId: string, state: object, id: number, bridgeId: string,capabilities: object, supportedStates: object, connectedBridge: any) {
         this.name = name;
         this.uniqueId = uniqueId;
         this.state = state;
         this.id = id;
+        this.bridgeId = bridgeId;
         this.capabilities = capabilities;
         this.connectedBridge = connectedBridge;
         this.supportedStates = supportedStates;
@@ -23,18 +26,33 @@ export class Light {
     }
 
 
-    update(newValues: object) {
-        Object.keys(newValues).forEach(key => {
-            if (typeof (this[key]) !== undefined) {
-                this[key] = newValues[key];
-            }
+    // update(newValues: object) {
+    //     Object.keys(newValues).forEach(key => {
+    //         if (typeof (this[key]) !== undefined) {
+    //             this[key] = newValues[key];
+    //         }
+    //
+    //     });
+    // }
 
-        });
+    async updateStateFromBridge() {
+        this.state = await this.connectedBridge.api.lights.getLightState(this.id);
+    }
+
+    _isAllowedStateType(state) {
+        if (state === 'on' || state === 'hue' ||
+            state === 'bri' || state === 'sat' ||
+            state === 'effect' || state === 'xy' ||
+            state === 'ct' || state === 'alert') {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     updateState(state) {
         Object.keys(state).forEach(key => {
-            if (typeof (this[key]) !== undefined) {
+            if (this._isAllowedStateType(key)) {
                 this.state[key] = state[key];
             }
         });
@@ -49,7 +67,14 @@ export class Light {
     }
 
     getInfo(): object {
-        return {name: this.name, uniqueId: this.uniqueId, state: this.state, id: this.id, capabilities : this.capabilities};
+        return {
+            name: this.name,
+            uniqueId: this.uniqueId,
+            state: this.state,
+            bridgeId: this.bridgeId,
+            id: this.id,
+            capabilities: this.capabilities
+        };
     }
 
 }

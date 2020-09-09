@@ -3,11 +3,11 @@ import {Bridge} from "./Bridge";
 
 const fetch = require('node-fetch');
 import {v3} from "node-hue-api";
+import {bri} from "node-hue-api/lib/model/lightstate/stateParameters";
 
 const discovery = v3.discovery;
 const hueApi = v3.api;
 const model = v3.model;
-
 
 
 //Return messages/Error codes
@@ -16,7 +16,6 @@ const NO_BRIDGES_DISCOVERED = "NO_BRIDGES_DISCOVERED";
 const UNAUTHORIZED_USER = "UNAUTHORIZED_USER";
 const BRIDGE_LINK_BUTTON_UNPRESSED = "BRIDGE_LINK_BUTTON_UNPRESSED";
 const BRIDGE_CONNECTION_FAILED = "BRIDGE_CONNECTION_FAILED";
-
 
 
 //TODO
@@ -28,13 +27,12 @@ const CONF_BRIDGE_LOCATION: string = "bridges";
 const CONF_LIGHT_LOCATION: string = "lights";
 
 
-
 export class Framework {
     configSettings: object = {"bridges": "", "lights": ""};
     connectedBridges: Bridge[] = new Array();
 
-     APP_NAME: string = 'node-hue-api';
-     DEVICE_NAME: string = 'testSuite';
+    APP_NAME: string = 'node-hue-api';
+    DEVICE_NAME: string = 'testSuite';
 
     constructor() {
     }
@@ -56,12 +54,13 @@ export class Framework {
             if (err.code === "ENOENT") {
                 this.updateConfigFile();
             }
+            throw err;
         });
 
     };
 
 
-    // Returns either a list of bridges or a errorcode TODO: map result to Bridge
+    // Returns either a list of bridges or a errorcode
     async discoverBridges(): Promise<Bridge[]> {
         const discoveryResults = await discovery.nupnpSearch()
         if (discoveryResults.length === 0) {
@@ -85,7 +84,7 @@ export class Framework {
 
 
     //Returns a string[] of bridges or an string.
-    getConfiguredBridges(): string[]{
+    getConfiguredBridges(): string[] {
         const bridges: string[] = Object.keys(this.configSettings["bridges"]);
         if (bridges === undefined || bridges === null || bridges.length === 0) {
             throw Error(NO_BRIDGES_IN_CONFIG);
@@ -104,6 +103,24 @@ export class Framework {
         if (oldIpAddress !== undefined) {
             delete this.configSettings[CONF_BRIDGE_LOCATION][oldIpAddress];
         }
+        await this.updateConfigFile();
+    }
+
+    async saveAllLightsFromConnectedBridges() {
+        this.connectedBridges.forEach(bridge => {
+            bridge.getConnectedLights().forEach(async light => {
+                await this.saveLightInfo(light.getInfo())
+            })
+        });
+    }
+
+
+    async saveLightInfo(light): Promise<void> {
+        this.configSettings[CONF_LIGHT_LOCATION][light.uniqueId] = {};
+        this.configSettings[CONF_LIGHT_LOCATION][light.uniqueId]["name"] = light.name;
+        this.configSettings[CONF_LIGHT_LOCATION][light.uniqueId]["id"] = light.id;
+        this.configSettings[CONF_LIGHT_LOCATION][light.uniqueId]["bridgeId"] = light.bridgeId;
+        this.configSettings[CONF_LIGHT_LOCATION][light.uniqueId]["state"] = light.state;
         await this.updateConfigFile();
     }
 
@@ -126,24 +143,25 @@ export class Framework {
 
 
 async function testing() {
-    try{
-    const test = new Framework();
-    const bridges = await test.init();
-    // const discoveredBridges = await test.discoverBridges();
-    // console.log(await discoveredBridges[0].init());
-    // const bridge = bridges[1];
-    const bridge2 = bridges[0];
-    // await bridge.init()
-    await bridge2.init()
-    console.log(test.connectedBridges)
+    try {
+        const test = new Framework();
+        const bridges = await test.init();
+        // const discoveredBridges = await test.discoverBridges();
+        // console.log(await discoveredBridges[0].init());
+        const bridge = bridges[1];
+        const bridge2 = bridges[0];
+        await bridge.init()
+        await bridge2.init()
+        await test.saveAllLightsFromConnectedBridges();
 
+        const lights = bridge2.getConnectedLights()
+        // console.log(lights[0].getInfo());
+        // console.log(await lights[0].setState({ct: 40}));
+        const light = bridge2.getLightById("00:17:88:01:10:25:5d:16-0b");
+        // await light.updateStateFromBridge();
+        // await test.saveLightInfo(light)
 
-    const lights = bridge2.getConnectedLights()
-        console.log(lights);
-    await lights[0].setState({on: true});
-
-
-    } catch(err){
+    } catch (err) {
         console.log(err);
     }
 }

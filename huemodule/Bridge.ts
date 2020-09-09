@@ -2,6 +2,7 @@ import {Framework} from "./index";
 import {Light} from "./Light"
 import lightModel = require("./node_modules/node-hue-api/lib/model/Light");
 import {v3} from "node-hue-api";
+
 const discovery = v3.discovery;
 const hueApi = v3.api;
 const model = v3.model;
@@ -83,7 +84,6 @@ export class Bridge {
         }
     }
 
-
     getConnectedLights(): Light[] {
         return this.lights;
     }
@@ -109,7 +109,7 @@ export class Bridge {
     async populateLights(): Promise<void> {
         let lights = await this.api.lights.getAll();
         lights.forEach(light => {
-            this.lights.push(new Light(light.name, light.uniqueid, light.state, light.id,light.capabilities.control,light.getSupportedStates(), this))
+            this.lights.push(new Light(light.name, light.uniqueid, light.state, light.id,this.bridgeId, light.capabilities.control, light.getSupportedStates(), this))
         });
     }
 
@@ -132,25 +132,51 @@ export class Bridge {
                 await this.createAuthenticatedApi()
                 await this.framework.saveBridgeInformation(this, oldIpAddress);
             }
-            if(result.id === ""){
+            if (result.id === "") {
                 throw Error(BRIDGE_NOT_DISCOVERED)
             }
         }
     }
 
+    getLightById(uniqueId: string): Light {
+        for(const light of this.lights){
+            if(light.uniqueId === uniqueId){
+                return light;
+            }
+        }
+        return undefined;
+    }
+
     async _getBridgesFromDiscoveryUrl(): Promise<discoverResult[]> {
-        const result = await fetch(DISCOVERY_URL, {method: "Get"}).then(res => {return res.json()});
+        const result = await fetch(DISCOVERY_URL, {method: "Get"}).then(res => {
+            return res.json()
+        });
         console.log(result);
         return result;
     }
 
-    /// TODO
-    update(newValues: object) {
-        Object.keys(newValues).forEach(key => {
-            if (typeof (this[key]) !== undefined) {
-                this[key] = newValues[key];
-            }
-        });
+    update(values: object) {
+        if (values["name"] !== undefined) {
+            this.name = values["name"]
+        }
+        if (values["ipAddress"] !== undefined) {
+            this.ipAddress = values["ipAddress"]
+        }
+        if (values["username"] !== undefined) {
+            this.username = values["username"]
+        }
+        if (values["clientKey"] !== undefined) {
+            this.clientKey = values["clientKey"]
+        }
+        if (values["macAddress"] !== undefined) {
+            this.macAddress = values["macAddress"]
+        }
+        if (values["bridgeId"] !== undefined) {
+            this.bridgeId = values["bridgeId"]
+        }
+        if (values["reachable"] !== undefined) {
+            this.reachable = values["reachable"]
+        }
     }
 
     getInfo(): object {

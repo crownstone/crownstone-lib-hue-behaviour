@@ -208,7 +208,7 @@ var Bridge = /** @class */ (function () {
                     case 1:
                         lights = _a.sent();
                         lights.forEach(function (light) {
-                            _this.lights.push(new Light_1.Light(light.name, light.uniqueid, light.state, light.id, light.capabilities.control, light.getSupportedStates(), _this));
+                            _this.lights.push(new Light_1.Light(light.name, light.uniqueid, light.state, light.id, _this.bridgeId, light.capabilities.control, light.getSupportedStates(), _this));
                         });
                         return [2 /*return*/];
                 }
@@ -255,12 +255,23 @@ var Bridge = /** @class */ (function () {
             });
         });
     };
+    Bridge.prototype.getLightById = function (uniqueId) {
+        for (var _i = 0, _a = this.lights; _i < _a.length; _i++) {
+            var light = _a[_i];
+            if (light.uniqueId === uniqueId) {
+                return light;
+            }
+        }
+        return undefined;
+    };
     Bridge.prototype._getBridgesFromDiscoveryUrl = function () {
         return __awaiter(this, void 0, void 0, function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, fetch(DISCOVERY_URL, { method: "Get" }).then(function (res) { return res.json(); })];
+                    case 0: return [4 /*yield*/, fetch(DISCOVERY_URL, { method: "Get" }).then(function (res) {
+                            return res.json();
+                        })];
                     case 1:
                         result = _a.sent();
                         console.log(result);
@@ -269,14 +280,28 @@ var Bridge = /** @class */ (function () {
             });
         });
     };
-    /// TODO
-    Bridge.prototype.update = function (newValues) {
-        var _this = this;
-        Object.keys(newValues).forEach(function (key) {
-            if (typeof (_this[key]) !== undefined) {
-                _this[key] = newValues[key];
-            }
-        });
+    Bridge.prototype.update = function (values) {
+        if (values["name"] !== undefined) {
+            this.name = values["name"];
+        }
+        if (values["ipAddress"] !== undefined) {
+            this.ipAddress = values["ipAddress"];
+        }
+        if (values["username"] !== undefined) {
+            this.username = values["username"];
+        }
+        if (values["clientKey"] !== undefined) {
+            this.clientKey = values["clientKey"];
+        }
+        if (values["macAddress"] !== undefined) {
+            this.macAddress = values["macAddress"];
+        }
+        if (values["bridgeId"] !== undefined) {
+            this.bridgeId = values["bridgeId"];
+        }
+        if (values["reachable"] !== undefined) {
+            this.reachable = values["reachable"];
+        }
     };
     Bridge.prototype.getInfo = function () {
         return {
