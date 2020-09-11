@@ -12,6 +12,15 @@ const UNAUTHORIZED_USER = "UNAUTHORIZED_USER";
 const BRIDGE_LINK_BUTTON_UNPRESSED = "BRIDGE_LINK_BUTTON_UNPRESSED";
 const BRIDGE_CONNECTION_FAILED = "BRIDGE_CONNECTION_FAILED";
 
+type confBridge = {
+    name: string;
+    username: string;
+    clientKey: string;
+    macAddress: string;
+    ipAddress: string;
+    bridgeId: string;
+    lights?: object;
+}
 
 
 
@@ -55,6 +64,22 @@ export class Framework {
         return this.configSettings;
     }
 
+    async addBridgeToConfig(bridge:confBridge){
+        this.configSettings[CONF_BRIDGE_LOCATION][bridge.bridgeId] = {
+            name: bridge.name,
+            username: bridge.username,
+            clientKey: bridge.clientKey,
+            macAddress: bridge.macAddress,
+            ipAddress: bridge.ipAddress,
+            bridgeId: bridge.bridgeId,
+            lights: {}
+        }
+        if (bridge.lights != undefined || bridge.lights != {} ){
+            Object.values(bridge.lights).forEach((light) => { this.saveLightInfo(bridge.bridgeId,light)});
+        }
+        await this.updateConfigFile();
+
+    }
     async discoverBridges(): Promise<Bridge[]> {
         const discoveryResults = await discovery.nupnpSearch()
         if (discoveryResults.length === 0) {
@@ -141,5 +166,6 @@ export class Framework {
         this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["ipAddress"] = ipAddress;
         await this.updateConfigFile()
     }
+
 
 }

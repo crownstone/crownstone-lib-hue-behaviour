@@ -21,11 +21,10 @@
   <component name="ChangeListManager">
     <list default="true" id="7f56d89c-2fae-4fc6-9386-518a056890c4" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Bridge.js" beforeDir="false" afterPath="$PROJECT_DIR$/Bridge.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Bridge.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Bridge.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Framework.js" beforeDir="false" afterPath="$PROJECT_DIR$/Framework.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Framework.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Framework.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.test.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/saveConfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/saveConfig.json" afterDir="false" />
     </list>
@@ -64,7 +63,7 @@
     <property name="ts.external.directory.path" value="D:\Program Files\JetBrains\WebStorm 2020.2.1\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
-  <component name="RunManager" selected="Jest.remove bridge by id">
+  <component name="RunManager" selected="Node.js.index.js">
     <configuration name="All Tests" type="JavaScriptTestRunnerJest" nameIsGenerated="true">
       <node-interpreter value="project" />
       <node-options value="" />
@@ -191,7 +190,7 @@
       <workItem from="1599550957344" duration="6494000" />
       <workItem from="1599560417930" duration="15346000" />
       <workItem from="1599638584444" duration="27935000" />
-      <workItem from="1599811204614" duration="20167000" />
+      <workItem from="1599811204614" duration="23215000" />
     </task>
     <servers />
   </component>
@@ -228,22 +227,22 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="740" y="275" key="FileChooserDialogImpl/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1599488203587" />
-    <state width="1899" height="405" key="GridCell.Tab.0.bottom" timestamp="1599835436181">
+    <state width="1899" height="405" key="GridCell.Tab.0.bottom" timestamp="1599838490564">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="405" key="GridCell.Tab.0.bottom/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1599835436181" />
-    <state width="1899" height="405" key="GridCell.Tab.0.center" timestamp="1599835436181">
+    <state width="1899" height="405" key="GridCell.Tab.0.bottom/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1599838490564" />
+    <state width="1899" height="405" key="GridCell.Tab.0.center" timestamp="1599838490564">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="405" key="GridCell.Tab.0.center/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1599835436181" />
-    <state width="1899" height="405" key="GridCell.Tab.0.left" timestamp="1599835436181">
+    <state width="1899" height="405" key="GridCell.Tab.0.center/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1599838490564" />
+    <state width="1899" height="405" key="GridCell.Tab.0.left" timestamp="1599838490564">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="405" key="GridCell.Tab.0.left/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1599835436181" />
-    <state width="1899" height="405" key="GridCell.Tab.0.right" timestamp="1599835436181">
+    <state width="1899" height="405" key="GridCell.Tab.0.left/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1599838490564" />
+    <state width="1899" height="405" key="GridCell.Tab.0.right" timestamp="1599838490564">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="405" key="GridCell.Tab.0.right/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1599835436181" />
+    <state width="1899" height="405" key="GridCell.Tab.0.right/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1599838490564" />
     <state width="1899" height="348" key="GridCell.Tab.1.bottom" timestamp="1599834968228">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

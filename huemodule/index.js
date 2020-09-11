@@ -40,42 +40,34 @@ var Framework_1 = require("./Framework");
 ;
 function testing() {
     return __awaiter(this, void 0, void 0, function () {
-        var test, bridges, bridge2, lights, err_1;
+        var test, bridges, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 5, , 6]);
+                    _a.trys.push([0, 3, , 4]);
                     test = new Framework_1.Framework();
                     return [4 /*yield*/, test.init()];
                 case 1:
                     bridges = _a.sent();
-                    bridge2 = bridges[0];
-                    // await bridge.init()
-                    return [4 /*yield*/, bridge2.init()
-                        // //
-                    ];
+                    return [4 /*yield*/, test.addBridgeToConfig({ name: "Bridge 1",
+                            username: "12351241",
+                            clientKey: "3456346",
+                            macAddress: "FF:AA:GG:CC:DD:EE",
+                            ipAddress: "192.168.172.15",
+                            bridgeId: "FFAAGGFFFECCDDEE",
+                            lights: {
+                                "AS:24:FA:DA": { id: "4", name: "TEST" },
+                                "AS:TE:ST:f4:FA:DA": { uniqueId: "AS:TE:ST:f4:FA:DA", id: "4", name: "TEST" }
+                            }
+                        })];
                 case 2:
-                    // await bridge.init()
                     _a.sent();
-                    lights = bridge2.getConnectedLights();
-                    return [4 /*yield*/, bridge2.configureLight(4)];
+                    return [3 /*break*/, 4];
                 case 3:
-                    _a.sent();
-                    // const light = bridge2.getLightById("00:17:88:01:10:25:5d:16-0b");
-                    // await  test.removeLightFromConfig(bridge2,"00:17:88:01:10:25:5d:16-0b");
-                    // console.log(lights)
-                    return [4 /*yield*/, bridge2.configureLight(4)];
-                case 4:
-                    // const light = bridge2.getLightById("00:17:88:01:10:25:5d:16-0b");
-                    // await  test.removeLightFromConfig(bridge2,"00:17:88:01:10:25:5d:16-0b");
-                    // console.log(lights)
-                    _a.sent();
-                    return [3 /*break*/, 6];
-                case 5:
                     err_1 = _a.sent();
                     console.log(err_1);
-                    return [3 /*break*/, 6];
-                case 6: return [2 /*return*/];
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
             }
         });
     });

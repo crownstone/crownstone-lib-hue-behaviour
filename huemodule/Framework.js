@@ -101,7 +101,32 @@ var Framework = /** @class */ (function () {
     Framework.prototype.getConfigSettings = function () {
         return this.configSettings;
     };
-    // Returns either a list of bridges
+    Framework.prototype.addBridgeToConfig = function (bridge) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.configSettings[CONF_BRIDGE_LOCATION][bridge.bridgeId] = {
+                            name: bridge.name,
+                            username: bridge.username,
+                            clientKey: bridge.clientKey,
+                            macAddress: bridge.macAddress,
+                            ipAddress: bridge.ipAddress,
+                            bridgeId: bridge.bridgeId,
+                            lights: {}
+                        };
+                        if (bridge.lights != undefined || bridge.lights != {}) {
+                            Object.values(bridge.lights).forEach(function (light) { _this.saveLightInfo(bridge.bridgeId, light); });
+                        }
+                        return [4 /*yield*/, this.updateConfigFile()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     Framework.prototype.discoverBridges = function () {
         return __awaiter(this, void 0, void 0, function () {
             var discoveryResults, bridges_1;
@@ -126,12 +151,12 @@ var Framework = /** @class */ (function () {
             });
         });
     };
-    Framework.prototype.removeBridge = function (uniqueId) {
+    Framework.prototype.removeBridge = function (bridgeId) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        delete this.configSettings[CONF_BRIDGE_LOCATION][uniqueId];
+                        delete this.configSettings[CONF_BRIDGE_LOCATION][bridgeId];
                         return [4 /*yield*/, this.updateConfigFile()];
                     case 1:
                         _a.sent();
@@ -140,7 +165,6 @@ var Framework = /** @class */ (function () {
             });
         });
     };
-    //Returns a string[] of bridges
     Framework.prototype.getConfiguredBridges = function () {
         var bridges = Object.keys(this.configSettings[CONF_BRIDGE_LOCATION]);
         if (bridges === undefined || bridges === null || bridges.length === 0) {
@@ -150,7 +174,6 @@ var Framework = /** @class */ (function () {
             return bridges;
         }
     };
-    //Temp???
     Framework.prototype.saveBridgeInformation = function (bridge) {
         return __awaiter(this, void 0, void 0, function () {
             var config, bridgeId;

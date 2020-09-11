@@ -210,7 +210,6 @@ export class Bridge {
             this.reachable = values["reachable"]
         }
     }
-
     getInfo(): object {
         return {
             name: this.name,

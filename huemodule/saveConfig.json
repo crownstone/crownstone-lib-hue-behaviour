@@ -37,6 +37,20 @@
           "id": 2
         }
       }
+    },
+    "FFAAGGFFFECCDDEE": {
+      "name": "Bridge 1",
+      "username": "12351241",
+      "clientKey": "3456346",
+      "macAddress": "FF:AA:GG:CC:DD:EE",
+      "ipAddress": "192.168.172.15",
+      "bridgeId": "FFAAGGFFFECCDDEE",
+      "lights": {
+        "AS:TE:ST:f4:FA:DA": {
+          "name": "TEST",
+          "id": "4"
+        }
+      }
     }
   }
 }
