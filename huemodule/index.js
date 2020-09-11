@@ -59,9 +59,12 @@ function testing() {
                     _a.sent();
                     lights = bridge2.getConnectedLights();
                     light = bridge2.getLightById("00:17:88:01:10:25:5d:16-0b");
-                    console.log(lights);
-                    return [4 /*yield*/, light.setState({ on: true })];
+                    // await  test.removeLightFromConfig(bridge2,"00:17:88:01:10:25:5d:16-0b");
+                    // console.log(lights)
+                    return [4 /*yield*/, bridge2.configureLight(4)];
                 case 3:
+                    // await  test.removeLightFromConfig(bridge2,"00:17:88:01:10:25:5d:16-0b");
+                    // console.log(lights)
                     _a.sent();
                     return [3 /*break*/, 5];
                 case 4:

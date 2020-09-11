@@ -152,14 +152,20 @@ var Bridge = /** @class */ (function () {
     //Adds a light to the list, in case a light is added to the bridge afterwards. id refers to id on the bridge.
     Bridge.prototype.configureLight = function (id) {
         return __awaiter(this, void 0, void 0, function () {
-            var lightInfo;
+            var lightInfo, light;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.api.lights.getLight(id)];
                     case 1:
                         lightInfo = _a.sent();
-                        this.lights[lightInfo.uniqueId] = {};
-                        this.lights[lightInfo.uniqueId] = new Light_1.Light(lightInfo.name, lightInfo.uniqueId, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this);
+                        light = new Light_1.Light(lightInfo.name, lightInfo.uniqueid, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this);
+                        this.lights[lightInfo.uniqueid] = light;
+                        return [4 /*yield*/, this.framework.saveLightInfo(this.bridgeId, light)];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, this.framework.updateConfigFile()];
+                    case 3:
+                        _a.sent();
                         return [2 /*return*/];
                 }
             });
@@ -263,12 +269,11 @@ var Bridge = /** @class */ (function () {
                     case 1:
                         if (!(_i < lightIds_1.length)) return [3 /*break*/, 4];
                         uniqueId = lightIds_1[_i];
-                        this.lights[uniqueId] = {};
                         light = lightsInConfig[uniqueId];
                         return [4 /*yield*/, this.api.lights.getLight(light.id)];
                     case 2:
                         lightInfo = _a.sent();
-                        this.lights[uniqueId] = new Light_1.Light(light.name, uniqueId, lightInfo.state, light.id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this);
+                        this.lights[uniqueId] = new Light_1.Light(lightInfo.name, uniqueId, lightInfo.state, light.id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this);
                         _a.label = 3;
                     case 3:
                         _i++;

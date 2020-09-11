@@ -91,8 +91,11 @@ export class Bridge {
     //Adds a light to the list, in case a light is added to the bridge afterwards. id refers to id on the bridge.
     async configureLight(id:number){
         const lightInfo = await this.api.lights.getLight(id);
-        this.lights[lightInfo.uniqueId] = {};
-        this.lights[lightInfo.uniqueId] = new Light(lightInfo.name, lightInfo.uniqueId, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this)
+        const light = new Light(lightInfo.name, lightInfo.uniqueid, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this)
+        this.lights[lightInfo.uniqueid] = light;
+
+        await this.framework.saveLightInfo(this.bridgeId,light)
+        await this.framework.updateConfigFile();
     }
 
     removeLight(uniqueLightId:string): void{
@@ -141,11 +144,10 @@ export class Bridge {
         const lightIds: string[] = Object.keys(lightsInConfig);
 
         for(const uniqueId of lightIds){
-            this.lights[uniqueId] = {};
+
             const light = lightsInConfig[uniqueId];
             const lightInfo = await this.api.lights.getLight(light.id);
-
-            this.lights[uniqueId] = new Light(light.name, uniqueId, lightInfo.state, light.id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this);
+            this.lights[uniqueId] = new Light(lightInfo.name, uniqueId, lightInfo.state, light.id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this);
         };
     }
 

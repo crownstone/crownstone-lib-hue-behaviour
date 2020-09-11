@@ -17,8 +17,10 @@ async function testing() {
         // //
         const lights = bridge2.getConnectedLights()
         const light = bridge2.getLightById("00:17:88:01:10:25:5d:16-0b");
-        console.log(lights)
-        await light.setState({on:true} )
+       // await  test.removeLightFromConfig(bridge2,"00:17:88:01:10:25:5d:16-0b");
+        // console.log(lights)
+        await bridge2.configureLight(4);
+        // await light.setState({on:true} )
     } catch (err) {
         console.log(err);
     }
