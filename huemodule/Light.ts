@@ -18,13 +18,11 @@ type hueState  = {
 export class Light {
     name: string;
     uniqueId: string;
-    // TODO Look into state objects
     state: hueState;
     id: number;
     bridgeId: string;
     capabilities: object;
     supportedStates: object;
-    //TODO Look if only api.lights is sufficient.
     connectedBridge: Bridge;
     lastUpdate: number;
 

@@ -55,7 +55,6 @@ export class Framework {
         return this.configSettings;
     }
 
-    // Returns either a list of bridges
     async discoverBridges(): Promise<Bridge[]> {
         const discoveryResults = await discovery.nupnpSearch()
         if (discoveryResults.length === 0) {
@@ -77,13 +76,11 @@ export class Framework {
         }
     }
 
-    async removeBridge(uniqueId:string){
-        delete this.configSettings[CONF_BRIDGE_LOCATION][uniqueId];
+    async removeBridge(bridgeId:string){
+        delete this.configSettings[CONF_BRIDGE_LOCATION][bridgeId];
         await this.updateConfigFile();
     }
 
-
-    //Returns a string[] of bridges
     getConfiguredBridges(): string[] {
         const bridges: string[] = Object.keys(this.configSettings[CONF_BRIDGE_LOCATION]);
         if (bridges === undefined || bridges === null || bridges.length === 0) {
@@ -93,7 +90,6 @@ export class Framework {
         }
     }
 
-    //Temp???
     async saveBridgeInformation(bridge: Bridge): Promise<void> {
         let config = bridge.getInfo();
         let bridgeId = config["bridgeId"];

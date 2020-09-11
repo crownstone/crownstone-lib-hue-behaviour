@@ -158,6 +158,7 @@ var Bridge = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.api.lights.getLight(id)];
                     case 1:
                         lightInfo = _a.sent();
+                        this.lights[lightInfo.uniqueid] = {};
                         light = new Light_1.Light(lightInfo.name, lightInfo.uniqueid, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this);
                         this.lights[lightInfo.uniqueid] = light;
                         return [4 /*yield*/, this.framework.saveLightInfo(this.bridgeId, light)];
@@ -269,6 +270,7 @@ var Bridge = /** @class */ (function () {
                     case 1:
                         if (!(_i < lightIds_1.length)) return [3 /*break*/, 4];
                         uniqueId = lightIds_1[_i];
+                        this.lights[uniqueId] = {};
                         light = lightsInConfig[uniqueId];
                         return [4 /*yield*/, this.api.lights.getLight(light.id)];
                     case 2:
