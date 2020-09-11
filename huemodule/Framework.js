@@ -51,10 +51,9 @@ var BRIDGE_CONNECTION_FAILED = "BRIDGE_CONNECTION_FAILED";
 //config locations/names
 var CONF_NAME = "saveConfig.json";
 var CONF_BRIDGE_LOCATION = "Bridges";
-var CONF_LIGHT_LOCATION = "lights";
 var Framework = /** @class */ (function () {
     function Framework() {
-        this.configSettings = { "Bridges": {} };
+        this.configSettings = { CONF_BRIDGE_LOCATION: {} };
         this.connectedBridges = new Array();
         this.APP_NAME = 'Hub';
         this.DEVICE_NAME = 'Hub1';
@@ -156,12 +155,18 @@ var Framework = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var config, bridgeId;
             return __generator(this, function (_a) {
-                config = bridge.getInfo();
-                bridgeId = config["bridgeId"];
-                delete config["reachable"];
-                delete config["bridgeId"];
-                this.configSettings[CONF_BRIDGE_LOCATION][bridgeId] = config;
-                return [2 /*return*/];
+                switch (_a.label) {
+                    case 0:
+                        config = bridge.getInfo();
+                        bridgeId = config["bridgeId"];
+                        delete config["reachable"];
+                        delete config["bridgeId"];
+                        this.configSettings[CONF_BRIDGE_LOCATION][bridgeId] = config;
+                        return [4 /*yield*/, this.updateConfigFile()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
             });
         });
     };
@@ -206,8 +211,10 @@ var Framework = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, fs_1.promises.writeFile(CONF_NAME, JSON.stringify(this.configSettings))];
-                    case 1: return [2 /*return*/, _a.sent()];
+                    case 0: return [4 /*yield*/, fs_1.promises.writeFile(CONF_NAME, JSON.stringify(this.configSettings, null, 2))];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
                 }
             });
         });
@@ -220,6 +227,20 @@ var Framework = /** @class */ (function () {
         var bridge = new Bridge_1.Bridge(bridgeConfig.name, bridgeConfig.username, bridgeConfig.clientKey, bridgeConfig.macAddress, bridgeConfig.ipAddress, bridgeId, this);
         this.connectedBridges.push(bridge);
         return bridge;
+    };
+    Framework.prototype.updateBridgeIpAddress = function (bridgeId, ipAddress) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["ipAddress"] = ipAddress;
+                        return [4 /*yield*/, this.updateConfigFile()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
     return Framework;
 }());

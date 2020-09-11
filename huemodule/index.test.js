@@ -37,7 +37,7 @@ test('Returns no bridge discovered', async () => {
 test('Manipulate light by id.', async () => {
     const bridge = await framework.init().then(bridges => {return bridges[0]});
     await bridge.init();
-    const light = bridge.getLightById("00:17:88:01:10:25:5d:16-0b");
+    const light = bridge.getLightById("00:17:88:01:10:4a:cd:c8-0b");
     return expect(light.setState({on: false})).toBeTruthy();
 });
 

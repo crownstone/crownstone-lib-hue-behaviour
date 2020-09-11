@@ -17,10 +17,12 @@ const UNAUTHORIZED_USER = "UNAUTHORIZED_USER";
 const BRIDGE_LINK_BUTTON_UNPRESSED = "BRIDGE_LINK_BUTTON_UNPRESSED";
 const BRIDGE_NOT_DISCOVERED = "BRIDGE_NOT_DISCOVERED";
 
+
 type discoverResult = {
     id: string,
     internalipaddress: string
 }
+
 
 export class Bridge {
     lights: Light[] = new Array();
@@ -52,8 +54,8 @@ export class Bridge {
             await this.link();
         } else {
             await this.connect();
+            await this.createLightsFromConfig();
         }
-        await this.createLightsFromConfig();
     }
 
     async link(): Promise<void> {
@@ -77,7 +79,7 @@ export class Bridge {
         try {
             await this.createAuthenticatedApi()
         } catch (err) {
-            if (err.code == "ENOTFOUND" || err.code == "ETIMEDOUT") {
+            if (err.code == "ENOTFOUND" || err.code == "ECONNREFUSED" || err.code == "ETIMEDOUT") {
                 await this._rediscoverMyself()
             } else {
                 throw err;
@@ -120,7 +122,8 @@ export class Bridge {
     }
 
     async createLightsFromConfig(): Promise<void> {
-        let lightsInConfig = this.framework.getConfigSettings()["Bridges"][this.bridgeId]["lights"];
+        let lightsInConfig = this.framework.getConfigSettings()
+        lightsInConfig = lightsInConfig["Bridges"][this.bridgeId]["lights"];
         const lightIds: string[] = Object.keys(lightsInConfig);
 
         for(const uniqueId of lightIds){
@@ -146,7 +149,7 @@ export class Bridge {
             if (typeof (result) === "object") {
                 this.ipAddress = result.internalipaddress;
                 await this.createAuthenticatedApi()
-                await this.framework.saveBridgeInformation(this);
+                await this.framework.updateBridgeIpAddress(this.bridgeId,this.ipAddress);
             }
             if (result.id === "") {
                 throw Error(BRIDGE_NOT_DISCOVERED)

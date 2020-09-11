@@ -47,30 +47,32 @@ var Light = /** @class */ (function () {
         this.capabilities = capabilities;
         this.supportedStates = supportedStates;
         this.connectedBridge = connectedBridge;
+        this.lastUpdate = Date.now();
     }
-    // update(newValues: object) {
-    //     Object.keys(newValues).forEach(key => {
-    //         if (typeof (this[key]) !== undefined) {
-    //             this[key] = newValues[key];
-    //         }
-    //
-    //     });
-    // }
+    Light.prototype.setName = function (name) {
+        this.name = name;
+    };
+    Light.prototype.setLastUpdate = function () {
+        this.lastUpdate = Date.now();
+    };
     Light.prototype.renewState = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        _a = this;
-                        return [4 /*yield*/, this.connectedBridge.api.lights.getLightState(this.id)];
+            var newState;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.connectedBridge.api.lights.getLightState(this.id)];
                     case 1:
-                        _a.state = _b.sent();
+                        newState = _a.sent();
+                        if (this.state != newState) {
+                            this.state = newState;
+                            this.setLastUpdate();
+                        }
                         return [2 /*return*/];
                 }
             });
         });
     };
+    //supported states and allowed states are different. This one is just for the state object.
     Light.prototype._isAllowedStateType = function (state) {
         if (state === 'on' || state === 'hue' ||
             state === 'bri' || state === 'sat' ||
@@ -89,6 +91,7 @@ var Light = /** @class */ (function () {
                 _this.state[key] = state[key];
             }
         });
+        this.setLastUpdate();
     };
     Light.prototype.setState = function (state) {
         return __awaiter(this, void 0, void 0, function () {
@@ -102,6 +105,9 @@ var Light = /** @class */ (function () {
             });
         });
     };
+    Light.prototype.isReachable = function () {
+        return this.state["reachable"];
+    };
     Light.prototype.getInfo = function () {
         return {
             name: this.name,
@@ -109,7 +115,8 @@ var Light = /** @class */ (function () {
             state: this.state,
             bridgeId: this.bridgeId,
             id: this.id,
-            capabilities: this.capabilities
+            capabilities: this.capabilities,
+            lastUpdate: this.lastUpdate
         };
     };
     return Light;

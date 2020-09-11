@@ -71,15 +71,15 @@ var Bridge = /** @class */ (function () {
                         return [4 /*yield*/, this.link()];
                     case 1:
                         _a.sent();
-                        return [3 /*break*/, 4];
+                        return [3 /*break*/, 5];
                     case 2: return [4 /*yield*/, this.connect()];
                     case 3:
                         _a.sent();
-                        _a.label = 4;
-                    case 4: return [4 /*yield*/, this.createLightsFromConfig()];
-                    case 5:
+                        return [4 /*yield*/, this.createLightsFromConfig()];
+                    case 4:
                         _a.sent();
-                        return [2 /*return*/];
+                        _a.label = 5;
+                    case 5: return [2 /*return*/];
                 }
             });
         });
@@ -137,7 +137,7 @@ var Bridge = /** @class */ (function () {
                         return [3 /*break*/, 6];
                     case 2:
                         err_1 = _a.sent();
-                        if (!(err_1.code == "ENOTFOUND" || err_1.code == "ETIMEDOUT")) return [3 /*break*/, 4];
+                        if (!(err_1.code == "ENOTFOUND" || err_1.code == "ECONNREFUSED" || err_1.code == "ETIMEDOUT")) return [3 /*break*/, 4];
                         return [4 /*yield*/, this._rediscoverMyself()];
                     case 3:
                         _a.sent();
@@ -235,7 +235,8 @@ var Bridge = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        lightsInConfig = this.framework.getConfigSettings()["Bridges"][this.bridgeId]["lights"];
+                        lightsInConfig = this.framework.getConfigSettings();
+                        lightsInConfig = lightsInConfig["Bridges"][this.bridgeId]["lights"];
                         lightIds = Object.keys(lightsInConfig);
                         _i = 0, lightIds_1 = lightIds;
                         _a.label = 1;
@@ -283,7 +284,7 @@ var Bridge = /** @class */ (function () {
                         return [4 /*yield*/, this.createAuthenticatedApi()];
                     case 3:
                         _a.sent();
-                        return [4 /*yield*/, this.framework.saveBridgeInformation(this)];
+                        return [4 /*yield*/, this.framework.updateBridgeIpAddress(this.bridgeId, this.ipAddress)];
                     case 4:
                         _a.sent();
                         _a.label = 5;

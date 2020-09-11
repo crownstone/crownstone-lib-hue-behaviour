@@ -2,7 +2,7 @@
   "Bridges": {
     "001788FFFE292AF4": {
       "name": "Philips Hue",
-      "ipAddress": "10.27.8.229",
+      "ipAddress": "192.168.178.26",
       "macAddress": "00:17:88:29:2a:f4",
       "username": "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo",
       "clientKey": "F713C35839453184BA3B148E5504C74B",

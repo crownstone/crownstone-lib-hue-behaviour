@@ -18,10 +18,9 @@ const BRIDGE_CONNECTION_FAILED = "BRIDGE_CONNECTION_FAILED";
 //config locations/names
 const CONF_NAME: string = "saveConfig.json";
 const CONF_BRIDGE_LOCATION: string = "Bridges";
-const CONF_LIGHT_LOCATION: string = "lights";
 
 export class Framework {
-    configSettings: object = {"Bridges": {}};
+    configSettings: object = {CONF_BRIDGE_LOCATION: {}};
     connectedBridges: Bridge[] = new Array();
 
      APP_NAME: string = 'Hub';
@@ -101,6 +100,8 @@ export class Framework {
         delete config["reachable"];
         delete config["bridgeId"];
         this.configSettings[CONF_BRIDGE_LOCATION][bridgeId] = config;
+        await this.updateConfigFile()
+
     }
 
     async saveAllLightsFromConnectedBridges(): Promise<void> {
@@ -120,7 +121,7 @@ export class Framework {
 
     //Call this to save configuration to the config file.
     async updateConfigFile(): Promise<void> {
-        return await fs.writeFile(CONF_NAME, JSON.stringify(this.configSettings));
+        await fs.writeFile(CONF_NAME, JSON.stringify(this.configSettings,null, 2));
     }
 
     getConnectedBridges(): Bridge[] {
@@ -132,6 +133,11 @@ export class Framework {
         let bridge = new Bridge(bridgeConfig.name, bridgeConfig.username, bridgeConfig.clientKey, bridgeConfig.macAddress, bridgeConfig.ipAddress, bridgeId, this);
         this.connectedBridges.push(bridge);
         return bridge;
+    }
+
+    async updateBridgeIpAddress(bridgeId,ipAddress): Promise<void>{
+        this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["ipAddress"] = ipAddress;
+        await this.updateConfigFile()
     }
 
 }

@@ -40,38 +40,37 @@ var Framework_1 = require("./Framework");
 ;
 function testing() {
     return __awaiter(this, void 0, void 0, function () {
-        var test, bridges, bridge, bridge2, lights, _a, _b, err_1;
+        var test, bridges, bridge2, lights, light, _a, _b, err_1;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
-                    _c.trys.push([0, 5, , 6]);
+                    _c.trys.push([0, 4, , 5]);
                     test = new Framework_1.Framework();
                     return [4 /*yield*/, test.init()];
                 case 1:
                     bridges = _c.sent();
-                    bridge = bridges[1];
                     bridge2 = bridges[0];
-                    return [4 /*yield*/, bridge.init()];
-                case 2:
-                    _c.sent();
+                    // await bridge.init()
                     return [4 /*yield*/, bridge2.init()
                         // //
                     ];
-                case 3:
+                case 2:
+                    // await bridge.init()
                     _c.sent();
                     lights = bridge2.getConnectedLights();
-                    console.log(lights);
-                    console.log(lights[0].getInfo());
+                    light = bridge2.getLightById("00:17:88:01:10:25:5d:16-0b");
+                    console.log(light.getInfo());
                     _b = (_a = console).log;
-                    return [4 /*yield*/, lights[0].setState({ on: false })];
-                case 4:
+                    return [4 /*yield*/, light.setState({ bri_inc: -254 })];
+                case 3:
                     _b.apply(_a, [_c.sent()]);
-                    return [3 /*break*/, 6];
-                case 5:
+                    console.log(light.getInfo());
+                    return [3 /*break*/, 5];
+                case 4:
                     err_1 = _c.sent();
                     console.log(err_1);
-                    return [3 /*break*/, 6];
-                case 6: return [2 /*return*/];
+                    return [3 /*break*/, 5];
+                case 5: return [2 /*return*/];
             }
         });
     });
