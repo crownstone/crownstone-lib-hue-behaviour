@@ -17,9 +17,8 @@ async function testing() {
         // //
         const lights = bridge2.getConnectedLights()
         const light = bridge2.getLightById("00:17:88:01:10:25:5d:16-0b");
-        console.log(light.getInfo());
-        console.log(await light.setState({bri_inc:-254}));
-        console.log(light.getInfo());
+        console.log(lights)
+        await light.setState({on:true} )
     } catch (err) {
         console.log(err);
     }

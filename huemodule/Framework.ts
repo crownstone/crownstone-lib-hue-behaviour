@@ -119,6 +119,12 @@ export class Framework {
         this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["id"] = light["id"];
     }
 
+    async removeLightFromConfig(bridge:Bridge,uniqueLightId){
+        bridge.removeLight(uniqueLightId);
+        delete this.configSettings[CONF_BRIDGE_LOCATION][bridge.bridgeId]["lights"][uniqueLightId];
+        await this.updateConfigFile();
+    }
+
     //Call this to save configuration to the config file.
     async updateConfigFile(): Promise<void> {
         await fs.writeFile(CONF_NAME, JSON.stringify(this.configSettings,null, 2));

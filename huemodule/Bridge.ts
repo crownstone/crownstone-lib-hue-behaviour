@@ -25,7 +25,7 @@ type discoverResult = {
 
 
 export class Bridge {
-    lights: Light[] = new Array();
+    lights: object = new Object();
     api: any;
     name: string;
     username: string;
@@ -88,8 +88,19 @@ export class Bridge {
         }
     }
 
+    //Adds a light to the list, in case a light is added to the bridge afterwards. id refers to id on the bridge.
+    async configureLight(id:number){
+        const lightInfo = await this.api.lights.getLight(id);
+        this.lights[lightInfo.uniqueId] = {};
+        this.lights[lightInfo.uniqueId] = new Light(lightInfo.name, lightInfo.uniqueId, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this)
+    }
+
+    removeLight(uniqueLightId:string): void{
+        delete this.lights[uniqueLightId];
+    }
+
     getConnectedLights(): Light[] {
-        return this.lights;
+        return Object.values(this.lights);
     }
 
     async getAllLightsFromBridge() {
@@ -114,10 +125,13 @@ export class Bridge {
 
     }
 
+
     async populateLights(): Promise<void> {
         let lights = await this.api.lights.getAll();
+
         lights.forEach(light => {
-            this.lights.push(new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this))
+            this.lights[light.uniqueId] = {};
+            this.lights[light.uniqueId] =new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this)
         });
     }
 
@@ -127,9 +141,11 @@ export class Bridge {
         const lightIds: string[] = Object.keys(lightsInConfig);
 
         for(const uniqueId of lightIds){
+            this.lights[uniqueId] = {};
             const light = lightsInConfig[uniqueId];
             const lightInfo = await this.api.lights.getLight(light.id);
-            this.lights.push(new Light(light.name, uniqueId, lightInfo.state, light.id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this))
+
+            this.lights[uniqueId] = new Light(light.name, uniqueId, lightInfo.state, light.id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this);
         };
     }
 
@@ -158,12 +174,7 @@ export class Bridge {
     }
 
     getLightById(uniqueId: string): Light {
-        for (const light of this.lights) {
-            if (light.uniqueId === uniqueId) {
-                return light;
-            }
-        }
-        return undefined;
+        return this.lights[uniqueId];
     }
 
     async _getBridgesFromDiscoveryUrl(): Promise<discoverResult[]> {

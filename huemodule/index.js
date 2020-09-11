@@ -40,15 +40,15 @@ var Framework_1 = require("./Framework");
 ;
 function testing() {
     return __awaiter(this, void 0, void 0, function () {
-        var test, bridges, bridge2, lights, light, _a, _b, err_1;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
+        var test, bridges, bridge2, lights, light, err_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0:
-                    _c.trys.push([0, 4, , 5]);
+                    _a.trys.push([0, 4, , 5]);
                     test = new Framework_1.Framework();
                     return [4 /*yield*/, test.init()];
                 case 1:
-                    bridges = _c.sent();
+                    bridges = _a.sent();
                     bridge2 = bridges[0];
                     // await bridge.init()
                     return [4 /*yield*/, bridge2.init()
@@ -56,18 +56,16 @@ function testing() {
                     ];
                 case 2:
                     // await bridge.init()
-                    _c.sent();
+                    _a.sent();
                     lights = bridge2.getConnectedLights();
                     light = bridge2.getLightById("00:17:88:01:10:25:5d:16-0b");
-                    console.log(light.getInfo());
-                    _b = (_a = console).log;
-                    return [4 /*yield*/, light.setState({ bri_inc: -254 })];
+                    console.log(lights);
+                    return [4 /*yield*/, light.setState({ on: true })];
                 case 3:
-                    _b.apply(_a, [_c.sent()]);
-                    console.log(light.getInfo());
+                    _a.sent();
                     return [3 /*break*/, 5];
                 case 4:
-                    err_1 = _c.sent();
+                    err_1 = _a.sent();
                     console.log(err_1);
                     return [3 /*break*/, 5];
                 case 5: return [2 /*return*/];

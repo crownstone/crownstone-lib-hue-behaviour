@@ -21,16 +21,9 @@
   <component name="ChangeListManager">
     <list default="true" id="7f56d89c-2fae-4fc6-9386-518a056890c4" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Bridge.js" beforeDir="false" afterPath="$PROJECT_DIR$/Bridge.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Bridge.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Bridge.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Framework.js" beforeDir="false" afterPath="$PROJECT_DIR$/Framework.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Framework.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Framework.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Light.js" beforeDir="false" afterPath="$PROJECT_DIR$/Light.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Light.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Light.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.test.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/saveConfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/saveConfig.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -179,7 +172,7 @@
       <workItem from="1599550957344" duration="6494000" />
       <workItem from="1599560417930" duration="15346000" />
       <workItem from="1599638584444" duration="27935000" />
-      <workItem from="1599811204614" duration="14018000" />
+      <workItem from="1599811204614" duration="16870000" />
     </task>
     <servers />
   </component>
@@ -308,17 +301,5 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1599828065672" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/Framework.ts</url>
-          <line>97</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="24" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

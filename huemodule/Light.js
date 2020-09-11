@@ -72,7 +72,7 @@ var Light = /** @class */ (function () {
             });
         });
     };
-    //supported states and allowed states are different. This one is just for the state object.
+    //This is just to filter for the state object. It is not connected to the supported states.
     Light.prototype._isAllowedStateType = function (state) {
         if (state === 'on' || state === 'hue' ||
             state === 'bri' || state === 'sat' ||
@@ -115,9 +115,16 @@ var Light = /** @class */ (function () {
             state: this.state,
             bridgeId: this.bridgeId,
             id: this.id,
+            supportedStates: this.supportedStates,
             capabilities: this.capabilities,
             lastUpdate: this.lastUpdate
         };
+    };
+    Light.prototype.getUniqueId = function () {
+        return this.uniqueId;
+    };
+    Light.prototype.getSupportedStates = function () {
+        return this.supportedStates;
     };
     return Light;
 }());

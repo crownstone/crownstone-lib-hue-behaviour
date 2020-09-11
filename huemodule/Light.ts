@@ -104,6 +104,11 @@ export class Light {
         };
     }
 
+    getUniqueId():string{
+        return this.uniqueId;
+    }
+
+
     getSupportedStates(): object{
         return this.supportedStates;
     }

@@ -206,6 +206,21 @@ var Framework = /** @class */ (function () {
             });
         });
     };
+    Framework.prototype.removeLightFromConfig = function (bridge, uniqueLightId) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        bridge.removeLight(uniqueLightId);
+                        delete this.configSettings[CONF_BRIDGE_LOCATION][bridge.bridgeId]["lights"][uniqueLightId];
+                        return [4 /*yield*/, this.updateConfigFile()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     //Call this to save configuration to the config file.
     Framework.prototype.updateConfigFile = function () {
         return __awaiter(this, void 0, void 0, function () {

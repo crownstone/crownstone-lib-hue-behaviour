@@ -52,7 +52,7 @@ var BRIDGE_LINK_BUTTON_UNPRESSED = "BRIDGE_LINK_BUTTON_UNPRESSED";
 var BRIDGE_NOT_DISCOVERED = "BRIDGE_NOT_DISCOVERED";
 var Bridge = /** @class */ (function () {
     function Bridge(name, username, clientKey, macAddress, ipAddress, bridgeId, framework) {
-        this.lights = new Array();
+        this.lights = new Object();
         this.reachable = false;
         this.name = name;
         this.username = username;
@@ -149,8 +149,27 @@ var Bridge = /** @class */ (function () {
             });
         });
     };
+    //Adds a light to the list, in case a light is added to the bridge afterwards. id refers to id on the bridge.
+    Bridge.prototype.configureLight = function (id) {
+        return __awaiter(this, void 0, void 0, function () {
+            var lightInfo;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.api.lights.getLight(id)];
+                    case 1:
+                        lightInfo = _a.sent();
+                        this.lights[lightInfo.uniqueId] = {};
+                        this.lights[lightInfo.uniqueId] = new Light_1.Light(lightInfo.name, lightInfo.uniqueId, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this);
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    Bridge.prototype.removeLight = function (uniqueLightId) {
+        delete this.lights[uniqueLightId];
+    };
     Bridge.prototype.getConnectedLights = function () {
-        return this.lights;
+        return Object.values(this.lights);
     };
     Bridge.prototype.getAllLightsFromBridge = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -222,7 +241,8 @@ var Bridge = /** @class */ (function () {
                     case 1:
                         lights = _a.sent();
                         lights.forEach(function (light) {
-                            _this.lights.push(new Light_1.Light(light.name, light.uniqueid, light.state, light.id, _this.bridgeId, light.capabilities.control, light.getSupportedStates(), _this));
+                            _this.lights[light.uniqueId] = {};
+                            _this.lights[light.uniqueId] = new Light_1.Light(light.name, light.uniqueid, light.state, light.id, _this.bridgeId, light.capabilities.control, light.getSupportedStates(), _this);
                         });
                         return [2 /*return*/];
                 }
@@ -243,11 +263,12 @@ var Bridge = /** @class */ (function () {
                     case 1:
                         if (!(_i < lightIds_1.length)) return [3 /*break*/, 4];
                         uniqueId = lightIds_1[_i];
+                        this.lights[uniqueId] = {};
                         light = lightsInConfig[uniqueId];
                         return [4 /*yield*/, this.api.lights.getLight(light.id)];
                     case 2:
                         lightInfo = _a.sent();
-                        this.lights.push(new Light_1.Light(light.name, uniqueId, lightInfo.state, light.id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this));
+                        this.lights[uniqueId] = new Light_1.Light(light.name, uniqueId, lightInfo.state, light.id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this);
                         _a.label = 3;
                     case 3:
                         _i++;
@@ -299,13 +320,7 @@ var Bridge = /** @class */ (function () {
         });
     };
     Bridge.prototype.getLightById = function (uniqueId) {
-        for (var _i = 0, _a = this.lights; _i < _a.length; _i++) {
-            var light = _a[_i];
-            if (light.uniqueId === uniqueId) {
-                return light;
-            }
-        }
-        return undefined;
+        return this.lights[uniqueId];
     };
     Bridge.prototype._getBridgesFromDiscoveryUrl = function () {
         return __awaiter(this, void 0, void 0, function () {
