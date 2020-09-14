@@ -14,8 +14,8 @@ test('Returns the amount of bridges.', async () => {
 });
 
 test('Returns discovery result bridges.', async () => {
-     await framework.init();
-    return await framework.discoverBridges().then(data => {expect(data.length).toBeGreaterThan(0) });
+    await framework.init();
+    return await framework.discoverBridges().then(data => {expect(data.length).toBeGreaterThanOrEqual(0) });
 });
 
 test('Returns bridge info', () => {
@@ -59,6 +59,7 @@ test('configure light by id.', async () => {
     await bridge.configureLight(5);
     return expect(framework.configSettings["Bridges"][bridge.bridgeId]["lights"]["00:17:88:01:10:4a:cd:c8-0b"]).toBeDefined();
 });
+
 
 
 
