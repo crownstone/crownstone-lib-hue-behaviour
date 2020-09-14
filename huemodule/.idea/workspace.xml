@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="BranchesTreeState">
     <expand>
       <path>
@@ -20,7 +23,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7f56d89c-2fae-4fc6-9386-518a056890c4" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/huemodule.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/root/src/Bridge.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/root/src/Bridge.ts" beforeDir="false" afterPath="$PROJECT_DIR$/root/src/Bridge.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/root/src/Framework.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/root/src/Framework.ts" beforeDir="false" afterPath="$PROJECT_DIR$/root/src/Framework.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/root/src/Light.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/root/src/Light.ts" beforeDir="false" afterPath="$PROJECT_DIR$/root/src/Light.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/root/src/index.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/root/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/root/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/root/tests/index.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/root/tests/index.test.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,7 +72,7 @@
     <property name="nodejs.jest.jest_package" value="$PROJECT_DIR$/root/node_modules/jest" />
     <property name="nodejs_interpreter_path" value="node" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="settings.typescriptcompiler" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.smartKeys" />
     <property name="ts.external.directory.path" value="D:\Program Files\JetBrains\WebStorm 2020.2.1\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
@@ -67,7 +85,7 @@
       <recent name="D:\Hue-Module\huemodule\root\tests" />
     </key>
   </component>
-  <component name="RunManager" selected="Jest.Returns no bridge discovered">
+  <component name="RunManager" selected="Node.js.index.js">
     <configuration name="All Tests" type="JavaScriptTestRunnerJest" nameIsGenerated="true">
       <node-interpreter value="project" />
       <node-options value="" />
@@ -75,6 +93,19 @@
       <working-dir value="$PROJECT_DIR$/root" />
       <envs />
       <scope-kind value="ALL" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Get light by id. fail" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <node-options value="" />
+      <jest-package value="$PROJECT_DIR$/root/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/root" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/root/tests/index.test.js" />
+      <test-names>
+        <test-name value="Get light by id. fail" />
+      </test-names>
       <method v="2" />
     </configuration>
     <configuration name="Manipulate light by id." type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
@@ -90,7 +121,7 @@
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="Remove light by id. (1)" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+    <configuration name="Returns discovery result bridges." type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <node-options value="" />
       <jest-package value="$PROJECT_DIR$/root/node_modules/jest" />
@@ -99,7 +130,7 @@
       <scope-kind value="TEST" />
       <test-file value="$PROJECT_DIR$/root/tests/index.test.js" />
       <test-names>
-        <test-name value="Remove light by id." />
+        <test-name value="Returns discovery result bridges." />
       </test-names>
       <method v="2" />
     </configuration>
@@ -113,19 +144,6 @@
       <test-file value="$PROJECT_DIR$/root/tests/index.test.js" />
       <test-names>
         <test-name value="Returns no bridge discovered" />
-      </test-names>
-      <method v="2" />
-    </configuration>
-    <configuration name="Returns the amount of bridges." type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
-      <node-interpreter value="project" />
-      <node-options value="" />
-      <jest-package value="$PROJECT_DIR$/root/node_modules/jest" />
-      <working-dir value="$PROJECT_DIR$/root" />
-      <envs />
-      <scope-kind value="TEST" />
-      <test-file value="$PROJECT_DIR$/root/tests/index.test.js" />
-      <test-names>
-        <test-name value="Returns the amount of bridges." />
       </test-names>
       <method v="2" />
     </configuration>
@@ -160,22 +178,22 @@
     </configuration>
     <list>
       <item itemvalue="Jest.All Tests" />
-      <item itemvalue="Jest.Returns the amount of bridges." />
       <item itemvalue="Jest.Manipulate light by id." />
-      <item itemvalue="Jest.Remove light by id. (1)" />
       <item itemvalue="Jest.configure light by id." />
+      <item itemvalue="Jest.Returns no bridge discovered" />
+      <item itemvalue="Jest.Get light by id. fail" />
+      <item itemvalue="Jest.Returns discovery result bridges." />
       <item itemvalue="Node.js.examples.js" />
       <item itemvalue="Node.js.index.js" />
       <item itemvalue="npm.test" />
-      <item itemvalue="Jest.Returns no bridge discovered" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Jest.Returns no bridge discovered" />
-        <item itemvalue="Jest.Manipulate light by id." />
-        <item itemvalue="Jest.Returns the amount of bridges." />
+        <item itemvalue="Jest.Returns discovery result bridges." />
         <item itemvalue="Jest.configure light by id." />
-        <item itemvalue="Jest.Remove light by id. (1)" />
+        <item itemvalue="Jest.Get light by id. fail" />
+        <item itemvalue="Jest.Manipulate light by id." />
+        <item itemvalue="Jest.Returns no bridge discovered" />
       </list>
     </recent_temporary>
   </component>
@@ -201,20 +219,13 @@
       <workItem from="1599811204614" duration="25492000" />
       <workItem from="1600069080871" duration="1776000" />
       <workItem from="1600071129000" duration="1476000" />
-      <workItem from="1600073378555" duration="6825000" />
+      <workItem from="1600073378555" duration="21366000" />
+      <workItem from="1600098870510" duration="1035000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-    <option name="exactExcludedFiles">
-      <list>
-        <option value="$PROJECT_DIR$/root/src/index.js" />
-        <option value="$PROJECT_DIR$/root/src/Framework.js" />
-        <option value="$PROJECT_DIR$/root/src/Bridge.js" />
-        <option value="$PROJECT_DIR$/root/src/Light.js" />
-      </list>
-    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -233,82 +244,82 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="414" y="175" width="1092" height="834" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600075605590" />
-    <state width="993" height="466" key="DebuggerActiveHint" timestamp="1600081163105">
+    <state width="1283" height="466" key="DebuggerActiveHint" timestamp="1600098681897">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="993" height="466" key="DebuggerActiveHint/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081163105" />
+    <state width="1283" height="466" key="DebuggerActiveHint/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600098681897" />
     <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1600075603477">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="740" y="275" key="FileChooserDialogImpl/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600075603477" />
-    <state width="1899" height="405" key="GridCell.Tab.0.bottom" timestamp="1600081956300">
+    <state width="1899" height="348" key="GridCell.Tab.0.bottom" timestamp="1600099442334">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="405" key="GridCell.Tab.0.bottom/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081956300" />
-    <state width="1899" height="405" key="GridCell.Tab.0.center" timestamp="1600081956300">
+    <state width="1899" height="348" key="GridCell.Tab.0.bottom/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600099442334" />
+    <state width="1899" height="348" key="GridCell.Tab.0.center" timestamp="1600099442334">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="405" key="GridCell.Tab.0.center/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081956300" />
-    <state width="1899" height="405" key="GridCell.Tab.0.left" timestamp="1600081956300">
+    <state width="1899" height="348" key="GridCell.Tab.0.center/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600099442334" />
+    <state width="1899" height="348" key="GridCell.Tab.0.left" timestamp="1600099442334">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="405" key="GridCell.Tab.0.left/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081956300" />
-    <state width="1899" height="405" key="GridCell.Tab.0.right" timestamp="1600081956300">
+    <state width="1899" height="348" key="GridCell.Tab.0.left/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600099442334" />
+    <state width="1899" height="348" key="GridCell.Tab.0.right" timestamp="1600099442334">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="405" key="GridCell.Tab.0.right/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081956300" />
-    <state width="1899" height="348" key="GridCell.Tab.1.bottom" timestamp="1600081337502">
+    <state width="1899" height="348" key="GridCell.Tab.0.right/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600099442334" />
+    <state width="1899" height="348" key="GridCell.Tab.1.bottom" timestamp="1600099463884">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="348" key="GridCell.Tab.1.bottom/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081337502" />
-    <state width="1899" height="348" key="GridCell.Tab.1.center" timestamp="1600081337502">
+    <state width="1899" height="348" key="GridCell.Tab.1.bottom/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600099463884" />
+    <state width="1899" height="348" key="GridCell.Tab.1.center" timestamp="1600099463884">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="348" key="GridCell.Tab.1.center/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081337502" />
-    <state width="1899" height="348" key="GridCell.Tab.1.left" timestamp="1600081337502">
+    <state width="1899" height="348" key="GridCell.Tab.1.center/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600099463884" />
+    <state width="1899" height="348" key="GridCell.Tab.1.left" timestamp="1600099463884">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="348" key="GridCell.Tab.1.left/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081337502" />
-    <state width="1899" height="348" key="GridCell.Tab.1.right" timestamp="1600081337502">
+    <state width="1899" height="348" key="GridCell.Tab.1.left/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600099463884" />
+    <state width="1899" height="348" key="GridCell.Tab.1.right" timestamp="1600099463884">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="348" key="GridCell.Tab.1.right/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081337502" />
-    <state width="1899" height="348" key="GridCell.Tab.2.bottom" timestamp="1600081337503">
+    <state width="1899" height="348" key="GridCell.Tab.1.right/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600099463884" />
+    <state width="1899" height="348" key="GridCell.Tab.2.bottom" timestamp="1600099442181">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="348" key="GridCell.Tab.2.bottom/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081337503" />
-    <state width="1899" height="348" key="GridCell.Tab.2.center" timestamp="1600081337503">
+    <state width="1899" height="348" key="GridCell.Tab.2.bottom/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600099442181" />
+    <state width="1899" height="348" key="GridCell.Tab.2.center" timestamp="1600099442181">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="348" key="GridCell.Tab.2.center/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081337503" />
-    <state width="1899" height="348" key="GridCell.Tab.2.left" timestamp="1600081337503">
+    <state width="1899" height="348" key="GridCell.Tab.2.center/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600099442181" />
+    <state width="1899" height="348" key="GridCell.Tab.2.left" timestamp="1600099442181">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="348" key="GridCell.Tab.2.left/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081337503" />
-    <state width="1899" height="348" key="GridCell.Tab.2.right" timestamp="1600081337503">
+    <state width="1899" height="348" key="GridCell.Tab.2.left/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600099442181" />
+    <state width="1899" height="348" key="GridCell.Tab.2.right" timestamp="1600099442181">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="348" key="GridCell.Tab.2.right/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081337503" />
-    <state width="1899" height="348" key="GridCell.Tab.3.bottom" timestamp="1600081337503">
+    <state width="1899" height="348" key="GridCell.Tab.2.right/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600099442181" />
+    <state width="1899" height="348" key="GridCell.Tab.3.bottom" timestamp="1600099442181">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="348" key="GridCell.Tab.3.bottom/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081337503" />
-    <state width="1899" height="348" key="GridCell.Tab.3.center" timestamp="1600081337503">
+    <state width="1899" height="348" key="GridCell.Tab.3.bottom/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600099442181" />
+    <state width="1899" height="348" key="GridCell.Tab.3.center" timestamp="1600099442181">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="348" key="GridCell.Tab.3.center/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081337503" />
-    <state width="1899" height="348" key="GridCell.Tab.3.left" timestamp="1600081337503">
+    <state width="1899" height="348" key="GridCell.Tab.3.center/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600099442181" />
+    <state width="1899" height="348" key="GridCell.Tab.3.left" timestamp="1600099442181">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="348" key="GridCell.Tab.3.left/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081337503" />
-    <state width="1899" height="348" key="GridCell.Tab.3.right" timestamp="1600081337503">
+    <state width="1899" height="348" key="GridCell.Tab.3.left/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600099442181" />
+    <state width="1899" height="348" key="GridCell.Tab.3.right" timestamp="1600099442181">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1899" height="348" key="GridCell.Tab.3.right/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600081337503" />
-    <state x="461" y="165" key="SettingsEditor" timestamp="1600075428372">
+    <state width="1899" height="348" key="GridCell.Tab.3.right/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600099442181" />
+    <state x="461" y="165" key="SettingsEditor" timestamp="1600088883516">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="461" y="165" key="SettingsEditor/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600075428372" />
+    <state x="461" y="165" key="SettingsEditor/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600088883516" />
     <state width="498" height="446" key="SwitcherDM" timestamp="1599647838127">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -321,29 +332,21 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="512" y="249" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1599483324545" />
-    <state x="616" y="240" key="run.anything.popup" timestamp="1599642656965">
+    <state x="616" y="240" key="run.anything.popup" timestamp="1600098029031">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="616" y="240" key="run.anything.popup/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1599642656965" />
+    <state x="616" y="240" key="run.anything.popup/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600098029031" />
     <state x="828" y="427" key="save.project.as.template.dialog" timestamp="1599814286233">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="828" y="427" key="save.project.as.template.dialog/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1599814286233" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1599828065672">
+    <state x="752" y="378" key="scopes" timestamp="1600085174794">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1599828065672" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/root/src/Bridge.ts</url>
-          <line>166</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <state x="752" y="378" key="scopes/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600085174793" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1600094608266">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1600094608266" />
   </component>
 </project>

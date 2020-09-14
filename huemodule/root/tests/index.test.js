@@ -14,7 +14,8 @@ test('Returns the amount of bridges.', async () => {
 });
 
 test('Returns discovery result bridges.', async () => {
-     await framework.init();
+    jest.setTimeout(55000);
+    await framework.init();
     return await framework.discoverBridges().then(data => {expect(data.length).toBeGreaterThan(0) });
 });
 
@@ -37,6 +38,12 @@ test('Returns no bridge discovered', async () => {
     } catch (e) {
         expect(e).toEqual(Error("BRIDGE_NOT_DISCOVERED"))
     }
+});
+
+test('Get light by id. fail', async () => {
+    const bridge = await framework.init().then(bridges => {return bridges[0]});
+    await bridge.init();
+    return expect(bridge.getLightById("A00:17:88:01:10:4a:cd:c8-Db")).toBeUndefined();
 });
 
 test('Manipulate light by id.', async () => {

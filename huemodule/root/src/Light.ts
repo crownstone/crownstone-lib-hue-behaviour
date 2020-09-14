@@ -1,7 +1,7 @@
 import {Bridge} from "./Bridge";
 
 
-interface hueState {
+interface HueState {
     on: boolean,
     bri?: number,
     hue?: number,
@@ -26,19 +26,34 @@ const possibleStates = {
     'ct': true,
     'alert': true
 }
-
+/**
+ * Light object
+ *
+ * @remarks
+ *
+ * @param name - Name of the light.
+ * @param uniqueId - Unique id of the Light.
+ * @param state - The state of the light.
+ * @param id - The id of the light on the Bridge.
+ * @param bridgeId - The id of the Bridge the Light is connected to.
+ * @param capabilities - Capabilities what the light is capable off,  For each light type it's different. Info added on creation from Bridge.
+ * @param supportedStates - supported states of the light. For each light type it's different. Info added on creation from Bridge.
+ * @param connectedBridge - Link to the bridge object it is connected to.
+ * @param lastUpdate - Timestamp of when the state was last changed.
+ *
+ */
 export class Light {
     name: string;
-    uniqueId: string;
-    state: hueState;
-    id: number;
+    readonly uniqueId: string;
+    private state: HueState;
+    readonly id: number;
     bridgeId: string;
     capabilities: object;
     supportedStates: object;
     connectedBridge: Bridge;
     lastUpdate: number;
 
-    constructor(name: string, uniqueId: string, state: hueState, id: number, bridgeId: string, capabilities: object, supportedStates: object, connectedBridge: any) {
+    constructor(name: string, uniqueId: string, state: HueState, id: number, bridgeId: string, capabilities: object, supportedStates: object, connectedBridge: any) {
         this.name = name;
         this.uniqueId = uniqueId;
         this.state = state;
@@ -49,16 +64,14 @@ export class Light {
         this.connectedBridge = connectedBridge;
         this.lastUpdate = Date.now();
     }
-
-    setName(name: string): void {
-        this.name = name;
-    }
-
-    setLastUpdate(): void {
+     setLastUpdate(): void {
         this.lastUpdate = Date.now();
 
     }
 
+    /**
+     * Obtains the state from the light on the bridge and compares it with current state.
+     */
     async renewState(): Promise<void> {
         const newState = await this.connectedBridge.api.lights.getLightState(this.id);
         if (this.state != newState) {
@@ -68,13 +81,17 @@ export class Light {
 
     }
 
+    getState(): HueState {
+    return this.state;
+    }
+
     //This is just to filter for the state object. It is not connected to the supported states.
     _isAllowedStateType(state): boolean {
         return possibleStates[state] || false;
     }
 
 
-    updateState(state: object): void {
+    _updateState(state: object): void {
         Object.keys(state).forEach(key => {
             if (this._isAllowedStateType(key)) {
                 this.state[key] = state[key];
@@ -86,13 +103,13 @@ export class Light {
     async setState(state: object): Promise<boolean> {
         const result = await this.connectedBridge.api.lights.setLightState(this.id.toString(), state);
         if (result) {
-            this.updateState(state);
+            this._updateState(state);
         }
         return result;
     }
 
     isReachable(): boolean {
-        return this.state["reachable"];
+        return this.state["reachable"] || false;
     }
 
     getInfo(): object {
