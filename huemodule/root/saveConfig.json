@@ -7,13 +7,13 @@
       "username": "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo",
       "clientKey": "F713C35839453184BA3B148E5504C74B",
       "lights": {
-        "00:17:88:01:10:4a:cd:c8-0b": {
-          "name": "Hue color lamp 2",
-          "id": 5
-        },
         "00:17:88:01:10:25:5d:16-0b": {
           "name": "Hue color lamp 1",
           "id": 4
+        },
+        "00:17:88:01:10:4a:cd:c8-0b": {
+          "name": "Hue color lamp 2",
+          "id": 5
         }
       }
     },

@@ -48,6 +48,7 @@ var NO_BRIDGES_DISCOVERED = "NO_BRIDGES_DISCOVERED";
 var UNAUTHORIZED_USER = "UNAUTHORIZED_USER";
 var BRIDGE_LINK_BUTTON_UNPRESSED = "BRIDGE_LINK_BUTTON_UNPRESSED";
 var BRIDGE_CONNECTION_FAILED = "BRIDGE_CONNECTION_FAILED";
+var CONFIG_UNDEFINED = "CONFIG_UNDEFINED";
 //config locations/names
 var CONF_NAME = "saveConfig.json";
 var CONF_BRIDGE_LOCATION = "Bridges";
@@ -137,7 +138,7 @@ var Framework = /** @class */ (function () {
                     case 1:
                         discoveryResults = _a.sent();
                         if (discoveryResults.length === 0) {
-                            throw Error(NO_BRIDGES_DISCOVERED);
+                            return [2 /*return*/, discoveryResults];
                         }
                         else {
                             bridges_1 = new Array();
@@ -168,7 +169,7 @@ var Framework = /** @class */ (function () {
     Framework.prototype.getConfiguredBridges = function () {
         var bridges = Object.keys(this.configSettings[CONF_BRIDGE_LOCATION]);
         if (bridges === undefined || bridges === null || bridges.length === 0) {
-            throw Error(NO_BRIDGES_IN_CONFIG);
+            return new Array();
         }
         else {
             return bridges;
@@ -203,7 +204,7 @@ var Framework = /** @class */ (function () {
                             bridge.getConnectedLights().forEach(function (light) { return __awaiter(_this, void 0, void 0, function () {
                                 return __generator(this, function (_a) {
                                     switch (_a.label) {
-                                        case 0: return [4 /*yield*/, this.saveLightInfo(bridge.bridgeId, light.getInfo())];
+                                        case 0: return [4 /*yield*/, this.saveLightInfo(bridge.bridgeId, light)];
                                         case 1:
                                             _a.sent();
                                             return [2 /*return*/];
@@ -214,20 +215,22 @@ var Framework = /** @class */ (function () {
                         return [4 /*yield*/, this.updateConfigFile()];
                     case 1:
                         _a.sent();
+                        "";
                         return [2 /*return*/];
                 }
             });
         });
     };
+    //TODO
     Framework.prototype.saveLightInfo = function (bridgeId, light) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]] = {};
-                this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["name"] = light["name"];
-                this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["id"] = light["id"];
-                return [2 /*return*/];
-            });
-        });
+        if (this.configSettings != undefined || this.configSettings != {}) {
+            this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]] = {};
+            this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["name"] = light["name"];
+            this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["id"] = light["id"];
+        }
+        else {
+            throw Error(CONFIG_UNDEFINED);
+        }
     };
     Framework.prototype.removeLightFromConfig = function (bridge, uniqueLightId) {
         return __awaiter(this, void 0, void 0, function () {

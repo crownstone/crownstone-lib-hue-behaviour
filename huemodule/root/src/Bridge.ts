@@ -1,6 +1,6 @@
 import {Framework} from "./Framework";
 import {Light} from "./Light"
-import lightModel = require("./node_modules/node-hue-api/lib/model/Light");
+import lightModel = require(".././node_modules/node-hue-api/lib/model/Light");
 import {v3} from "node-hue-api";
 
 const discovery = v3.discovery;
@@ -18,7 +18,7 @@ const BRIDGE_LINK_BUTTON_UNPRESSED = "BRIDGE_LINK_BUTTON_UNPRESSED";
 const BRIDGE_NOT_DISCOVERED = "BRIDGE_NOT_DISCOVERED";
 
 
-type discoverResult = {
+interface DiscoverResult {
     id: string,
     internalipaddress: string
 }
@@ -59,7 +59,7 @@ export class Bridge {
     }
 
     async link(): Promise<void> {
-        await this.createUser()
+        await this.createNewUser()
         await this.connect();
         const bridgeConfig = await this.api.configuration.getConfiguration();
         await this.update({
@@ -121,7 +121,7 @@ export class Bridge {
     }
 
     //User should press link button before this is called.
-    async createUser(): Promise<void> {
+    async createNewUser(): Promise<void> {
         await this.createUnAuthenticatedApi();
         let createdUser = await this.api.users.createUser(this.framework.APP_NAME, this.framework.DEVICE_NAME);
         this.update({"username": createdUser.username, "clientKey": createdUser.clientkey})
@@ -133,7 +133,6 @@ export class Bridge {
         let lights = await this.api.lights.getAll();
 
         lights.forEach(light => {
-            this.lights[light.uniqueId] = {};
             this.lights[light.uniqueId] =new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this)
         });
     }
@@ -158,20 +157,19 @@ export class Bridge {
         if (possibleBridges.length === 0) {
             throw Error(BRIDGE_NOT_DISCOVERED);
         } else {
-            let result = {id: "", internalipaddress: ""};
+            let result: DiscoverResult = {id: "", internalipaddress: ""};
             for (const item of possibleBridges) {
                 if (this.bridgeId.toLowerCase() === item.id.toLowerCase()) {
                     result = item;
                     break;
                 }
             }
-            if (typeof (result) === "object") {
+            if (result.id === "") {
+                throw Error(BRIDGE_NOT_DISCOVERED)
+            } else {
                 this.ipAddress = result.internalipaddress;
                 await this.createAuthenticatedApi()
                 await this.framework.updateBridgeIpAddress(this.bridgeId,this.ipAddress);
-            }
-            if (result.id === "") {
-                throw Error(BRIDGE_NOT_DISCOVERED)
             }
         }
     }
@@ -180,7 +178,7 @@ export class Bridge {
         return this.lights[uniqueId];
     }
 
-    async _getBridgesFromDiscoveryUrl(): Promise<discoverResult[]> {
+    async _getBridgesFromDiscoveryUrl(): Promise<DiscoverResult[]> {
         const result = await fetch(DISCOVERY_URL, {method: "Get"}).then(res => {
             return res.json()
         });

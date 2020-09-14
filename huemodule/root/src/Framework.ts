@@ -11,6 +11,11 @@ const NO_BRIDGES_DISCOVERED = "NO_BRIDGES_DISCOVERED";
 const UNAUTHORIZED_USER = "UNAUTHORIZED_USER";
 const BRIDGE_LINK_BUTTON_UNPRESSED = "BRIDGE_LINK_BUTTON_UNPRESSED";
 const BRIDGE_CONNECTION_FAILED = "BRIDGE_CONNECTION_FAILED";
+const CONFIG_UNDEFINED = "CONFIG_UNDEFINED";
+
+
+
+
 
 type confBridge = {
     name: string;
@@ -83,7 +88,7 @@ export class Framework {
     async discoverBridges(): Promise<Bridge[]> {
         const discoveryResults = await discovery.nupnpSearch()
         if (discoveryResults.length === 0) {
-            throw Error(NO_BRIDGES_DISCOVERED);
+            return discoveryResults;
         } else {
             let bridges: Bridge[] = new Array();
             discoveryResults.forEach(item => {
@@ -109,7 +114,7 @@ export class Framework {
     getConfiguredBridges(): string[] {
         const bridges: string[] = Object.keys(this.configSettings[CONF_BRIDGE_LOCATION]);
         if (bridges === undefined || bridges === null || bridges.length === 0) {
-            throw Error(NO_BRIDGES_IN_CONFIG);
+            return new Array();
         } else {
             return bridges;
         }
@@ -128,16 +133,21 @@ export class Framework {
     async saveAllLightsFromConnectedBridges(): Promise<void> {
         this.connectedBridges.forEach(bridge => {
             bridge.getConnectedLights().forEach(async light => {
-                await this.saveLightInfo(bridge.bridgeId,light.getInfo())
+                await this.saveLightInfo(bridge.bridgeId,light)
             })
         });
-        await this.updateConfigFile();
+        await this.updateConfigFile();``
     }
 
-    async saveLightInfo(bridgeId: string, light: object): Promise<void> {
+    //TODO
+    saveLightInfo(bridgeId: string, light: Light): void {
+        if(this.configSettings != undefined || this.configSettings != {}){
         this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]] = {};
         this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["name"] = light["name"];
         this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["id"] = light["id"];
+        } else {
+            throw Error(CONFIG_UNDEFINED)
+        }
     }
 
     async removeLightFromConfig(bridge:Bridge,uniqueLightId){

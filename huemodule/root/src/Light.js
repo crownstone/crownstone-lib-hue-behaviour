@@ -37,6 +37,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Light = void 0;
+var possibleStates = {
+    'on': true,
+    'hue': true,
+    'bri': true,
+    'sat': true,
+    'effect': true,
+    'xy': true,
+    'ct': true,
+    'alert': true
+};
 var Light = /** @class */ (function () {
     function Light(name, uniqueId, state, id, bridgeId, capabilities, supportedStates, connectedBridge) {
         this.name = name;
@@ -74,15 +84,7 @@ var Light = /** @class */ (function () {
     };
     //This is just to filter for the state object. It is not connected to the supported states.
     Light.prototype._isAllowedStateType = function (state) {
-        if (state === 'on' || state === 'hue' ||
-            state === 'bri' || state === 'sat' ||
-            state === 'effect' || state === 'xy' ||
-            state === 'ct' || state === 'alert') {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return possibleStates[state] || false;
     };
     Light.prototype.updateState = function (state) {
         var _this = this;
@@ -97,11 +99,15 @@ var Light = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var result;
             return __generator(this, function (_a) {
-                result = this.connectedBridge.api.lights.setLightState(this.id.toString(), state);
-                if (result) {
-                    this.updateState(state);
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.connectedBridge.api.lights.setLightState(this.id.toString(), state)];
+                    case 1:
+                        result = _a.sent();
+                        if (result) {
+                            this.updateState(state);
+                        }
+                        return [2 /*return*/, result];
                 }
-                return [2 /*return*/, result];
             });
         });
     };

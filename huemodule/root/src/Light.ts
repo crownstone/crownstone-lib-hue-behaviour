@@ -1,12 +1,13 @@
 import {Bridge} from "./Bridge";
 
-type hueState  = {
+
+interface hueState {
     on: boolean,
     bri?: number,
     hue?: number,
     sat?: number,
     effect?: string,
-    xy?: [ number, number ],
+    xy?: [number, number],
     ct?: number,
     alert?: string,
     colormode?: string,
@@ -14,6 +15,17 @@ type hueState  = {
     reachable?: boolean
 }
 
+
+const possibleStates = {
+    'on': true,
+    'hue': true,
+    'bri': true,
+    'sat': true,
+    'effect': true,
+    'xy': true,
+    'ct': true,
+    'alert': true
+}
 
 export class Light {
     name: string;
@@ -26,7 +38,7 @@ export class Light {
     connectedBridge: Bridge;
     lastUpdate: number;
 
-    constructor(name: string, uniqueId: string, state: hueState, id: number, bridgeId: string,capabilities: object, supportedStates: object, connectedBridge: any) {
+    constructor(name: string, uniqueId: string, state: hueState, id: number, bridgeId: string, capabilities: object, supportedStates: object, connectedBridge: any) {
         this.name = name;
         this.uniqueId = uniqueId;
         this.state = state;
@@ -38,17 +50,18 @@ export class Light {
         this.lastUpdate = Date.now();
     }
 
-    setName(name:string): void{
+    setName(name: string): void {
         this.name = name;
     }
 
-    setLastUpdate():void{
+    setLastUpdate(): void {
         this.lastUpdate = Date.now();
 
     }
+
     async renewState(): Promise<void> {
         const newState = await this.connectedBridge.api.lights.getLightState(this.id);
-        if( this.state != newState){
+        if (this.state != newState) {
             this.state = newState
             this.setLastUpdate()
         }
@@ -56,19 +69,12 @@ export class Light {
     }
 
     //This is just to filter for the state object. It is not connected to the supported states.
-    _isAllowedStateType(state):boolean {
-        if (state === 'on' || state === 'hue' ||
-            state === 'bri' || state === 'sat' ||
-            state === 'effect' || state === 'xy' ||
-            state === 'ct' || state === 'alert') {
-            return true;
-        } else {
-            return false;
-        }
+    _isAllowedStateType(state): boolean {
+        return possibleStates[state] || false;
     }
 
 
-    updateState(state:object): void{
+    updateState(state: object): void {
         Object.keys(state).forEach(key => {
             if (this._isAllowedStateType(key)) {
                 this.state[key] = state[key];
@@ -77,15 +83,15 @@ export class Light {
         this.setLastUpdate()
     }
 
-    async setState(state:object): Promise<boolean> {
-        const result = this.connectedBridge.api.lights.setLightState(this.id.toString(), state);
+    async setState(state: object): Promise<boolean> {
+        const result = await this.connectedBridge.api.lights.setLightState(this.id.toString(), state);
         if (result) {
             this.updateState(state);
         }
         return result;
     }
 
-    isReachable(): boolean{
+    isReachable(): boolean {
         return this.state["reachable"];
     }
 
@@ -96,18 +102,18 @@ export class Light {
             state: this.state,
             bridgeId: this.bridgeId,
             id: this.id,
-            supportedStates : this.supportedStates,
+            supportedStates: this.supportedStates,
             capabilities: this.capabilities,
             lastUpdate: this.lastUpdate
         };
     }
 
-    getUniqueId():string{
+    getUniqueId(): string {
         return this.uniqueId;
     }
 
 
-    getSupportedStates(): object{
+    getSupportedStates(): object {
         return this.supportedStates;
     }
 }

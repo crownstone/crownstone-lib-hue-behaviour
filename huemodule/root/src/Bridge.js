@@ -248,7 +248,6 @@ var Bridge = /** @class */ (function () {
                     case 1:
                         lights = _a.sent();
                         lights.forEach(function (light) {
-                            _this.lights[light.uniqueId] = {};
                             _this.lights[light.uniqueId] = new Light_1.Light(light.name, light.uniqueid, light.state, light.id, _this.bridgeId, light.capabilities.control, light.getSupportedStates(), _this);
                         });
                         return [2 /*return*/];

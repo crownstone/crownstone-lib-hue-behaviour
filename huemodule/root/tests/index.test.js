@@ -2,8 +2,8 @@
  * @jest-environment node
  */
 
-const Framework = require('./Framework').Framework;
-const Bridge = require('./Bridge').Bridge;
+const Framework = require('../dist').Framework;
+const Bridge = require('../dist').Bridge;
 
 const framework = new Framework();
 const notWorkingBridge = new Bridge("Hue color lamp 3","user","key","mac","192.168.178.12","-1",framework);
@@ -31,7 +31,12 @@ test('Returns bridge info', () => {
 });
 
 test('Returns no bridge discovered', async () => {
-    return expect(await notWorkingBridge.init()).toStrictEqual( Error("NO_BRIDGES_DISCOVERED"))
+    jest.setTimeout(20000);
+    try {
+        await notWorkingBridge.init();
+    } catch (e) {
+        expect(e).toEqual(Error("BRIDGE_NOT_DISCOVERED"))
+    }
 });
 
 test('Manipulate light by id.', async () => {
