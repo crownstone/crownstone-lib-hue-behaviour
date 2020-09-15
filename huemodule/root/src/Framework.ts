@@ -71,7 +71,7 @@ export class Framework {
         return this.configSettings;
     }
 
-    async addBridgeToConfig(bridge: BridgeFormat) {
+    async addBridgeToConfig(bridge: BridgeFormat): Promise<void> {
         if (this.configSettings != undefined || this.configSettings != {}) {
             this.configSettings[CONF_BRIDGE_LOCATION][bridge.bridgeId] = {
                 name: bridge.name,
@@ -146,7 +146,7 @@ export class Framework {
         } else if (bridges.length >= 0) {
             let confBridges = [];
             for (const bridgeId of bridges) {
-                confBridges.push(this._createBridgeFromConfig(bridgeId));
+                confBridges.push(this.createBridgeFromConfig(bridgeId));
             }
             return confBridges;
         } else {
@@ -159,7 +159,7 @@ export class Framework {
      * Including it's lights.
      *
      */
-    async saveBridgeInformation(bridge: Bridge): Promise<void> {
+        async saveBridgeInformation(bridge: Bridge): Promise<void> {
         let config = bridge.getInfo();
         let bridgeId = config["bridgeId"];
         delete config["reachable"];
@@ -222,7 +222,7 @@ export class Framework {
         return this.connectedBridges;
     }
 
-    private _createBridgeFromConfig(bridgeId: string): Bridge {
+    createBridgeFromConfig(bridgeId: string): Bridge {
         const bridgeConfig = this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]
         if (bridgeConfig.name != "", bridgeConfig.macAddress != "", bridgeConfig.ipAddress != "") {
             if (bridgeConfig.username === undefined || bridgeConfig.username === null) {
