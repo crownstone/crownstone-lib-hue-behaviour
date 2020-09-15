@@ -1,15 +1,13 @@
 import {Framework} from "./Framework";
 import {Light} from "./Light"
 import {v3} from "node-hue-api";
+import {FrameworkError} from "./FrameworkError";
 
 const hueApi = v3.api;
 const fetch = require('node-fetch');
 
 
 const DISCOVERY_URL = "https://discovery.meethue.com/";
-//Return messages/Error codes
-const BRIDGE_NOT_DISCOVERED = "BRIDGE_NOT_DISCOVERED";
-const BRIDGE_NOT_CONNECTED = "BRIDGE_NOT_CONNECTED";
 
 
 interface DiscoverResult {
@@ -60,18 +58,28 @@ export class Bridge {
 
         this.framework = framework;
     }
+
     /**
      * To be called for initialization of a bridge.
      *
      */
     async init(): Promise<void> {
-        if (this.username == "") {
-            await this.link();
-        } else {
-            await this.connect();
-            await this.createLightsFromConfig();
+        try {
+            if (this.username == "") {
+                await this.link();
+            } else {
+                await this.connect();
+                await this.createLightsFromConfig();
+            }
+        } catch (err) {
+            if (typeof (err.getHueErrorType) === "function" && err.getHueErrorType() === 1) {
+                throw new FrameworkError(401)
+            } else {
+                throw err;
+            }
         }
     }
+
     /**
      * Links and connects the bridge to the module. Bridge link button should be pressed before being called.
      *
@@ -124,22 +132,35 @@ export class Bridge {
      * Used to add a light that is connected to the Hue bridge to the list of this class.
      * id refers to the id of the light on the bridge and NOT the uniqueId of a light.
      * Gets info of the light from Bridge and creates a Light object and pushes it to the list.
-     * Invalid id: Throws Error: Light # not found.
+     * Throws error on invalid Id.
      */
-    async configureLight(id:number):Promise<void>{
-        if(this.authenticated){
-        const lightInfo = await this.api.lights.getLight(id);
-        this.lights[lightInfo.uniqueid] = {};
-        const light = new Light(lightInfo.name, lightInfo.uniqueid, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this)
-        this.lights[lightInfo.uniqueid] = light;
-        await this.framework.saveLightInfo(this.bridgeId,light)
-        await this.framework.updateConfigFile();
+    async configureLight(id: number): Promise<void> {
+        if (this.authenticated) {
+            try{
+            const lightInfo = await this.api.lights.getLight(id);
+            this.lights[lightInfo.uniqueid] = {};
+            const light = new Light(lightInfo.name, lightInfo.uniqueid, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this)
+            this.lights[lightInfo.uniqueid] = light;
+            await this.framework.addLightInfo(this.bridgeId, light)
+            await this.framework.updateConfigFile();
+            } catch (err){
+                if (typeof (err.getHueErrorType) === "function") {
+                    if (err.message.includes(`Light ${id} not found`)){
+                    throw new FrameworkError(422, id)
+                    } else {
+                        throw new FrameworkError(999,err.message);
+                    }
+                } else {
+                    throw err;
+                }
+            }
         } else {
-            throw Error()
+            throw new FrameworkError(405);
+
         }
     }
 
-    removeLight(uniqueLightId:string): void{
+    removeLight(uniqueLightId: string): void {
         delete this.lights[uniqueLightId];
     }
 
@@ -149,24 +170,30 @@ export class Bridge {
 
 
     async getAllLightsFromBridge() {
-        return await this.api.lights.getAll();
+        if (this.authenticated) {
+            return await this.api.lights.getAll();
+        } else {
+            throw new FrameworkError(405);
+        }
     }
+
     /**
      * Connects to the bridge and creates an API that has full access to the bridge.
      * Bridge should be linked and a username should be present before calling.
      *
      */
-    async _createAuthenticatedApi(): Promise<void> {
+    private async _createAuthenticatedApi(): Promise<void> {
         this.api = await hueApi.createLocal(this.ipAddress).connect(this.username);
         this.reachable = true;
         this.authenticated = true;
     }
+
     /**
      * Connects to the bridge and creates an API that has limited access to the bridge.
      * @remarks
      * Mainly used to create a user
      */
-    async _createUnAuthenticatedApi(): Promise<void> {
+    private async _createUnAuthenticatedApi(): Promise<void> {
         this.api = await hueApi.createLocal(this.ipAddress).connect();
         this.reachable = true;
         this.authenticated = false;
@@ -178,13 +205,22 @@ export class Bridge {
      *
      * @remarks
      * Creates a user on the Bridge, link button on bridge should be pressed before being called.
-     * this.api.users.createUser throws LINK_BUTTON_NOT_PRESSED  if link button is not pressed
+     * Throws error if link button is not pressed
      *
      */
     async createNewUser(): Promise<void> {
         await this._createUnAuthenticatedApi();
-        let createdUser = await this.api.users.createUser(this.framework.APP_NAME, this.framework.DEVICE_NAME);
-        this.update({"username": createdUser.username, "clientKey": createdUser.clientkey})
+        try {
+            let createdUser = await this.api.users.createUser(this.framework.APP_NAME, this.framework.DEVICE_NAME);
+            this.update({"username": createdUser.username, "clientKey": createdUser.clientkey})
+
+        } catch (err) {
+            if (typeof (err.getHueErrorType) === "function" && err.getHueErrorType() === 101) {
+                throw new FrameworkError(406)
+            } else {
+                throw err;
+            }
+        }
 
     }
 
@@ -193,11 +229,15 @@ export class Bridge {
      *
      */
     async populateLights(): Promise<void> {
-        let lights = await this.api.lights.getAll();
+        if (this.authenticated) {
+            let lights = await this.api.lights.getAll();
 
-        lights.forEach(light => {
-            this.lights[light.uniqueId] =new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this)
-        });
+            lights.forEach(light => {
+                this.lights[light.uniqueId] = new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this)
+            });
+        } else {
+            throw new FrameworkError(405);
+        }
     }
 
     async createLightsFromConfig(): Promise<void> {
@@ -205,11 +245,10 @@ export class Bridge {
         lightsInConfig = lightsInConfig["Bridges"][this.bridgeId]["lights"];
         const lightIds: string[] = Object.keys(lightsInConfig);
 
-        for(const uniqueId of lightIds){
+        for (const uniqueId of lightIds) {
             this.lights[uniqueId] = {};
             const light = lightsInConfig[uniqueId];
             const lightInfo = await this.api.lights.getLight(light.id);
-
             this.lights[uniqueId] = new Light(lightInfo.name, uniqueId, lightInfo.state, light.id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this);
         }
     }
@@ -223,13 +262,13 @@ export class Bridge {
      * Success:
      * If bridge is found it updates bridge info and creates the API for it.
      * Fail:
-     * If the bridge is not found in the network it throws Error BRIDGE_NOT_DISCOVERED
+     * If the bridge is not found in the network it throws Error
      *
      */
-    async _rediscoverMyself(): Promise<void> {
+    private async _rediscoverMyself(): Promise<void> {
         let possibleBridges = await this._getBridgesFromDiscoveryUrl();
         if (possibleBridges.length === 0) {
-            throw Error(BRIDGE_NOT_DISCOVERED);
+            throw new FrameworkError(404, "Bridge with id " + this.ipAddress + " not found.");
         } else {
             let result: DiscoverResult = {id: "", internalipaddress: ""};
             for (const item of possibleBridges) {
@@ -239,11 +278,11 @@ export class Bridge {
                 }
             }
             if (result.id === "") {
-                throw Error(BRIDGE_NOT_DISCOVERED)
+                throw new FrameworkError(404, "Bridge with id " + this.ipAddress + " not found.")
             } else {
                 this.ipAddress = result.internalipaddress;
                 await this._createAuthenticatedApi()
-                await this.framework.updateBridgeIpAddress(this.bridgeId,this.ipAddress);
+                await this.framework.updateBridgeIpAddress(this.bridgeId, this.ipAddress);
             }
         }
     }
@@ -251,6 +290,7 @@ export class Bridge {
     getLightById(uniqueId: string): Light {
         return this.lights[uniqueId];
     }
+
     /**
      * Retrieves online Hue bridges in the local network with Hue's discover url.
      *
@@ -261,7 +301,7 @@ export class Bridge {
      * An array of DiscoverResult either filled or empty.
      *
      */
-    async _getBridgesFromDiscoveryUrl(): Promise<DiscoverResult[]> {
+    private async _getBridgesFromDiscoveryUrl(): Promise<DiscoverResult[]> {
         return await fetch(DISCOVERY_URL, {method: "Get"}).then(res => {
             return res.json()
         });

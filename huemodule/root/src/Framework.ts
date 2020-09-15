@@ -2,12 +2,9 @@ import {promises as fs} from 'fs';
 import {Bridge} from "./Bridge";
 import {Light} from "./Light";
 import {v3} from "node-hue-api";
+import {FrameworkError} from "./FrameworkError";
 
-const discovery = v3.discovery;
-
-//Return messages/Error codes
-const CONFIG_UNDEFINED = "CONFIG_UNDEFINED";
-
+const discovery = v3.discovery
 
 interface BridgeFormat {
     name: string;
@@ -53,11 +50,8 @@ export class Framework {
     async init(): Promise<Bridge[]> {
         await this.loadConfigSettings();
         const result = this.getConfiguredBridges();
-        let bridges = [];
-        for (const bridgeId of result) {
-            bridges.push(this.createBridgeFromConfig(bridgeId));
-        }
-        return bridges;
+
+        return result;
     }
 
     async loadConfigSettings(): Promise<void> {
@@ -90,12 +84,12 @@ export class Framework {
             }
             if (bridge.lights != undefined || bridge.lights != {}) {
                 Object.values(bridge.lights).forEach((light) => {
-                    this.saveLightInfo(bridge.bridgeId, light)
+                    this.addLightInfo(bridge.bridgeId, light)
                 });
             }
             await this.updateConfigFile();
         } else {
-            throw Error(CONFIG_UNDEFINED)
+            throw new FrameworkError(410);
         }
     }
 
@@ -104,26 +98,34 @@ export class Framework {
      *
      * @returns List of discovered bridges.
      *
-     * .nupnpSearch() Throws Error with message when a Bridge is for any reason offline but registered to the Portal of Philips
+     *
      */
     async discoverBridges(): Promise<Bridge[]> {
-        const discoveryResults = await discovery.nupnpSearch()
-        if (discoveryResults.length === 0) {
-            return discoveryResults;
-        } else {
-            let bridges: Bridge[] = [];
-            discoveryResults.forEach(item => {
-                bridges.push(new Bridge(
-                    item.name,
-                    "",
-                    "",
-                    "",
-                    item.ipaddress,
-                    "",
-                    this
-                ))
-            })
-            return bridges;
+        try{
+            const discoveryResults = await discovery.nupnpSearch()
+            if (discoveryResults.length === 0) {
+                return discoveryResults;
+            } else {
+                let bridges: Bridge[] = [];
+                discoveryResults.forEach(item => {
+                    bridges.push(new Bridge(
+                        item.name,
+                        "",
+                        "",
+                        "",
+                        item.ipaddress,
+                        "",
+                        this
+                    ))
+                })
+                return bridges;
+            }
+        } catch(err){
+            if(err.message.includes("ETIMEDOUT")){
+                return [];
+            } else {
+                throw err;
+            }
         }
     }
 
@@ -132,43 +134,73 @@ export class Framework {
         await this.updateConfigFile();
     }
 
-    getConfiguredBridges(): string[] {
+    /**
+     * Retrieves the bridges from the config file.
+     *
+     * @Returns array of Bridge
+     */
+    getConfiguredBridges(): Bridge[] {
         const bridges: string[] = Object.keys(this.configSettings[CONF_BRIDGE_LOCATION]);
         if (bridges === undefined || bridges === null || bridges.length === 0) {
             return [];
+        } else if (bridges.length >= 0) {
+            let confBridges = [];
+            for (const bridgeId of bridges) {
+                confBridges.push(this._createBridgeFromConfig(bridgeId));
+            }
+            return confBridges;
         } else {
-            return bridges;
+            throw Error("Unexpected Error in getConfiguredBridges()");
         }
     }
 
+    /**
+     * Saves the given Bridge into the config file.
+     * Including it's lights.
+     *
+     */
     async saveBridgeInformation(bridge: Bridge): Promise<void> {
         let config = bridge.getInfo();
         let bridgeId = config["bridgeId"];
         delete config["reachable"];
         delete config["bridgeId"];
         this.configSettings[CONF_BRIDGE_LOCATION][bridgeId] = config;
+        if (bridge.lights != {}) {
+            bridge.getConnectedLights().forEach(light => {
+                this.addLightInfo(bridge.bridgeId, light)
+            })
+        }
         await this.updateConfigFile()
 
     }
 
+    /**
+     * Saves all lights from the connected bridges into the config file.
+     *
+     */
     async saveAllLightsFromConnectedBridges(): Promise<void> {
         this.connectedBridges.forEach(bridge => {
-            bridge.getConnectedLights().forEach(async light => {
-                await this.saveLightInfo(bridge.bridgeId, light)
+            bridge.getConnectedLights().forEach(light => {
+                this.addLightInfo(bridge.bridgeId, light)
             })
         });
         await this.updateConfigFile();
-        ``
     }
 
-    //TODO
-    saveLightInfo(bridgeId: string, light: Light): void {
+    /**
+     * Adds the given Light to the configSettings variable
+     * call this.updateConfigFile() to save into the config file.
+     *
+     * @param bridgeId - The id of the bridge the light is connected to.
+     * @param light - Light object of the light to be saved
+     */
+    addLightInfo(bridgeId: string, light: Light): void {
         if (this.configSettings != undefined || this.configSettings != {}) {
             this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]] = {};
             this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["name"] = light["name"];
             this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["id"] = light["id"];
         } else {
-            throw Error(CONFIG_UNDEFINED)
+            throw new FrameworkError(410)
         }
     }
 
@@ -178,7 +210,10 @@ export class Framework {
         await this.updateConfigFile();
     }
 
-    //Call this to save configuration to the config file.
+    /**
+     * Updates the configFile with the current configSettings variable.
+     *
+     */
     async updateConfigFile(): Promise<void> {
         await fs.writeFile(CONF_NAME, JSON.stringify(this.configSettings, null, 2));
     }
@@ -187,16 +222,26 @@ export class Framework {
         return this.connectedBridges;
     }
 
-    createBridgeFromConfig(bridgeId: string): Bridge {
+    private _createBridgeFromConfig(bridgeId: string): Bridge {
         const bridgeConfig = this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]
-        let bridge = new Bridge(bridgeConfig.name, bridgeConfig.username, bridgeConfig.clientKey, bridgeConfig.macAddress, bridgeConfig.ipAddress, bridgeId, this);
-        this.connectedBridges.push(bridge);
-        return bridge;
+        if (bridgeConfig.name != "", bridgeConfig.macAddress != "", bridgeConfig.ipAddress != "") {
+            if (bridgeConfig.username === undefined || bridgeConfig.username === null) {
+                bridgeConfig.username = "";
+            }
+            if (bridgeConfig.clientKey === undefined || bridgeConfig.clientKey === null) {
+                bridgeConfig.clientKey = "";
+            }
+            let bridge = new Bridge(bridgeConfig.name, bridgeConfig.username, bridgeConfig.clientKey, bridgeConfig.macAddress, bridgeConfig.ipAddress, bridgeId, this);
+            this.connectedBridges.push(bridge);
+            return bridge;
+        }
     }
 
     async updateBridgeIpAddress(bridgeId, ipAddress): Promise<void> {
-        this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["ipAddress"] = ipAddress;
-        await this.updateConfigFile()
+        if (this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["ipAddress"] != undefined) {
+            this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["ipAddress"] = ipAddress;
+            await this.updateConfigFile()
+        }
     }
 
 

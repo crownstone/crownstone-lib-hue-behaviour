@@ -15,17 +15,52 @@ interface HueState {
     reachable?: boolean
 }
 
+interface StateUpdate {
+    on?: boolean,
+    bri?: number,
+    hue?: number,
+    sat?: number,
+    effect?: string,
+    xy?: [number, number],
+    ct?: number,
+    alert?: string,
+    bri_inc?: number;
+    hue_inc?: number;
+    sat_inc?: number;
+    ct_inc?: number;
+    xy_inc?: [number, number];
+}
 
-const possibleStates = {
-    'on': true,
+const maxValueOfStates: StateUpdate = {
+    'hue': 65535,
+    'bri': 254,
+    'sat': 254,
+    'xy': [0.5, 0.5],
+    'ct': 500
+}
+
+const minValueOfStates: StateUpdate = {
+    'hue': 0,
+    'bri': 1,
+    'sat': 0,
+    'xy': [0.0, 0.0],
+    'ct': 153
+}
+
+const minMaxValueStates = {
     'hue': true,
     'bri': true,
     'sat': true,
-    'effect': true,
     'xy': true,
     'ct': true,
+}
+const possibleStates = {
+    ...minMaxValueStates,
+    'on': true,
+    'effect': true,
     'alert': true
 }
+
 /**
  * Light object
  *
@@ -64,13 +99,14 @@ export class Light {
         this.connectedBridge = connectedBridge;
         this.lastUpdate = Date.now();
     }
-     setLastUpdate(): void {
+
+    setLastUpdate(): void {
         this.lastUpdate = Date.now();
 
     }
 
     /**
-     * Obtains the state from the light on the bridge and compares it with current state.
+     * Obtains the state from the light on the bridge and updates the state object if different.
      */
     async renewState(): Promise<void> {
         const newState = await this.connectedBridge.api.lights.getLightState(this.id);
@@ -78,20 +114,18 @@ export class Light {
             this.state = newState
             this.setLastUpdate()
         }
-
     }
 
     getState(): HueState {
-    return this.state;
+        return this.state;
     }
 
-    //This is just to filter for the state object. It is not connected to the supported states.
-    _isAllowedStateType(state): boolean {
+    private _isAllowedStateType(state): boolean {
         return possibleStates[state] || false;
     }
 
+    private _updateState(state: StateUpdate): void {
 
-    _updateState(state: object): void {
         Object.keys(state).forEach(key => {
             if (this._isAllowedStateType(key)) {
                 this.state[key] = state[key];
@@ -100,7 +134,31 @@ export class Light {
         this.setLastUpdate()
     }
 
-    async setState(state: object): Promise<boolean> {
+
+    /**
+     * Checks if state value is out of it's range and then return right value.
+     *
+     * @return State value between it's min and max.
+     */
+   private _manipulateMinMaxValueStates(state:StateUpdate): StateUpdate {
+        Object.keys(state).forEach(key => {
+            if ((minMaxValueStates[key] || false)) {
+                if (key === "xy") {
+                    state[key] = [Math.min(maxValueOfStates[key][0], Math.max(minValueOfStates[key][0], state[key][0])), Math.min(maxValueOfStates[key][1], Math.max(minValueOfStates[key][1], state[key][1]))];
+                } else {
+                    state[key] = Math.min(maxValueOfStates[key], Math.max(minValueOfStates[key], state[key]));
+                }
+            }
+        });
+
+        return state;
+    }
+
+    /**
+     * Sets the state of the light.
+     */
+    async setState(state: StateUpdate): Promise<boolean> {
+        state = this._manipulateMinMaxValueStates(state);
         const result = await this.connectedBridge.api.lights.setLightState(this.id.toString(), state);
         if (result) {
             this._updateState(state);

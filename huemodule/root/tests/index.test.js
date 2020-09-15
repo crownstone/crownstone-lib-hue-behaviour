@@ -40,6 +40,14 @@ test('Returns no bridge discovered', async () => {
     }
 });
 
+test('Save bridge', async () => {
+    const bridge = await framework.init().then(bridges => {return bridges[0]});
+    await bridge.init();
+    await bridge.populateLights()
+    await framework.saveBridgeInformation(bridge);
+    return expect(bridge.getConnectedLights).toBeUndefined();
+});
+
 test('Get light by id. fail', async () => {
     const bridge = await framework.init().then(bridges => {return bridges[0]});
     await bridge.init();
