@@ -10,11 +10,6 @@ const fetch = require('node-fetch');
 const DISCOVERY_URL = "https://discovery.meethue.com/";
 
 
-interface DiscoverResult {
-    id: string,
-    internalipaddress: string
-}
-
 /**
  * Bridge object
  *

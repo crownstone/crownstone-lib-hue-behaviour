@@ -6,15 +6,6 @@ import {FrameworkError} from "./FrameworkError";
 
 const discovery = v3.discovery
 
-interface BridgeFormat {
-    name: string;
-    username: string;
-    clientKey: string;
-    macAddress: string;
-    ipAddress: string;
-    bridgeId: string;
-    lights?: object;
-}
 
 //config locations/names
 const CONF_NAME: string = "saveConfig.json";

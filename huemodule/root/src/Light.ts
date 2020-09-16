@@ -1,36 +1,6 @@
 import {Bridge} from "./Bridge";
 
 
-interface HueState {
-    on: boolean,
-    bri?: number,
-    hue?: number,
-    sat?: number,
-    effect?: string,
-    xy?: [number, number],
-    ct?: number,
-    alert?: string,
-    colormode?: string,
-    mode?: string,
-    reachable?: boolean
-}
-
-interface StateUpdate {
-    on?: boolean,
-    bri?: number,
-    hue?: number,
-    sat?: number,
-    effect?: string,
-    xy?: [number, number],
-    ct?: number,
-    alert?: string,
-    bri_inc?: number;
-    hue_inc?: number;
-    sat_inc?: number;
-    ct_inc?: number;
-    xy_inc?: [number, number];
-}
-
 const maxValueOfStates: StateUpdate = {
     'hue': 65535,
     'bri': 254,
