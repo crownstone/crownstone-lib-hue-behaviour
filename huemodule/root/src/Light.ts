@@ -100,7 +100,7 @@ export class Light {
         this.lastUpdate = Date.now();
     }
 
-    setLastUpdate(): void {
+    private _setLastUpdate(): void {
         this.lastUpdate = Date.now();
 
     }
@@ -112,7 +112,7 @@ export class Light {
         const newState = await this.connectedBridge.api.lights.getLightState(this.id);
         if (this.state != newState) {
             this.state = newState
-            this.setLastUpdate()
+            this._setLastUpdate()
         }
     }
 
@@ -131,7 +131,7 @@ export class Light {
                 this.state[key] = state[key];
             }
         });
-        this.setLastUpdate()
+        this._setLastUpdate()
     }
 
 
