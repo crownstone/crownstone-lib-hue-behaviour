@@ -268,7 +268,7 @@ const framework = new Framework();
 const bridges = await framework.init();
 
 await bridges[0].init()
-const light = bridges[0].getLightById(1);
+const light = bridges[0].getLightById("00:17:00:00:00:4a:cd:c3-1b");
 
 await light.setState({on: true, bri: 200});
 ```
