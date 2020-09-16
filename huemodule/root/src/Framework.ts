@@ -150,7 +150,7 @@ export class Framework {
             }
             return confBridges;
         } else {
-            throw Error("Unexpected Error in getConfiguredBridges()");
+            throw new FrameworkError(999,bridges);
         }
     }
 

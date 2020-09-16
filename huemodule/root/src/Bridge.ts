@@ -134,7 +134,7 @@ export class Bridge {
      * Gets info of the light from Bridge and creates a Light object and pushes it to the list.
      * Throws error on invalid Id.
      */
-    async configureLight(id: number): Promise<void> {
+        async configureLight(id: number): Promise<void> {
         if (this.authenticated) {
             try{
             const lightInfo = await this.api.lights.getLight(id);
@@ -169,9 +169,10 @@ export class Bridge {
     }
 
 
-    async getAllLightsFromBridge() {
+    async getAllLightsFromBridge(): Promise<Light[]> {
         if (this.authenticated) {
-            return await this.api.lights.getAll();
+            const lights = await this.api.lights.getAll();
+            return lights.map(light => {return new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this)});
         } else {
             throw new FrameworkError(405);
         }
