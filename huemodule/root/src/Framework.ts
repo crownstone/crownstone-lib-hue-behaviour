@@ -205,7 +205,6 @@ export class Framework {
     }
 
     async removeLightFromConfig(bridge: Bridge, uniqueLightId) {
-        bridge.removeLight(uniqueLightId);
         delete this.configSettings[CONF_BRIDGE_LOCATION][bridge.bridgeId]["lights"][uniqueLightId];
         await this.updateConfigFile();
     }

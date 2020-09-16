@@ -134,21 +134,21 @@ export class Bridge {
      * Gets info of the light from Bridge and creates a Light object and pushes it to the list.
      * Throws error on invalid Id.
      */
-        async configureLight(id: number): Promise<void> {
+    async configureLight(id: number): Promise<void> {
         if (this.authenticated) {
-            try{
-            const lightInfo = await this.api.lights.getLight(id);
-            this.lights[lightInfo.uniqueid] = {};
-            const light = new Light(lightInfo.name, lightInfo.uniqueid, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this)
-            this.lights[lightInfo.uniqueid] = light;
-            await this.framework.addLightInfo(this.bridgeId, light)
-            await this.framework.updateConfigFile();
-            } catch (err){
+            try {
+                const lightInfo = await this.api.lights.getLight(id);
+                this.lights[lightInfo.uniqueid] = {};
+                const light = new Light(lightInfo.name, lightInfo.uniqueid, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this)
+                this.lights[lightInfo.uniqueid] = light;
+                await this.framework.addLightInfo(this.bridgeId, light)
+                await this.framework.updateConfigFile();
+            } catch (err) {
                 if (typeof (err.getHueErrorType) === "function") {
-                    if (err.message.includes(`Light ${id} not found`)){
-                    throw new FrameworkError(422, id)
+                    if (err.message.includes(`Light ${id} not found`)) {
+                        throw new FrameworkError(422, id)
                     } else {
-                        throw new FrameworkError(999,err.message);
+                        throw new FrameworkError(999, err.message);
                     }
                 } else {
                     throw err;
@@ -160,7 +160,8 @@ export class Bridge {
         }
     }
 
-    removeLight(uniqueLightId: string): void {
+    async removeLight(uniqueLightId: string): Promise<void> {
+        await this.framework.removeLightFromConfig(this, uniqueLightId);
         delete this.lights[uniqueLightId];
     }
 
@@ -172,7 +173,9 @@ export class Bridge {
     async getAllLightsFromBridge(): Promise<Light[]> {
         if (this.authenticated) {
             const lights = await this.api.lights.getAll();
-            return lights.map(light => {return new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this)});
+            return lights.map(light => {
+                return new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this)
+            });
         } else {
             throw new FrameworkError(405);
         }
