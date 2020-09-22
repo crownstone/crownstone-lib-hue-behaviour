@@ -15,14 +15,14 @@ const delay = ms => {
 interface LightBehaviourWrapper {
     behaviour: behaviourWrapper,
     light: Light,
-    override: boolean
-    active: boolean
+    overrideActive: boolean
+    behaviourActive: boolean
 }
 
 export class BehaviourModule {
     eventBus: EventBus;
     private moduleRunning: boolean;
-    behaviours: object;
+    behaviours: object = {};
     pollingRate: number;
     lightsInRoom: object;
 
@@ -31,11 +31,9 @@ export class BehaviourModule {
     constructor(pollingRate: number = 500) {
         this.eventBus = new EventBus();
         this.moduleRunning = false;
-        this.behaviours = {};
         this.lightsInRoom = {};
         this.lights = [];
         this.pollingRate = pollingRate;
-
 
         this.eventBus.subscribe("lightStateChanged", (data) => {
             this._lightStateCheck(data)
@@ -68,7 +66,8 @@ export class BehaviourModule {
                 this.behaviours[light.uniqueId] = {
                     behaviour: behaviour,
                     light: light,
-                    override: false,
+                    overrideActive: false,
+                    behaviourActive: false,
                     someoneInRoom: false
                 }
             })
@@ -90,11 +89,6 @@ export class BehaviourModule {
         }
     }
 
-//     await light.setState({
-//                              on: data.presence,
-//                              bri: this.behaviours[light.uniqueId].behaviour.data.action.data * oneBriPercentage
-//                          });
-// }
     detectPresence(data) {
         if (!this.moduleRunning) {
             return;
@@ -108,38 +102,53 @@ export class BehaviourModule {
         }
         this.lightsInRoom[data.room].forEach(light => {
             this.behaviours[light.uniqueId].someoneInRoom = data.presence;
+
+
+
+            // to be removed/changed        .
+            this._behaviourHandling(this.behaviours[light.uniqueId]);
+            this._lightStateCheck(this.behaviours[light.uniqueId]);
+            this._stateHandling(this.behaviours[light.uniqueId]);
+
         });
     }
 
 
     _checkBehaviours() {
-        if (this.behaviours = {}) {
+        if (this.behaviours == {}) {
             return;
         }
         Object.keys(this.behaviours).forEach(id => {
             this._behaviourHandling(this.behaviours[id]);
+            this._lightStateCheck(this.behaviours[id]);
         })
     }
 
-    _getDayOfToday() {
-        return numberToWeekDay[new Date().getDay()];
 
+    _createStateFromBehaviour(data: LightBehaviourWrapper): StateUpdate {
+        if (data.behaviourActive) {
+            return {on: true, bri: data.behaviour.data.action.data * oneBriPercentage}
+        } else {
+            return {on: false}
+        }
     }
 
+    //TODO endcondition
     _behaviourHandling(behaviourLightWrapper) {
+
         function isValidBehaviourType() {
-            return behaviourLightWrapper.behaviours.type === "BEHAVIOUR"
+            return behaviourLightWrapper.behaviour.type === "BEHAVIOUR"
         }
 
         function isActiveWeekObject() {
-            return behaviourLightWrapper.behaviours.activeWeekdays._getDayOfToday()
+            return behaviourLightWrapper.behaviour.activeDays[getDayOfToday()]
         }
 
         function isActiveTimeObject() {
-            if (behaviourLightWrapper.behaviours.data.time.type === "ALL_DAY") {
+            if (behaviourLightWrapper.behaviour.data.time.type === "ALL_DAY") {
                 return true;
             }
-            if (behaviourLightWrapper.behaviours.data.time.type === "RANGE") {
+            if (behaviourLightWrapper.behaviour.data.time.type === "RANGE") {
 
                 //TODO Impl. sunset sunrise
                 const getSunsetTime = () => {
@@ -151,20 +160,19 @@ export class BehaviourModule {
 
                 const handleTimeObject = (operator: string) => {
                     let switchingTime = 0;
-                    if (behaviourLightWrapper.behaviours.data.time[operator].type === "SUNRISE") {
-                        switchingTime = getSunriseTime().getMinutes() + behaviourLightWrapper.behaviours.data.time.from.offset + (getSunriseTime().getHours() * 60);
+                    if (behaviourLightWrapper.behaviour.data.time[operator].type === "SUNRISE") {
+                        switchingTime = getSunriseTime().getMinutes() + behaviourLightWrapper.behaviour.data.time.from.offsetMinutes + (getSunriseTime().getHours() * 60);
                     }
 
-                    if (behaviourLightWrapper.behaviours.data.time[operator].type === "SUNSET") {
-                        switchingTime = getSunsetTime().getMinutes() + behaviourLightWrapper.behaviours.data.time.from.offset + (getSunsetTime().getHours() * 60);
+                    if (behaviourLightWrapper.behaviour.data.time[operator].type === "SUNSET") {
+                        switchingTime = getSunsetTime().getMinutes() + behaviourLightWrapper.behaviour.data.time.from.offsetMinutes + (getSunsetTime().getHours() * 60);
                     }
 
-                    if (behaviourLightWrapper.behaviours.data.time[operator].type === "CLOCK") {
-                        switchingTime = behaviourLightWrapper.behaviours.data.time[operator].data.minutes + (behaviourLightWrapper.behaviours.data.time[operator].data.hours * 60)
+                    if (behaviourLightWrapper.behaviour.data.time[operator].type === "CLOCK") {
+                        switchingTime = behaviourLightWrapper.behaviour.data.time[operator].data.minutes + (behaviourLightWrapper.behaviour.data.time[operator].data.hours * 60)
                     }
 
                     const currentMinutesInDay = new Date().getMinutes() + (new Date().getHours() * 60);
-
                     if (operator === "from") {
                         if (currentMinutesInDay >= switchingTime) {
                             return true;
@@ -189,8 +197,9 @@ export class BehaviourModule {
             return false;
         }
 
+        //todo PresenceData & Delay
         function isActivePresenceObject() {
-            switch (behaviourLightWrapper.behaviours.data.presence.type) {
+            switch (behaviourLightWrapper.behaviour.data.presence.type) {
                 case "SOMEBODY":
                     return behaviourLightWrapper.someoneInRoom;
 
@@ -205,33 +214,32 @@ export class BehaviourModule {
         if (!isValidBehaviourType()) {
             //Todo Replace consolelog
             console.log("Not valid behaviour type");
-            behaviourLightWrapper.active = false;
+            behaviourLightWrapper.behaviourActive = false;
             return;
         }
         if (!isActiveWeekObject()) {
             //Todo Replace consolelog
             console.log("Not active today.");
-            behaviourLightWrapper.active = false;
-            return;
-        }
-
-        if (!isActiveTimeObject) {
-            //Todo Replace consolelog
-            console.log("Not active on this time of the day.");
-            behaviourLightWrapper.active = false;
+            behaviourLightWrapper.behaviourActive = false;
             return;
         }
 
         if (!isActivePresenceObject()) {
             //Todo Replace consolelog
             console.log("Not active with this presence state");
-            behaviourLightWrapper.active = false;
+            behaviourLightWrapper.behaviourActive = false;
             return
         }
 
-        behaviourLightWrapper.active = true;
-        this._lightStateCheck(behaviourLightWrapper);
+        if (!isActiveTimeObject()) {
+            //Todo Replace consolelog
+            console.log("Not active on this time of the day.");
+            behaviourLightWrapper.behaviourActive = false;
+            return;
+        }
 
+
+        behaviourLightWrapper.behaviourActive = true;
     }
 
     async _pollLights() {
@@ -245,13 +253,17 @@ export class BehaviourModule {
         }
     }
 
-
-    _lightStateCheck(data: LightBehaviourWrapper) {
-        if ((data.light.getState().on === true && data.behaviour.data.action.type === "BE_ON") && (data.light.getState().bri === data.behaviour.data.action.data * oneBriPercentage)) {
-            data.override = false;
+    _stateHandling(data: LightBehaviourWrapper) {
+        if (!data.overrideActive) {
+            data.light.setState(this._createStateFromBehaviour(data));
         } else {
-            data.override = true;
+            console.log("OVERRIDE ACTIVE");
         }
+    }
+
+    //Todo When state match. override checking
+    _lightStateCheck(data: LightBehaviourWrapper) {
+     return;
     }
 
     _errorHandling(error) {
@@ -260,6 +272,10 @@ export class BehaviourModule {
 
 }
 
+function getDayOfToday(): number {
+    return numberToWeekDay[new Date().getDay()];
+
+}
 
 function debugPrintStateDifference(oldS, newS) {
     let printableState = {};

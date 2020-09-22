@@ -24,6 +24,7 @@ const BehaviourWrapperSim = {
         "action": {"type": "BE_ON", "data": 100},
         "time": {
             "type": "ALL_DAY"
+
         },
         "presence": {"type": "SOMEBODY", "data": {"type": "SPHERE"}, "delay": 300}
     },
@@ -55,6 +56,7 @@ async function simulation() {
     await module.init();
 
     module.addBehaviour(BehaviourWrapperSim,"Bedroom");
+
     const mod = module._loop();
     await cycle(500);
     await mod;
@@ -68,6 +70,7 @@ const cycle = async (ms) => {
 
         return cycle(ms);
     } catch(err){
+        console.log(err);
         return cycle(ms);
 
     }
