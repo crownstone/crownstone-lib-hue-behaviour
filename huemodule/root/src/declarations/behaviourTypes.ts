@@ -78,7 +78,7 @@ interface behaviourReply {
 
 interface behaviourWrapper {
     type: "BEHAVIOUR" | "TWILIGHT"
-    data: string, // behaviour | twilight, // stringified
+    data: behaviour | twilight, // behaviour | twilight,     //!!!!!! Changed from stringified
     activeDays: dayOfWeek,
 
     // from here on it is data required for syncing and UI state.

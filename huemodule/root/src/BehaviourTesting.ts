@@ -11,7 +11,10 @@ import {setLightState} from "node-hue-api/lib/api/http/endpoints/lights";
 //     },
 //     time: { type: "ALL_DAY" },
 //     presence: aicorePresence,
-//     endCondition?: aicoreEndCondition
+// //     endCondition?: aicoreEndCondition
+// "type": "RANGE",
+//     "from": {"type": "SUNSET", "offsetMinutes": 0},
+// "to": {"type": "SUNRISE", "offsetMinutes": 0}
 // }
 
 let SimulatedPersonIsInRoom = true;
@@ -20,9 +23,7 @@ const BehaviourWrapperSim = {
     "data": {
         "action": {"type": "BE_ON", "data": 100},
         "time": {
-            "type": "RANGE",
-            "from": {"type": "SUNSET", "offsetMinutes": 0},
-            "to": {"type": "SUNRISE", "offsetMinutes": 0}
+            "type": "ALL_DAY"
         },
         "presence": {"type": "SOMEBODY", "data": {"type": "SPHERE"}, "delay": 300}
     },
