@@ -1,22 +1,85 @@
 import {Framework} from "./index";
-import {Light} from "./index";
 import {EventBus} from "./util/EventBus";
 
-const framework = new Framework();
 const oneBriPercentage = 2.54;
 
+class fakeLights {
+    uniqueId: string;
+    state: { on: boolean, bri: number };
+    id: number;
 
-const numberToWeekDay = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat"}
+    constructor(uniqueId, state, id) {
+        this.uniqueId = uniqueId;
+        this.state = state;
+        this.id = id;
+    }
+
+    getState() {
+        return this.state;
+    }
+
+    renewState() {
+
+    }
+
+
+    setState(state) {
+        if (state.bri != undefined) {
+            this.state.bri = state.bri;
+        }
+        if (state.on != undefined) {
+            this.state.on = state.on;
+        }
+        this.printLightInformation()
+    }
+
+    printLightInformation() {
+        console.log(`Light is turned ${(this.state.on) ? "ON" : "OFF"} with a brightness of ${(this.state["bri"]) / oneBriPercentage}%`)
+    }
+
+}
+
+class Light extends fakeLights {
+
+}
+
 
 const delay = ms => {
     return new Promise(resolve => setTimeout(resolve, ms));
 };
 
 interface LightBehaviourWrapper {
-    behaviour: behaviourWrapper,
+    behaviour: BehaviourWrapper,
     light: Light,
     overrideActive: boolean
     behaviourActive: boolean
+    presence: true,
+    presenceUpdated: number
+}
+
+
+class BehaviourSimulator {
+
+}
+
+class LightBehaviour extends Light {
+    lightPolling = setInterval(this.poll, 500);
+    eventBus: EventBus;
+
+    constructor(uniqueId, state, id, eventBus) {
+        super(uniqueId, state, id);
+        this.eventBus = eventBus;
+    }
+
+    poll() {
+        const old = this.state;
+        this.renewState();
+        if (old != this.state) {
+            this.eventBus.emit("presenceChanged", this);
+        }
+    }
+
+
 }
 
 export class BehaviourModule {
@@ -36,7 +99,7 @@ export class BehaviourModule {
         this.pollingRate = pollingRate;
 
         this.eventBus.subscribe("lightStateChanged", (data) => {
-            this._lightStateCheck(data)
+            this._handleLightStateChange(data)
         });
         this.eventBus.subscribe("presenceDetected", this._onPresenceDetected.bind(this));
         this.eventBus.subscribe("error", this._errorHandling.bind(this));
@@ -44,12 +107,9 @@ export class BehaviourModule {
 
     async init() {
         ///--- To Be changed
-        const bridges = await framework.init();
-        const bridge = bridges[0];
-        await bridge.init();
-
-        this.lights = bridge.getConnectedLights()
-        this.lightsInRoom["Bedroom"] = [this.lights[0], this.lights[1]];
+        let lightA = new Light("AA:BB:CC:DD:EE:FF:GG-af", {}, 0);
+        let lightB = new Light("TT:EE:SS:TT:11:22:33-af", {}, 1);
+        this.lightsInRoom["Bedroom"] = [lightA, lightB];
 
         ///---
         this.moduleRunning = true;
@@ -82,10 +142,10 @@ export class BehaviourModule {
             await delay(this.pollingRate);
 
 
-            return (this.moduleRunning) ? this._loop() : "";
+            return (this.moduleRunning) ? this._loop() : "STOPPED";
         } catch (err) {
             this.eventBus.emit("error", err);
-            return (this.moduleRunning) ? this._loop() : "";
+            return (this.moduleRunning) ? this._loop() : "STOPPED";
         }
     }
 
@@ -96,6 +156,12 @@ export class BehaviourModule {
         this.eventBus.emit("presenceDetected", data);
     }
 
+    _handleLightStateChange(data) {
+        this._behaviourHandling(this.behaviours[data.uniqueId]);
+        this._lightStateCheck(this.behaviours[data.uniqueId]);
+
+    }
+
     async _onPresenceDetected(data) {
         if (!this.lightsInRoom[data.room]) {
             return;
@@ -103,12 +169,11 @@ export class BehaviourModule {
         this.lightsInRoom[data.room].forEach(light => {
             this.behaviours[light.uniqueId].someoneInRoom = data.presence;
 
-
-
             // to be removed/changed        .
             this._behaviourHandling(this.behaviours[light.uniqueId]);
-            this._lightStateCheck(this.behaviours[light.uniqueId]);
             this._stateHandling(this.behaviours[light.uniqueId]);
+            this._lightStateCheck(this.behaviours[light.uniqueId]);
+
 
         });
     }
@@ -119,8 +184,11 @@ export class BehaviourModule {
             return;
         }
         Object.keys(this.behaviours).forEach(id => {
+            const oldBehaviour = this.behaviours[id].behaviourActive
             this._behaviourHandling(this.behaviours[id]);
-            this._lightStateCheck(this.behaviours[id]);
+            if (oldBehaviour != this.behaviours[id].behaviourActive) {
+                this._lightStateCheck(this.behaviours[id]);
+            }
         })
     }
 
@@ -134,113 +202,7 @@ export class BehaviourModule {
     }
 
     //TODO endcondition
-    _behaviourHandling(behaviourLightWrapper) {
 
-        function isValidBehaviourType() {
-            return behaviourLightWrapper.behaviour.type === "BEHAVIOUR"
-        }
-
-        function isActiveWeekObject() {
-            return behaviourLightWrapper.behaviour.activeDays[getDayOfToday()]
-        }
-
-        function isActiveTimeObject() {
-            if (behaviourLightWrapper.behaviour.data.time.type === "ALL_DAY") {
-                return true;
-            }
-            if (behaviourLightWrapper.behaviour.data.time.type === "RANGE") {
-
-                //TODO Impl. sunset sunrise
-                const getSunsetTime = () => {
-                    return new Date(2020, 9, 22, 20, 10, 0);
-                }
-                const getSunriseTime = () => {
-                    return new Date(2020, 9, 22, 6, 10, 0);
-                }
-
-                const handleTimeObject = (operator: string) => {
-                    let switchingTime = 0;
-                    if (behaviourLightWrapper.behaviour.data.time[operator].type === "SUNRISE") {
-                        switchingTime = getSunriseTime().getMinutes() + behaviourLightWrapper.behaviour.data.time.from.offsetMinutes + (getSunriseTime().getHours() * 60);
-                    }
-
-                    if (behaviourLightWrapper.behaviour.data.time[operator].type === "SUNSET") {
-                        switchingTime = getSunsetTime().getMinutes() + behaviourLightWrapper.behaviour.data.time.from.offsetMinutes + (getSunsetTime().getHours() * 60);
-                    }
-
-                    if (behaviourLightWrapper.behaviour.data.time[operator].type === "CLOCK") {
-                        switchingTime = behaviourLightWrapper.behaviour.data.time[operator].data.minutes + (behaviourLightWrapper.behaviour.data.time[operator].data.hours * 60)
-                    }
-
-                    const currentMinutesInDay = new Date().getMinutes() + (new Date().getHours() * 60);
-                    if (operator === "from") {
-                        if (currentMinutesInDay >= switchingTime) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    } else if (operator === "to") {
-                        if (currentMinutesInDay <= switchingTime) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
-                }
-
-
-                if (handleTimeObject("from") && handleTimeObject("to")) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        //todo PresenceData & Delay
-        function isActivePresenceObject() {
-            switch (behaviourLightWrapper.behaviour.data.presence.type) {
-                case "SOMEBODY":
-                    return behaviourLightWrapper.someoneInRoom;
-
-                case "NOBODY":
-                    return !behaviourLightWrapper.someoneInRoom;
-
-                case "IGNORE":
-                    return true;
-            }
-        }
-
-        if (!isValidBehaviourType()) {
-            //Todo Replace consolelog
-            console.log("Not valid behaviour type");
-            behaviourLightWrapper.behaviourActive = false;
-            return;
-        }
-        if (!isActiveWeekObject()) {
-            //Todo Replace consolelog
-            console.log("Not active today.");
-            behaviourLightWrapper.behaviourActive = false;
-            return;
-        }
-
-        if (!isActivePresenceObject()) {
-            //Todo Replace consolelog
-            console.log("Not active with this presence state");
-            behaviourLightWrapper.behaviourActive = false;
-            return
-        }
-
-        if (!isActiveTimeObject()) {
-            //Todo Replace consolelog
-            console.log("Not active on this time of the day.");
-            behaviourLightWrapper.behaviourActive = false;
-            return;
-        }
-
-
-        behaviourLightWrapper.behaviourActive = true;
-    }
 
     async _pollLights() {
         for (const light of this.lights) {
@@ -261,9 +223,29 @@ export class BehaviourModule {
         }
     }
 
+
+    /*
+
+    user gets in room... lights on.
+    User turns lights off.  > Beh: on = override true.
+    user leaves room, lights still off. override false;
+
+     */
+
     //Todo When state match. override checking
     _lightStateCheck(data: LightBehaviourWrapper) {
-     return;
+        if (data.light.getState().on === this._createStateFromBehaviour(data).on && data.light.getState().bri === this._createStateFromBehaviour(data).bri) {
+            data.overrideActive = false;
+        } else {
+            if (!data.behaviourActive && !data.light.getState().on) {
+                data.overrideActive = false;
+            } else if (data.light.getState().on !== this._createStateFromBehaviour(data).on || data.light.getState().bri !== this._createStateFromBehaviour(data).bri) {
+                data.overrideActive = true
+                console.log("OVERRIDE ACTIVE");
+
+            }
+
+        }
     }
 
     _errorHandling(error) {
@@ -272,10 +254,6 @@ export class BehaviourModule {
 
 }
 
-function getDayOfToday(): number {
-    return numberToWeekDay[new Date().getDay()];
-
-}
 
 function debugPrintStateDifference(oldS, newS) {
     let printableState = {};

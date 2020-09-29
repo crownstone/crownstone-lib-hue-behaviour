@@ -44,3 +44,16 @@ interface BridgeFormat {
     bridgeId: string;
     lights?: object;
 }
+
+interface PresenceProfileLocation {
+    type: "LOCATION"
+    profileIdx: number
+    locationIds: number[]
+}
+
+interface PresenceProfileSphere {
+    type: "SPHERE"
+    profileIdx: number
+}
+
+type DetectedPresence = PresenceProfileLocation | PresenceProfileSphere
