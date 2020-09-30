@@ -7,7 +7,7 @@ interface PresenceNone {
     type: "IGNORE"
 }
 interface PresenceGeneric {
-    type: PresenceTypeSomeone,
+    type: PresenceType,
     data: PresenceData,
     delay: number
 }

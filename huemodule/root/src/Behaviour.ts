@@ -6,18 +6,18 @@ const numberToWeekDay = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "F
 export class Behaviour {
     behaviour: HueBehaviourWrapper;
     isActive: boolean;
-    presenceLocations: number[];
+    presenceLocations: PresenceProfile[];
     // presenceTypeActive: boolean;   // True on presence with "SOMEBODY", True without presence with "NOBODY", Always true with IGNORE
     eventBus: EventBus;
-    ticks: number;
+    ticks: number; // ms
 
     constructor(behaviour, eventBus) {
         this.behaviour = behaviour;
         this.eventBus = eventBus;
-        this.isActive = false;
         this._presenceOnCreation();
-        this.eventBus.subscribe("onPresenceDetect", this.handlePresence.bind(this))
-        this.ticks = Date.now()
+        this.eventBus.subscribe("onPresenceDetect", this.handlePresence.bind(this));
+        this.ticks = Date.now();
+        this._behaviourActiveCheck();
     }
 
     tick(ticks = Date.now()) {
@@ -25,13 +25,53 @@ export class Behaviour {
         this._behaviourActiveCheck();
     }
 
-    handlePresence(data: DetectedPresence) {
+    //ENDCONDITION:? MAY HAVE IGNORE... TEMP ADDING/REMOVING MECHANISM
+    handlePresence(presenceEvent: PresenceEvent) {
         if (this.behaviour.data.presence.type !== "IGNORE") {
-            if (data.type === "SPHERE") {
-
-            } else if (data.type === "LOCATION") {
-
+            this._handlePresenceEvent(presenceEvent);
+        } else if ("endCondition" in this.behaviour.data && this.behaviour.data.endCondition.presence.type === "SOMEBODY") {
+            if (presenceEvent.data.type === "SPHERE" && presenceEvent.type === "ENTER") {
+                this.presenceLocations.push(presenceEvent.data);
+            } else if (presenceEvent.data.type === "SPHERE" && presenceEvent.type === "LEAVE") {
+                this._handlePresenceEventLeave(presenceEvent);
             }
+        }
+    }
+
+    _handlePresenceEventEnter(presenceEvent: PresenceEvent) {
+        if (presenceEvent.data.type === "SPHERE") {
+            this.presenceLocations.push(presenceEvent.data);
+        } else if (presenceEvent.data.type === "LOCATION") {
+            if ("data" in this.behaviour.data.presence && this.behaviour.data.presence.data.type === "LOCATION") {
+                presenceEvent.data.locationIds.forEach(locationId => {
+                    if (this._hasPresenceGivenLocationId(locationId)) {
+                        this.presenceLocations.push(presenceEvent.data);
+                        return;
+                    }
+                });
+            }
+        }
+    }
+
+    _handlePresenceEventLeave(presenceEvent: PresenceEvent) {
+        for (var i = 0; i < this.presenceLocations.length; i++) {
+            if (presenceEvent.data.profileIdx === this.presenceLocations[i].profileIdx) {
+                if (presenceEvent.data.type === this.presenceLocations[i].type && presenceEvent.data.type === "SPHERE") {
+                    this.presenceLocations[i] = undefined;
+                    break;
+                } else if (presenceEvent.data.type === this.presenceLocations[i].type && presenceEvent.data.type === "LOCATION") {
+                    this.presenceLocations[i] = undefined;
+                    break;
+                }
+            }
+        }
+    }
+
+    _handlePresenceEvent(presenceEvent: PresenceEvent) {
+        if (presenceEvent.type === "ENTER") {
+            this._handlePresenceEventEnter(presenceEvent);
+        } else if (presenceEvent.type === "LEAVE") {
+            this._handlePresenceEventLeave(presenceEvent);
         }
     }
 
@@ -47,16 +87,6 @@ export class Behaviour {
     //TODO Get save state?
     _presenceOnCreation() {
         // return (this.behaviour.data.presence.type === "IGNORE") ? this.currentPresence = "IGNORE" : "NOBODY";
-    }
-
-    _isLocation(data) {
-        // if (this.behaviour.data.presence.data.type === "SPHERE" && data.locationId === "SPHERE") {
-        //     return true;
-        // } else if (this.behaviour.data.presence.data.type === "LOCATION") {
-        //     return (this.behaviour.data.presence.data.locationIds[0] === data.locationId) ? true : false; //Currently 1 room sup.
-        // } else {
-        //     return false; //Type is wrong.
-        // }
     }
 
 
@@ -282,17 +312,17 @@ export class Behaviour {
         }
         // 12:00 - 11:00  19:00
         //Starts today and still active. (12:00) -> 15:59  curr. 13:00.   13:00 >= 12:00 true
-        if (currentTimeInMinutes >= fromTimeInMinutes ) {
+        if (currentTimeInMinutes >= fromTimeInMinutes) {
             // 12:00 -> (15:59)    curr. 13:00   13:00 < 15:59 = true;
-            if( currentTimeInMinutes < toTimeInMinutes){
+            if (currentTimeInMinutes < toTimeInMinutes) {
                 return this.behaviour.activeDays[this._getWeekday()];
             }
             // 12:00 -> 11:00 Curr. 13:00 11:00 < 12:00 = true. Meaning that the time overlaps to next day and will be caught at 00:00 by yesterday checking
-            if(toTimeInMinutes < fromTimeInMinutes){
+            if (toTimeInMinutes < fromTimeInMinutes) {
                 return this.behaviour.activeDays[this._getWeekday()];
             }
-    }
-    return false;
+        }
+        return false;
 
     }
 
@@ -306,26 +336,75 @@ export class Behaviour {
         return false;
     }
 
-    //todo PresenceData & Delay
-    // _isActivePresenceObject() {
-    //     switch (this.behaviour.data.presence.type) {
-    //         case "SOMEBODY":
-    //             return this.someoneInRoom;
-    //
-    //         case "NOBODY":
-    //             return !this.someoneInRoom;
-    //
-    //         case "IGNORE":
-    //             return true;
-    //     }
-    // }
+    _isActivePresenceObject(): boolean {
+        switch (this.behaviour.data.presence.type) {
+            case "IGNORE":
+                return true;
+            case "NOBODY":
+                return !this._isSomeonePresent();
+            case "SOMEBODY":
+                return this._isSomeonePresent();
+            default:
+                return false;
+        }
+    }
 
-    _behaviourActiveCheck() {
+    _isActiveEndConditionObject(): boolean {
+        if (this.behaviour.data.endCondition.presence.data.type === "SPHERE" && this.presenceLocations.length !== 0) {
+            return true;
+        }
+        if (this.behaviour.data.endCondition.presence.data.type === "LOCATION") {
+            for (let i = 0; i < this.presenceLocations.length; i++) {
+                // @ts-ignore
+                if ("locationIds" in this.presenceLocations[i] && this.behaviour.data.endCondition.presence.data.locationIds.some(r => this.presenceLocations[i].locationIds.indexOf(r) >= 0)) {
+                    return true;
+                }
+                ;
+            }
+        }
+        return false;
+    }
+
+    /* Checks if someone is present in the sphere or a certain location
+
+     */
+    _isSomeonePresent(): boolean {
+        const result = this.presenceLocations.forEach(profile => {
+            if (profile.type === "SPHERE") {
+                return true;
+            } else if ("locationIds" in profile && profile.type === "LOCATION") {
+                const result = profile.locationIds.forEach(id => {
+                    if (this._hasPresenceGivenLocationId(id)) {
+                        return true;
+                    }
+                });
+                return (result !== undefined) ? true : false;
+            }
+        });
+        return (result !== undefined) ? true : false;
+
+    }
+
+    _hasPresenceGivenLocationId(locationId: number): boolean {
+        if ("data" in this.behaviour.data.presence && "locationIds" in this.behaviour.data.presence.data && locationId in this.behaviour.data.presence.data.locationIds) {
+            return true
+        } else {
+            return false;
+        }
+    }
+
+    _behaviourActiveCheck(): void {
         if (this.behaviour.type === "BEHAVIOUR") {
             if (this._isActiveTimeObject()) {
-                // if (this._isActivePresenceObject()) {
-                //     this.isActive = true;
-                // }
+                if (this._isActivePresenceObject()) {
+                    this.isActive = true;
+                    return;
+                }
+            } else if ("endCondition" in this.behaviour.data && this.isActive) {
+                if (this._isActiveEndConditionObject()) {
+                    this.isActive = true;
+                    return;
+                }
             }
         }
         this.isActive = false;

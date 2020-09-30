@@ -14,10 +14,10 @@ const BehaviourWrapperSim = {
         "action": {"type": "BE_ON", "data": 100},
         "time": {
             "type": "RANGE",
-            "from": {"type": "CLOCK", "data": {"hours": 20, "minutes": 10}},
+            "from": {"type": "CLOCK", "data": {"hours": 10, "minutes": 10}},
             "to": {"type": "CLOCK", "data":{ "hours": 13, "minutes": 10}}
         },
-        "presence": {"type": "IGNORE"}
+        "presence": {"type": "SOMEBODY", "data":{"type":"SPHERE"} }
     },
     "idOnCrownstone": 0,
     "profileIndex": 0,
@@ -49,7 +49,7 @@ async function simulation() {
     let date = new Date(2020,8 ,30,20,10,0);
     behaviour.tick(Date.parse(date.toISOString()))
 
-    console.log(behaviour._isActiveTimeObject());
+    console.log(behaviour.isActive);
 
 
     // await module.init();

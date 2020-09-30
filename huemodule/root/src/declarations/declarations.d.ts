@@ -56,4 +56,11 @@ interface PresenceProfileSphere {
     profileIdx: number
 }
 
-type DetectedPresence = PresenceProfileLocation | PresenceProfileSphere
+type PresenceProfile = PresenceProfileLocation | PresenceProfileSphere
+
+type PresenceEventType = "ENTER" | "LEAVE"
+
+interface PresenceEvent{
+    type: PresenceEventType
+    data: PresenceProfile
+}
