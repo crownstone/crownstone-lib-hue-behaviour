@@ -117,10 +117,10 @@ export const switchOnBetweenRange = {
         "action": {"type": "BE_ON", "data": 100},
         "time": {
             "type": "RANGE",
-            "from": {"hours": 3, "minutes": 10},
-            "to": {"hours": 21, "minutes": 10}
+            "from": {"type": "CLOCK", "data": {"hours": 3, "minutes": 10}},
+            "to": {"type": "CLOCK", "data":{ "hours": 21, "minutes": 10}}
         },
-        "presence": {"type": "SOMEBODY", "data": {"type": "SPHERE"}, "delay": 300}
+        "presence": {"type": "IGNORE"}
     },
     "idOnCrownstone": 0,
     "profileIndex": 0,

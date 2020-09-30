@@ -1,6 +1,7 @@
 type PresenceTypeSomeone = "SOMEBODY" | "NOBODY"
 type PresenceType = PresenceTypeSomeone | "IGNORE" | "SPECIFIC_USERS"
 type SunTimes = "SUNSET" | "SUNRISE"
+type TimeDataType = SunTimes | "CLOCK"
 
 interface PresenceNone {
     type: "IGNORE"

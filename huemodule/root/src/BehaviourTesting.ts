@@ -3,19 +3,9 @@ import {Framework} from "./index";
 import {BehaviourModule} from "./BehaviourModule";
 import {Light} from "./index";
 import {setLightState} from "node-hue-api/lib/api/http/endpoints/lights";
-
-// interface behaviour {
-//     action: {
-//         type: "BE_ON",
-//         data: number, // 0 .. 1
-//     },
-//     time: { type: "ALL_DAY" },
-//     presence: aicorePresence,
-// //     endCondition?: aicoreEndCondition
-// "type": "RANGE",
-//     "from": {"type": "SUNSET", "offsetMinutes": 0},
-// "to": {"type": "SUNRISE", "offsetMinutes": 0}
-// }
+import {Behaviour} from "./Behaviour";
+import {EventBus} from "./util/EventBus";
+const eventBus = new EventBus();
 
 let SimulatedPersonIsInRoom = true;
 const BehaviourWrapperSim = {
@@ -23,10 +13,11 @@ const BehaviourWrapperSim = {
     "data": {
         "action": {"type": "BE_ON", "data": 100},
         "time": {
-            "type": "ALL_DAY"
-
+            "type": "RANGE",
+            "from": {"type": "CLOCK", "data": {"hours": 20, "minutes": 10}},
+            "to": {"type": "CLOCK", "data":{ "hours": 13, "minutes": 10}}
         },
-        "presence": {"type": "SOMEBODY", "data": {"type": "SPHERE"}, "delay": 300}
+        "presence": {"type": "IGNORE"}
     },
     "idOnCrownstone": 0,
     "profileIndex": 0,
@@ -53,13 +44,21 @@ const framework = new Framework();
 const module = new BehaviourModule();
 let lights = [];
 async function simulation() {
-    await module.init();
+    const behaviour = new Behaviour(BehaviourWrapperSim,eventBus);
 
-    module.addBehaviour(BehaviourWrapperSim,"Bedroom");
+    let date = new Date(2020,8 ,30,20,10,0);
+    behaviour.tick(Date.parse(date.toISOString()))
 
-    const mod = module._loop();
-    await cycle(500);
-    await mod;
+    console.log(behaviour._isActiveTimeObject());
+
+
+    // await module.init();
+
+    // module.addBehaviour(BehaviourWrapperSim,"Bedroom");
+
+    // const mod = module._loop();
+    // await cycle(500);
+    // await mod;
 }
 
 

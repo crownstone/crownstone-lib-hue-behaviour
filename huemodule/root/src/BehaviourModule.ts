@@ -49,7 +49,7 @@ const delay = ms => {
 };
 
 interface LightBehaviourWrapper {
-    behaviour: BehaviourWrapper,
+    behaviour: HueBehaviourWrapper,
     light: Light,
     overrideActive: boolean
     behaviourActive: boolean
@@ -149,6 +149,10 @@ export class BehaviourModule {
         }
     }
 
+    setDumbHouseMode(on: boolean) {
+
+    }
+
     detectPresence(data) {
         if (!this.moduleRunning) {
             return;
@@ -178,7 +182,9 @@ export class BehaviourModule {
         });
     }
 
+    _behaviourHandling(a){
 
+    }
     _checkBehaviours() {
         if (this.behaviours == {}) {
             return;
