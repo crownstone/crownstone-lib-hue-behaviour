@@ -25,6 +25,7 @@ export class Behaviour {
         this._behaviourActiveCheck();
     }
 
+
     /**
      * On Presence detection when someone enters/leaves a SPHERE or LOCATION,
      * Checks if Behaviour has IGNORE as presence type and if endCondition is set.
@@ -100,7 +101,12 @@ export class Behaviour {
         }
     }
 
-
+    /**
+     * Retrieves the Behaviour's composed state.
+     *
+     *
+     * @Returns a Hue Light state
+     */
     getComposedState(): StateUpdate {
         return (this.isActive) ? this._createComposedState() : {on: false}
     }
@@ -109,16 +115,10 @@ export class Behaviour {
         return {on: true, bri: this.behaviour.data.action.data * oneBriPercentage}
     }
 
-    /*
-    Checks if type All_DAY is still valid.
-    if currentTimeInMinutes < 240 = new day.. Check yesterday for activation..
-
-    04:00 - 03:59
-     */
     _isActiveTimeAllDay(): boolean {
         const currentTimeInMinutes = new Date(this.ticks).getMinutes() + (new Date(this.ticks).getHours() * 60);
 
-        //Checks if time is between  00:00 > 03:59.
+        //Checks if current time is between  00:00 > 03:59.
         if (currentTimeInMinutes < 4 * 60) {
             //Checks if yesterday should be active.
             return this.behaviour.activeDays[this._getWeekday(-1)]
@@ -129,8 +129,14 @@ export class Behaviour {
     }
 
 
-//Returns (de)activation time in minutes from 00:00 to 23:59 or -1 when invalid type.
-    _getSwitchingTime(operator: string): number {
+    /**
+     * Retrieves the Behaviour's (de)activation time in minutes.
+
+     * @Param operator -  Either from or to
+     *
+     * @Returns
+     */
+    _getSwitchingTime(operator: "from" | "to"): number {
         switch (this.behaviour.data.time[operator].type) {
             case "SUNRISE":
                 return getSunriseTime().getMinutes() + this.behaviour.data.time[operator].offsetMinutes + (getSunriseTime().getHours() * 60);
@@ -152,191 +158,18 @@ export class Behaviour {
             return false;
         }
 
-        //TODO GLOBAL CALC and 00:00 case
-        /*
-         start 21:00 - 04:00 end. Curr time. 03:00
-        21*60 = 1260
-        4*60 = 240
-        3*60 =  180
-       yesterday check> true.
-
-
-        yesterday start, today ends, active Wanted result: true
-        start 15:00 - 14:59 end. Curr time. 13:00
-        14*60 + 59 = 899
-        15*60 = 900
-        13*60 =  780
-        yesterday check> true
-
-         yesterday start, today end inactive after. Wanted result: False
-        start 21:00 - 04:00 end. Curr time. 05:00
-        21*60 = 1260
-        4*60 = 240
-        5*60 =  300
-       yesterday check false
-       currentTimeInMinutes >= fromTimeInMinutes = FALSE
-
-
-        today start, tomorrow end active. Wanted result: true
-        start 21:00 - 04:00 end. Curr time. 22:00
-        21*60 = 1260
-        4*60 = 240
-        22*60 =  1320
-       yesterday check false
-       currentTimeInMinutes >= fromTimeInMinutes = true
-
-       currentTimeInMinutes < toTimeInMinutes  = false
-       toTimeInMinutes < fromTimeInMinutes = true
-
-
-        today start, tomorrow end, inactive before Wanted result: false
-        start 21:00 - 04:00 end. Curr time. 19:00
-        21*60 = 1260
-        4*60 = 240
-        19*60 =  1140
-       yesterday check false
-       currentTimeInMinutes >= fromTimeInMinutes = false
-
-
-        today start and end, active Wanted result: true
-        start 15:00 - 18:00 end. Curr time. 17:00 res false
-        15*60 = 900
-        18*60 = 1080
-        17*60 =  1020
-       yesterday check false
-
-       currentTimeInMinutes >= fromTimeInMinutes = true
-       currentTimeInMinutes < toTimeInMinutes  = true
-
-
-
-
-        today start and end, after active Wanted result: false
-        start 15:00 - 18:00 end. Curr time. 19:00 res false
-        15*60 = 900
-        18*60 = 1080
-        19*60 = 1140
-       yesterday check false
-       currentTimeInMinutes >= fromTimeInMinutes = true
-       currentTimeInMinutes < toTimeInMinutes  = false
-        toTimeInMinutes < fromTimeInMinutes = false
-
-
-
-
-        today start and end, before active Wanted result: false
-        start 15:00 - 18:00 end. Curr time. 14:00 res false
-        15*60 = 900
-        18*60 = 1080
-        14*60 =  840
-       yesterday check false
-       currentTimeInMinutes >= fromTimeInMinutes = false
-
-
-        start 00:00 - 04:00 end. Curr time. 00:00
-        21*60 = 1260
-        4*60 = 240
-        0*60 =  0
-        yesterday check false
-        currentTimeInMinutes >= fromTimeInMinutes = false
-
-
-
-
-         start 21:00 - 04:00 end. Curr time. 00:00
-        21*60 = 1260
-        4*60 = 240
-        3*60 =  180
-       ((toTimeInMinutes - fromTimeInMinutes) < 0) && (currentTimeInMinutes < toTimeInMinutes)
-        true &&  true
-        */
-
-        /*Yesterday started and still active. CALCULATION
-        ONLY CHECKS FOR YESTERDAY, TODAY OR TOMORROW ARE NOT INCLUDED
-                    (24 hour check)                                               (still active check)               (check if started yesterday)
-        END TIME MINUS START TIME LESS THAN 0 IS TRUE? THEN CURRENT TIME IS LESS THAN END TIME IS TRUE? THEN CHECK IF YESTERDAY IS ACTIVE.
-        (((endTime - startTime)< 0 ) && (currentTime < endTime) && yesterday should be active)?true:false
-        yesterday start, today ends, active Wanted result: true
-        start 21:00 - 04:00 end. Curr time. 03:00
-        21*60 = 1260
-        4*60 = 240
-        3*60 =  180
-        240-1260 < 0  = True;
-                       (180 < 240) true
-
-
-        yesterday start, today ends, active Wanted result: true
-        start 15:00 - 14:59 end. Curr time. 13:00
-        14*60 + 59 = 899
-        15*60 = 900
-        13*60 =  780
-        840 - 899 < 0  = True;
-                       (780 < 899 ) true
-
-         yesterday start, today end inactive after. Wanted result: False
-        start 21:00 - 04:00 end. Curr time. 05:00
-        21*60 = 1260
-        4*60 = 240
-        5*60 =  300
-        240-1260 < 0  = True;
-                       (300 < 240) false
-
-
-
-        today start, tomorrow end active. Wanted result: False
-        start 21:00 - 04:00 end. Curr time. 22:00
-        21*60 = 1260
-        4*60 = 240
-        22*60 =  1320
-        240 - 1260 < 0 == true
-                        (1320 < 240) = false;
-
-        today start, tomorrow end, inactive before Wanted result: False
-        start 21:00 - 04:00 end. Curr time. 19:00
-        21*60 = 1260
-        4*60 = 240
-        19*60 =  1140
-        240 - 1260  < 0 = true
-                        (1140 < 240) = false;
-
-        today start and end, active Wanted result: False
-        start 15:00 - 18:00 end. Curr time. 17:00 res false
-        15*60 = 900
-        18*60 = 1080
-        17*60 =  1020
-        1080 - 900 < 0 = false;
-
-
-
-        today start and end, after active Wanted result: False
-        start 15:00 - 18:00 end. Curr time. 19:00 res false
-        15*60 = 900
-        18*60 = 1080
-        19*60 = 1140
-        1080 - 900 < 0 = false;
-
-
-
-        today start and end, before active Wanted result: False
-        start 15:00 - 18:00 end. Curr time. 14:00 res false
-        15*60 = 900
-        18*60 = 1080
-        14*60 =  840
-        1080 - 900 < 0 = false;
-
-
-        */
+        //Checks if Behaviour is activated yesterday and is still active.
         if (((toTimeInMinutes - fromTimeInMinutes) < 0) && (currentTimeInMinutes < toTimeInMinutes)) {
             return this.behaviour.activeDays[this._getWeekday(-1)];
         }
-        // 12:00 - 11:00  19:00
-        //Starts today and still active. (12:00) -> 15:59  curr. 13:00.   13:00 >= 12:00 true
+
+        //Checks if behaviour should be activated today
         if (currentTimeInMinutes >= fromTimeInMinutes) {
-            // 12:00 -> (15:59)    curr. 13:00   13:00 < 15:59 = true;
+            //Checks if behaviour is still active with ending day today)
             if (currentTimeInMinutes < toTimeInMinutes) {
                 return this.behaviour.activeDays[this._getWeekday()];
             }
-            // 12:00 -> 11:00 Curr. 13:00 11:00 < 12:00 = true. Meaning that the time overlaps to next day and will be caught at 00:00 by yesterday checking
+            // If above failed, check if ending day is the next day.
             if (toTimeInMinutes < fromTimeInMinutes) {
                 return this.behaviour.activeDays[this._getWeekday()];
             }
@@ -369,35 +202,16 @@ export class Behaviour {
     }
 
     _isActiveEndConditionObject(): boolean {
-        if (this.behaviour.data.endCondition.presence.data.type === "SPHERE" && this.presenceLocations.length !== 0) {
-            return true;
-        }
-        if (this.behaviour.data.endCondition.presence.data.type === "LOCATION") {
-            for (let i = 0; i < this.presenceLocations.length; i++) {
-                // @ts-ignore
-                if ("locationIds" in this.presenceLocations[i] && this.behaviour.data.endCondition.presence.data.locationIds.some(r => this.presenceLocations[i].locationIds.indexOf(r) >= 0)) {
-                    return true;
-                }
-                ;
-            }
-        }
-        return false;
+        return ("endCondition" in this.behaviour.data && this.isActive && this._isSomeonePresent())?true:false;
     }
 
-    /* Checks if someone is present in the sphere or a certain location
-
+    /**
+     * Presence check
+     *
+     * @returns Boolean - True if Someone is present, False if No one is present.
      */
     _isSomeonePresent(): boolean {
         return (this.presenceLocations.length > 0);
-
-    }
-
-    _hasPresenceGivenLocationId(locationId: number): boolean {
-        if ("data" in this.behaviour.data.presence && "locationIds" in this.behaviour.data.presence.data && locationId in this.behaviour.data.presence.data.locationIds) {
-            return true
-        } else {
-            return false;
-        }
     }
 
     _behaviourActiveCheck(): void {
@@ -408,11 +222,10 @@ export class Behaviour {
                     this.isActive = true;
                     return;
                 }
-            } else if ("endCondition" in this.behaviour.data && this.isActive) {
-                if (this._isActiveEndConditionObject()) {
-                    this.isActive = true;
-                    return;
-                }
+            } else if (this._isActiveEndConditionObject()) {
+                this.isActive = true;
+                return;
+
             }
         }
         this.isActive = false;
