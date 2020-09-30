@@ -48,7 +48,7 @@ interface BridgeFormat {
 interface PresenceProfileLocation {
     type: "LOCATION"
     profileIdx: number
-    locationIds: number[]
+    locationId: number
 }
 
 interface PresenceProfileSphere {

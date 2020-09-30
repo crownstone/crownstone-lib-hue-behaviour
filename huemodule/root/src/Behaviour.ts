@@ -6,18 +6,18 @@ const numberToWeekDay = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "F
 export class Behaviour {
     behaviour: HueBehaviourWrapper;
     isActive: boolean;
-    presenceLocations: PresenceProfile[];
-    // presenceTypeActive: boolean;   // True on presence with "SOMEBODY", True without presence with "NOBODY", Always true with IGNORE
+    presenceLocations: PresenceProfile[]; // Empty when no one is present for this behaviour.
     eventBus: EventBus;
     ticks: number; // ms
 
     constructor(behaviour, eventBus) {
         this.behaviour = behaviour;
         this.eventBus = eventBus;
-        this._presenceOnCreation();
-        this.eventBus.subscribe("onPresenceDetect", this.handlePresence.bind(this));
+        this.presenceLocations = [];
         this.ticks = Date.now();
         this._behaviourActiveCheck();
+
+        this.eventBus.subscribe("onPresenceDetect", this._onPresenceDetect.bind(this));
     }
 
     tick(ticks = Date.now()) {
@@ -25,70 +25,89 @@ export class Behaviour {
         this._behaviourActiveCheck();
     }
 
-    //ENDCONDITION:? MAY HAVE IGNORE... TEMP ADDING/REMOVING MECHANISM
-    handlePresence(presenceEvent: PresenceEvent) {
+    /**
+     * On Presence detection when someone enters/leaves a SPHERE or LOCATION,
+     * Checks if Behaviour has IGNORE as presence type and if endCondition is set.
+     * Calls _handlePresenceEvent() with the appropriate Presence object.
+     * @param presenceEvent - PresenceEvent object of type ENTER or LEAVE, containing information of who enters/leaves which room or the house.
+     */
+    _onPresenceDetect(presenceEvent: PresenceEvent): void {
         if (this.behaviour.data.presence.type !== "IGNORE") {
-            this._handlePresenceEvent(presenceEvent);
+            this._handlePresenceEvent(presenceEvent, this.behaviour.data.presence)
         } else if ("endCondition" in this.behaviour.data && this.behaviour.data.endCondition.presence.type === "SOMEBODY") {
-            if (presenceEvent.data.type === "SPHERE" && presenceEvent.type === "ENTER") {
-                this.presenceLocations.push(presenceEvent.data);
-            } else if (presenceEvent.data.type === "SPHERE" && presenceEvent.type === "LEAVE") {
-                this._handlePresenceEventLeave(presenceEvent);
-            }
+            this._handlePresenceEvent(presenceEvent, this.behaviour.data.endCondition.presence)
         }
     }
 
-    _handlePresenceEventEnter(presenceEvent: PresenceEvent) {
+    /**
+     * Parsing function for Presence Detection Event Handling,
+     * Simple check for handling the appropriate event.
+     * @param presenceEvent - PresenceEvent object of type ENTER or LEAVE
+     * @param presenceObject - Presence object, can be the one of Behaviour.presence or Behaviour.endCondition.
+     */
+    _handlePresenceEvent(presenceEvent: PresenceEvent, presenceInformation): void {
+        if (presenceEvent.type === "ENTER") {
+            this._onPresenceEnterEvent(presenceEvent, presenceInformation);
+        } else if (presenceEvent.type === "LEAVE") {
+            this._onPresenceLeaveEvent(presenceEvent);
+        }
+    }
+
+    /**
+     * On Presence detection when someone enters a SPHERE or LOCATION,
+     * If SPHERE related, Check if Behaviour handles SPHERE based presences, then simply add PresenceProfile to list.
+     * If LOCATION related, Check if Behaviour handles LOCATION based presences,
+     *    If true: Check if PresenceProfile locationId matches locationId in Presence object locationIds.
+     *        If true: add to presenceLocations list if matches.
+     * @param presenceEvent - PresenceEvent object of type ENTER, containing information of who entered a which room or the house.
+     * @param presenceObject - Presence object, can be the one of Behaviour.presence or Behaviour.endCondition.
+     */
+    _onPresenceEnterEvent(presenceEvent: PresenceEvent, presenceObject: Presence): void {
         if (presenceEvent.data.type === "SPHERE") {
-            this.presenceLocations.push(presenceEvent.data);
-        } else if (presenceEvent.data.type === "LOCATION") {
-            if ("data" in this.behaviour.data.presence && this.behaviour.data.presence.data.type === "LOCATION") {
-                presenceEvent.data.locationIds.forEach(locationId => {
-                    if (this._hasPresenceGivenLocationId(locationId)) {
-                        this.presenceLocations.push(presenceEvent.data);
-                        return;
-                    }
-                });
+            if ("data" in presenceObject && presenceObject.data.type === "SPHERE") {
+                this.presenceLocations.push(presenceEvent.data);
             }
-        }
-    }
-
-    _handlePresenceEventLeave(presenceEvent: PresenceEvent) {
-        for (var i = 0; i < this.presenceLocations.length; i++) {
-            if (presenceEvent.data.profileIdx === this.presenceLocations[i].profileIdx) {
-                if (presenceEvent.data.type === this.presenceLocations[i].type && presenceEvent.data.type === "SPHERE") {
-                    this.presenceLocations[i] = undefined;
-                    break;
-                } else if (presenceEvent.data.type === this.presenceLocations[i].type && presenceEvent.data.type === "LOCATION") {
-                    this.presenceLocations[i] = undefined;
-                    break;
+        } else if (presenceEvent.data.type === "LOCATION") {
+            if ("data" in presenceObject && presenceObject.data.type === "LOCATION") {
+                if (presenceEvent.data.locationId in presenceObject.data.locationIds) {
+                    this.presenceLocations.push(presenceEvent.data);
                 }
             }
         }
     }
 
-    _handlePresenceEvent(presenceEvent: PresenceEvent) {
-        if (presenceEvent.type === "ENTER") {
-            this._handlePresenceEventEnter(presenceEvent);
-        } else if (presenceEvent.type === "LEAVE") {
-            this._handlePresenceEventLeave(presenceEvent);
+    /**
+     * On Presence detection when someone leaves a SPHERE or LOCATION,
+     * Removes the PresenceProfile from the list on a match.
+     *
+     * @param presenceEvent - PresenceEvent object of type LEAVE, containing information of who leaves which room or the house.
+     */
+    _onPresenceLeaveEvent(presenceEvent: PresenceEvent): void {
+        for (let i = 0; i < this.presenceLocations.length; i++) {
+            let presenceProfile = this.presenceLocations[i];
+            if (presenceProfile.profileIdx === presenceEvent.data.profileIdx) {
+                if (presenceEvent.data.type === "SPHERE" && presenceProfile.type === "SPHERE") {
+                    this.presenceLocations[i] = undefined;
+                    break;
+                }
+                if (presenceEvent.data.type === "LOCATION" && presenceProfile.type === "LOCATION") {
+                    if (presenceEvent.data.locationId === presenceProfile.locationId) {
+                        this.presenceLocations[i] = undefined;
+                        break;
+                    }
+                }
+            }
         }
     }
 
-    getComposedState() {
+
+    getComposedState(): StateUpdate {
         return (this.isActive) ? this._createComposedState() : {on: false}
     }
 
-    _createComposedState() {
-        const state = {on: true, bri: this.behaviour.data.action.data * oneBriPercentage}
+    _createComposedState(): StateUpdate {
+        return {on: true, bri: this.behaviour.data.action.data * oneBriPercentage}
     }
-
-
-    //TODO Get save state?
-    _presenceOnCreation() {
-        // return (this.behaviour.data.presence.type === "IGNORE") ? this.currentPresence = "IGNORE" : "NOBODY";
-    }
-
 
     /*
     Checks if type All_DAY is still valid.
@@ -110,7 +129,7 @@ export class Behaviour {
     }
 
 
-    //Returns (de)activation time in minutes from 00:00 to 23:59 or -1 when invalid type.
+//Returns (de)activation time in minutes from 00:00 to 23:59 or -1 when invalid type.
     _getSwitchingTime(operator: string): number {
         switch (this.behaviour.data.time[operator].type) {
             case "SUNRISE":
@@ -369,19 +388,7 @@ export class Behaviour {
 
      */
     _isSomeonePresent(): boolean {
-        const result = this.presenceLocations.forEach(profile => {
-            if (profile.type === "SPHERE") {
-                return true;
-            } else if ("locationIds" in profile && profile.type === "LOCATION") {
-                const result = profile.locationIds.forEach(id => {
-                    if (this._hasPresenceGivenLocationId(id)) {
-                        return true;
-                    }
-                });
-                return (result !== undefined) ? true : false;
-            }
-        });
-        return (result !== undefined) ? true : false;
+        return (this.presenceLocations.length > 0);
 
     }
 
@@ -394,7 +401,8 @@ export class Behaviour {
     }
 
     _behaviourActiveCheck(): void {
-        if (this.behaviour.type === "BEHAVIOUR") {
+        if (this.behaviour.type === "BEHAVIOUR"
+        ) {
             if (this._isActiveTimeObject()) {
                 if (this._isActivePresenceObject()) {
                     this.isActive = true;
