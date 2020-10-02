@@ -36,13 +36,11 @@ class fakeLights {
     printLightInformation() {
         console.log(`Light is turned ${(this.state.on) ? "ON" : "OFF"} with a brightness of ${(this.state["bri"]) / oneBriPercentage}%`)
     }
-
 }
 
 class Light extends fakeLights {
 
 }
-
 
 const delay = ms => {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -57,59 +55,27 @@ interface LightBehaviourWrapper {
     presenceUpdated: number
 }
 
-
-class BehaviourSimulator {
-
-}
-
-class LightBehaviour extends Light {
-    lightPolling = setInterval(this.poll, 500);
-    eventBus: EventBus;
-
-    constructor(uniqueId, state, id, eventBus) {
-        super(uniqueId, state, id);
-        this.eventBus = eventBus;
-    }
-
-    poll() {
-        const old = this.state;
-        this.renewState();
-        if (old != this.state) {
-            this.eventBus.emit("presenceChanged", this);
-        }
-    }
-
-
-}
-
 export class BehaviourAggregator {
     private moduleRunning: boolean;
     behaviours: object = {};
     pollingRate: number;
-    lightsInRoom: object;
 
-    light: Light; // TODO: this should only have a single light reference
+    light: Light;
 
-    constructor(pollingRate: number = 500) {
+    constructor(pollingRate: number = 500, light) {
         this.moduleRunning = false;
-        this.lightsInRoom = {};
-        this.lights = [];
+        this.light = light;
         this.pollingRate = pollingRate;
 
         eventBus.subscribe("lightStateChanged", (data) => {
             this._handleLightStateChange(data)
-        });
-        eventBus.subscribe("presenceDetected", this._onPresenceDetected.bind(this));
-        // Ik zou dit niet doen, probeer gewoon een goed beschrijvende log in elke error
-        // eventBus.subscribe("error", this._errorHandling.bind(this));
+        }); ;
+
     }
 
     async init() {
         ///--- To Be changed
         let lightA = new Light("AA:BB:CC:DD:EE:FF:GG-af", {}, 0);
-        let lightB = new Light("TT:EE:SS:TT:11:22:33-af", {}, 1);
-        this.lightsInRoom["Bedroom"] = [lightA, lightB];
-
         ///---
         this.moduleRunning = true;
     }
@@ -119,18 +85,8 @@ export class BehaviourAggregator {
     }
 
 
-    addBehaviour(behaviour: object, room) {
-        if (this.lightsInRoom[room] !== undefined) {
-            this.lightsInRoom[room].forEach(light => {
-                this.behaviours[light.uniqueId] = {
-                    behaviour: behaviour,
-                    light: light,
-                    overrideActive: false,
-                    behaviourActive: false,
-                    someoneInRoom: false
-                }
-            })
-        }
+    addBehaviour(behaviour: HueBehaviourWrapper) {
+
     }
 
 
@@ -152,34 +108,12 @@ export class BehaviourAggregator {
 
     }
 
-    detectPresence(data) {
-        if (!this.moduleRunning) {
-            return;
-        }
-        eventBus.emit("presenceDetected", data);
-    }
-
     _handleLightStateChange(data) {
         this._behaviourHandling(this.behaviours[data.uniqueId]);
         this._lightStateCheck(this.behaviours[data.uniqueId]);
 
     }
 
-    async _onPresenceDetected(data) {
-        if (!this.lightsInRoom[data.room]) {
-            return;
-        }
-        this.lightsInRoom[data.room].forEach(light => {
-            this.behaviours[light.uniqueId].someoneInRoom = data.presence;
-
-            // to be removed/changed        .
-            this._behaviourHandling(this.behaviours[light.uniqueId]);
-            this._stateHandling(this.behaviours[light.uniqueId]);
-            this._lightStateCheck(this.behaviours[light.uniqueId]);
-
-
-        });
-    }
 
     _behaviourHandling(a){
 
@@ -189,11 +123,7 @@ export class BehaviourAggregator {
             return;
         }
         Object.keys(this.behaviours).forEach(id => {
-            const oldBehaviour = this.behaviours[id].behaviourActive
-            this._behaviourHandling(this.behaviours[id]);
-            if (oldBehaviour != this.behaviours[id].behaviourActive) {
-                this._lightStateCheck(this.behaviours[id]);
-            }
+             //check if active
         })
     }
 
@@ -206,19 +136,16 @@ export class BehaviourAggregator {
         }
     }
 
-    //TODO endcondition
 
 
     async _pollLights() {
-        for (const light of this.lights) {
-            const prevLightState = light.getState();
-            await light.renewState();
-            if (JSON.stringify(light.getState()) !== JSON.stringify(prevLightState)) {
-                debugPrintStateDifference(prevLightState, light.getState());
-                this.eventBus.emit("lightStateChanged", light);
+            const prevLightState = this.light.getState();
+            await this.light.renewState();
+            if (JSON.stringify(this.light.getState()) !== JSON.stringify(prevLightState)) {
+                debugPrintStateDifference(prevLightState, this.light.getState());
+                eventBus.emit("lightStateChanged", this.light);
             }
         }
-    }
 
     _stateHandling(data: LightBehaviourWrapper) {
         if (!data.overrideActive) {

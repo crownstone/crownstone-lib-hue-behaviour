@@ -1,7 +1,7 @@
-import {Framework} from "./CrownstoneHue";
+import {CrownstoneHue} from "../CrownstoneHue";
 import {Light} from "./Light"
 import {v3} from "node-hue-api";
-import {FrameworkError} from "./FrameworkError";
+import {CrownstoneHueError} from "../util/CrownstoneHueError";
 
 const hueApi = v3.api;
 const fetch = require('node-fetch');
@@ -40,9 +40,9 @@ export class Bridge {
     bridgeId: string
     reachable: boolean = false;
 
-    framework: Framework;
+    framework: CrownstoneHue;
 
-    constructor(name: string, username: string, clientKey: string, macAddress: string, ipAddress: string, bridgeId: string, framework: Framework) {
+    constructor(name: string, username: string, clientKey: string, macAddress: string, ipAddress: string, bridgeId: string, framework: CrownstoneHue) {
         this.name = name;
         this.username = username;
         this.ipAddress = ipAddress;
@@ -68,7 +68,7 @@ export class Bridge {
             }
         } catch (err) {
             if (typeof (err.getHueErrorType) === "function" && err.getHueErrorType() === 1) {
-                throw new FrameworkError(401)
+                throw new CrownstoneHueError(401)
             } else {
                 throw err;
             }
@@ -141,16 +141,16 @@ export class Bridge {
             } catch (err) {
                 if (typeof (err.getHueErrorType) === "function") {
                     if (err.message.includes(`Light ${id} not found`)) {
-                        throw new FrameworkError(422, id)
+                        throw new CrownstoneHueError(422, id)
                     } else {
-                        throw new FrameworkError(999, err.message);
+                        throw new CrownstoneHueError(999, err.message);
                     }
                 } else {
                     throw err;
                 }
             }
         } else {
-            throw new FrameworkError(405);
+            throw new CrownstoneHueError(405);
 
         }
     }
@@ -172,7 +172,7 @@ export class Bridge {
                 return new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this)
             });
         } else {
-            throw new FrameworkError(405);
+            throw new CrownstoneHueError(405);
         }
     }
 
@@ -215,7 +215,7 @@ export class Bridge {
 
         } catch (err) {
             if (typeof (err.getHueErrorType) === "function" && err.getHueErrorType() === 101) {
-                throw new FrameworkError(406)
+                throw new CrownstoneHueError(406)
             } else {
                 throw err;
             }
@@ -235,7 +235,7 @@ export class Bridge {
                 this.lights[light.uniqueId] = new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this)
             });
         } else {
-            throw new FrameworkError(405);
+            throw new CrownstoneHueError(405);
         }
     }
 
@@ -267,7 +267,7 @@ export class Bridge {
     private async _rediscoverMyself(): Promise<void> {
         let possibleBridges = await this._getBridgesFromDiscoveryUrl();
         if (possibleBridges.length === 0) {
-            throw new FrameworkError(404, "Bridge with id " + this.ipAddress + " not found.");
+            throw new CrownstoneHueError(404, "Bridge with id " + this.ipAddress + " not found.");
         } else {
             let result: DiscoverResult = {id: "", internalipaddress: ""};
             for (const item of possibleBridges) {
@@ -277,7 +277,7 @@ export class Bridge {
                 }
             }
             if (result.id === "") {
-                throw new FrameworkError(404, "Bridge with id " + this.ipAddress + " not found.")
+                throw new CrownstoneHueError(404, "Bridge with id " + this.ipAddress + " not found.")
             } else {
                 this.ipAddress = result.internalipaddress;
                 await this._createAuthenticatedApi()

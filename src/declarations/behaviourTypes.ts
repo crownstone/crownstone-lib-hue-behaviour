@@ -87,7 +87,7 @@ interface HueBehaviour {
 }
 
 // TYPE: TWILIGHT
-interface Twilight {
+interface HueTwilight {
     action: {
         type: "DIM_WHEN_TURNED_ON",
         data: number,
@@ -100,7 +100,6 @@ interface HueBehaviourWrapper {
     type: "BEHAVIOUR"
     data: HueBehaviour
     activeDays: ActiveDays,
-    lightId,
-    string
+    lightId: string,
     updatedAt: number
 }

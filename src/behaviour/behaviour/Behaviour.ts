@@ -1,46 +1,36 @@
-
 import {eventBus} from "../../util/EventBus";
 import {BehaviourUtil} from "./BehaviourUtil";
+import {BehaviourSupport} from "./BehaviourSupport";
 
 
 export class Behaviour {
   behaviour: HueBehaviourWrapper;
   isActive: boolean;
   presenceLocations: PresenceProfile[] = []; // Empty when no one is present for this behaviour.
-  timestamp: number | null = null; // TODO: deze kan niet geinitialiseerd zijn. Hij mag tot die tijd geen waarde hebben.
+  timestamp: number | null = null;
 
-  sphereLocation : SphereLocation
+  sphereLocation: SphereLocation
 
-  unsubscribe : EventUnsubscriber
+  unsubscribe: EventUnsubscriber
 
-  constructor(behaviour : HueBehaviourWrapper, sphereLocation: SphereLocation) {
+  constructor(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation) {
     this.behaviour = behaviour;
     this.sphereLocation = sphereLocation;
-
-    // pas doen op het moment dat je een tick krijgt.
-    // this._behaviourActiveCheck();
-
     this.unsubscribe = eventBus.subscribe("onPresenceDetect", this._onPresenceDetect.bind(this));
   }
 
-
-  setSphereLocation(sphereLocation : SphereLocation) {
+  setSphereLocation(sphereLocation: SphereLocation) {
     this.sphereLocation = sphereLocation;
   }
 
-  // TODO: belangrijk! events opruimen als de behaviour weggegooit gaat worden
   cleanup() {
     this.unsubscribe();
   }
 
-
-  // TODO: geen default Date.now hier. Forceer hier altijd een tijd in
-  // kies tussen een Date of timestamp.
-  tick(timestamp : number) {
+  tick(timestamp: number) {
     this.timestamp = timestamp;
     this._behaviourActiveCheck();
   }
-
 
   /**
    * On Presence detection when someone enters/leaves a SPHERE or LOCATION,
@@ -62,9 +52,9 @@ export class Behaviour {
    * @param presenceEvent - PresenceEvent object of type ENTER or LEAVE
    * @param presenceObject - Presence object, can be the one of Behaviour.presence or Behaviour.endCondition.
    */
-  _handlePresenceEvent(presenceEvent: PresenceEvent, presenceInformation): void {
+  _handlePresenceEvent(presenceEvent: PresenceEvent, presenceObject): void {
     if (presenceEvent.type === "ENTER") {
-      this._onPresenceEnterEvent(presenceEvent, presenceInformation);
+      this._onPresenceEnterEvent(presenceEvent, presenceObject);
     } else if (presenceEvent.type === "LEAVE") {
       this._onPresenceLeaveEvent(presenceEvent);
     }
@@ -128,120 +118,23 @@ export class Behaviour {
   }
 
   _createComposedState(): StateUpdate {
-    return {on: true, bri: BehaviourUtil.mapBehaviourActionToHue(this.behaviour.data.action.data) }
-  }
-
-  _isActiveTimeAllDay(): boolean {
-    const currentTimeInMinutes = new Date(this.timestamp).getMinutes() + (new Date(this.timestamp).getHours() * 60);
-
-    //Checks if current time is between  00:00 > 03:59.
-    if (currentTimeInMinutes < 4 * 60) {
-      //Checks if yesterday should be active.
-      return this.behaviour.activeDays[BehaviourUtil.getWeekday(this.timestamp, -1)]
-    } else {//Else means 04:00 -> 23:59.
-      //Is Today active. Thus 04:00 -> 23:59
-      return this.behaviour.activeDays[BehaviourUtil.getWeekday(this.timestamp)]
-    }
+    return {on: true, bri: BehaviourUtil.mapBehaviourActionToHue(this.behaviour.data.action.data)}
   }
 
 
   /**
-   * Retrieves the Behaviour's (de)activation time in minutes.
-
-   * @Param operator -  Either from or to
+   * Checks if the behaviour is active according to its rules.
    *
-   * @Returns
-   *
-   *
-   * TODO: hij mag niet zelf zn tick methode aanroepen!
    */
-  _getSwitchingTime(operator: "from" | "to"): number {
-    switch (this.behaviour.data.time[operator].type) {
-      case "SUNRISE":
-        return BehaviourUtil.getSunriseTimeInMinutes(this.timestamp, this.sphereLocation) + this.behaviour.data.time[operator].offsetMinutes;
-      case "SUNSET":
-        return BehaviourUtil.getSunsetTimeInMinutes(this.timestamp, this.sphereLocation) + this.behaviour.data.time[operator].offsetMinutes;
-      case "CLOCK":
-        return this.behaviour.data.time[operator].data.minutes + (this.behaviour.data.time[operator].data.hours * 60);
-      default:
-        return -1;
-    }
-  }
-
-  _isActiveRangeObject(): boolean {
-    const currentTimeInMinutes = new Date(this.timestamp).getMinutes() + (new Date(this.timestamp).getHours() * 60);
-    const fromTimeInMinutes = this._getSwitchingTime("from");
-    const toTimeInMinutes = this._getSwitchingTime("to");
-
-    if (fromTimeInMinutes === -1 || toTimeInMinutes === -1) {
-      return false;
-    }
-
-    //Checks if Behaviour is activated yesterday and is still active.
-    if (((toTimeInMinutes - fromTimeInMinutes) < 0) && (currentTimeInMinutes < toTimeInMinutes)) {
-      return this.behaviour.activeDays[BehaviourUtil.getWeekday(-1)];
-    }
-
-    //Checks if behaviour should be activated today
-    if (currentTimeInMinutes >= fromTimeInMinutes) {
-      //Checks if behaviour is still active with ending day today)
-      if (currentTimeInMinutes < toTimeInMinutes) {
-        return this.behaviour.activeDays[BehaviourUtil.getWeekday(this.timestamp)];
-      }
-      // If above failed, check if ending day is the next day.
-      if (toTimeInMinutes < fromTimeInMinutes) {
-        return this.behaviour.activeDays[BehaviourUtil.getWeekday(this.timestamp)];
-      }
-    }
-    return false;
-
-  }
-
-  _isActiveTimeObject(): boolean {
-    if (this.behaviour.data.time.type === "ALL_DAY") {
-      return this._isActiveTimeAllDay();
-    }
-    if (this.behaviour.data.time.type === "RANGE") {
-      return this._isActiveRangeObject();
-    }
-    return false;
-  }
-
-  _isActivePresenceObject(): boolean {
-    switch (this.behaviour.data.presence.type) {
-      case "IGNORE":
-        return true;
-      case "NOBODY":
-        return !this._isSomeonePresent();
-      case "SOMEBODY":
-        return this._isSomeonePresent();
-      default:
-        return false;
-    }
-  }
-
-  _isActiveEndConditionObject(): boolean {
-    return ("endCondition" in this.behaviour.data && this.isActive && this._isSomeonePresent())?true:false;
-  }
-
-  /**
-   * Presence check
-   *
-   * @returns Boolean - True if Someone is present, False if No one is present.
-   */
-  _isSomeonePresent(): boolean {
-    return (this.presenceLocations.length > 0);
-  }
-
   _behaviourActiveCheck(): void {
-    if (this.behaviour.type === "BEHAVIOUR"
-    ) {
-      if (this._isActiveTimeObject()) {
-        if (this._isActivePresenceObject()) {
+    const behaviourObj = new BehaviourSupport(this.behaviour);
+    if (this.behaviour.type === "BEHAVIOUR") {
+      if (behaviourObj.isActiveTimeObject(this.timestamp,this.sphereLocation)) {
+        if (behaviourObj.isActivePresenceObject(this.presenceLocations)) {
           this.isActive = true;
           return;
         }
-      } else if (this._isActiveEndConditionObject()) {
+      } else if (behaviourObj.hasLocationEndCondition(),this.isActive && BehaviourUtil.isSomeonePresent(this.presenceLocations)) {
         this.isActive = true;
         return;
 

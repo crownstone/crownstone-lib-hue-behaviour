@@ -6,32 +6,34 @@ const WEEKDAY_MAP = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri",
 
 export const BehaviourUtil = {
 
-  // voorbeeld, er kunnen er meer volgen.
   getWeekday: function(timestamp, offsetDay: number = 0): string {
-    const dayNumber = ((new Date(timestamp).getDay()) + offsetDay) % 7 // TODO: modulo is niet nodig, dit geeft per definitie 0-6 terug
+    const dayNumber = ((((new Date(timestamp).getDay()) + offsetDay) % 7) + 7) % 7 // ((n % m) + m) % m - Fix for negative numbers
     return WEEKDAY_MAP[dayNumber];
+  },
+
+  isSomeonePresent(presenceLocations): boolean {
+    return (this.presenceLocations.length > 0);
   },
 
   mapBehaviourActionToHue: function(value: number) {
     return value * 2.54
   },
 
-
-  /**
-   * TODO:
-   * Wij gebruiken de volgende tijden:
-   * let sunriseTime = times.sunriseEnd
-   let sunsetTime  = times.sunset
-   * @param tick
+  /** returns the sunset time in minutes, given the timestamp and sphereLocation
+   * @param sphereLocation
+   * @param timestamp
    */
   getSunsetTimeInMinutes: function(timestamp : number, sphereLocation : SphereLocation): Number {
     const sunTimes = SunCalc.getTimes(new Date(timestamp), sphereLocation.latitude,sphereLocation.longitude);
     return (sunTimes.sunset.getHours() * 60) + sunTimes.sunset.getMinutes();
   },
-
+  /** returns the end of the sunrise time in minutes, given the timestamp and sphereLocation
+   * @param sphereLocation
+   * @param timestamp
+   */
   getSunriseTimeInMinutes: function(timestamp : number, sphereLocation : SphereLocation): Number {
     const sunTimes = SunCalc.getTimes(new Date(timestamp),sphereLocation.latitude,sphereLocation.longitude);
-    return (sunTimes.sunrise.getHours() * 60) + sunTimes.sunrise.getMinutes() ;
+    return (sunTimes.sunriseEnd.getHours() * 60) + sunTimes.sunriseEnd.getMinutes() ;
   }
 
 }

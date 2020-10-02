@@ -9,7 +9,7 @@ export const ERROR_CODES = {
 }
 
 
-export class HueError extends Error {
+export class CrownstoneHueError extends Error {
     errorCode: number;
     description: string;
     constructor(errorCode,description?) {

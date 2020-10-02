@@ -1,9 +1,8 @@
 import {promises as fs} from 'fs';
-import {Bridge} from "./Bridge";
-import {Light} from "./Light";
+import {Bridge} from "./hue/Bridge";
+import {Light} from "./hue/Light";
 import {v3} from "node-hue-api";
-import {HueError} from "./util/HueError";
-
+import {CrownstoneHueError} from "./util/CrownstoneHueError";
 const discovery = v3.discovery
 
 
@@ -80,7 +79,7 @@ export class CrownstoneHue {
             }
             await this.updateConfigFile();
         } else {
-            throw new HueError(410);
+            throw new CrownstoneHueError(410);
         }
     }
 
@@ -141,7 +140,7 @@ export class CrownstoneHue {
             }
             return confBridges;
         } else {
-            throw new HueError(999,bridges);
+            throw new CrownstoneHueError(999,bridges);
         }
     }
 
@@ -191,7 +190,7 @@ export class CrownstoneHue {
             this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["name"] = light["name"];
             this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["id"] = light["id"];
         } else {
-            throw new HueError(410)
+            throw new CrownstoneHueError(410)
         }
     }
 

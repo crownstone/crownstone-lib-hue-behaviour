@@ -13,7 +13,6 @@
   "dependencies": {
     "node-fetch": "^2.6.1",
     "node-hue-api": "^4.0.9",
-    "sun-time": "^1.0.2",
     "suncalc": "^1.8.0"
   },
   "devDependencies": {

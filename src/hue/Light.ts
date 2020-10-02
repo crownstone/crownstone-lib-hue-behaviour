@@ -1,4 +1,5 @@
 import {Bridge} from "./Bridge";
+import {minValueOfStates,maxValueOfStates,minMaxValueStates,possibleStates} from "../constants/HueConstants";
 
 
 
