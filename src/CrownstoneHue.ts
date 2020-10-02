@@ -2,7 +2,7 @@ import {promises as fs} from 'fs';
 import {Bridge} from "./Bridge";
 import {Light} from "./Light";
 import {v3} from "node-hue-api";
-import {FrameworkError} from "./FrameworkError";
+import {HueError} from "./util/HueError";
 
 const discovery = v3.discovery
 
@@ -12,7 +12,7 @@ const CONF_NAME: string = "saveConfig.json";
 const CONF_BRIDGE_LOCATION: string = "Bridges";
 
 /**
- * Framework object
+ * CrownstoneHue object
  *
  * @remarks
  * init() should be called before using this object.
@@ -21,7 +21,7 @@ const CONF_BRIDGE_LOCATION: string = "Bridges";
  * @param connectedBridges - List of connected bridges
  *
  */
-export class Framework {
+export class CrownstoneHue {
     configSettings: object = {};
     connectedBridges: Bridge[] = [];
 
@@ -33,7 +33,7 @@ export class Framework {
     }
 
     /**
-     * To be called for initialization of the Framework.
+     * To be called for initialization of the CrownstoneHue.
      *
      * @returns a List of Bridge objects configured from the config file.
      *
@@ -80,7 +80,7 @@ export class Framework {
             }
             await this.updateConfigFile();
         } else {
-            throw new FrameworkError(410);
+            throw new HueError(410);
         }
     }
 
@@ -141,7 +141,7 @@ export class Framework {
             }
             return confBridges;
         } else {
-            throw new FrameworkError(999,bridges);
+            throw new HueError(999,bridges);
         }
     }
 
@@ -191,7 +191,7 @@ export class Framework {
             this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["name"] = light["name"];
             this.configSettings[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["id"] = light["id"];
         } else {
-            throw new FrameworkError(410)
+            throw new HueError(410)
         }
     }
 

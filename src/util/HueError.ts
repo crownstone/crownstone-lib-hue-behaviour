@@ -9,7 +9,7 @@ export const ERROR_CODES = {
 }
 
 
-export class FrameworkError extends Error {
+export class HueError extends Error {
     errorCode: number;
     description: string;
     constructor(errorCode,description?) {
@@ -18,7 +18,7 @@ export class FrameworkError extends Error {
         }
         super(ERROR_CODES[errorCode]);
         this.errorCode = errorCode;
-        this.name = "FrameworkError";
+        this.name = "CrownstoneHueError";
         this.description = description;
     }
 

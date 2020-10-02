@@ -64,7 +64,7 @@ interface timeHoursMinutes {
 }
 
 
-type ActiveDays = {
+interface ActiveDays {
     Mon: boolean,
     Tue: boolean,
     Wed: boolean,

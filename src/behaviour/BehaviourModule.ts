@@ -1,5 +1,5 @@
-import {Framework} from "./index";
-import {EventBus} from "./util/EventBus";
+import {CrownstoneHue} from "../index";
+import {eventBus} from "../util/EventBus";
 
 const oneBriPercentage = 2.54;
 
@@ -83,7 +83,6 @@ class LightBehaviour extends Light {
 }
 
 export class BehaviourModule {
-    eventBus: EventBus;
     private moduleRunning: boolean;
     behaviours: object = {};
     pollingRate: number;
@@ -92,17 +91,17 @@ export class BehaviourModule {
     lights: Light[];
 
     constructor(pollingRate: number = 500) {
-        this.eventBus = new EventBus();
         this.moduleRunning = false;
         this.lightsInRoom = {};
         this.lights = [];
         this.pollingRate = pollingRate;
 
-        this.eventBus.subscribe("lightStateChanged", (data) => {
+        eventBus.subscribe("lightStateChanged", (data) => {
             this._handleLightStateChange(data)
         });
-        this.eventBus.subscribe("presenceDetected", this._onPresenceDetected.bind(this));
-        this.eventBus.subscribe("error", this._errorHandling.bind(this));
+        eventBus.subscribe("presenceDetected", this._onPresenceDetected.bind(this));
+        // Ik zou dit niet doen, probeer gewoon een goed beschrijvende log in elke error
+        // eventBus.subscribe("error", this._errorHandling.bind(this));
     }
 
     async init() {
@@ -144,7 +143,7 @@ export class BehaviourModule {
 
             return (this.moduleRunning) ? this._loop() : "STOPPED";
         } catch (err) {
-            this.eventBus.emit("error", err);
+            eventBus.emit("error", err);
             return (this.moduleRunning) ? this._loop() : "STOPPED";
         }
     }
@@ -157,7 +156,7 @@ export class BehaviourModule {
         if (!this.moduleRunning) {
             return;
         }
-        this.eventBus.emit("presenceDetected", data);
+        eventBus.emit("presenceDetected", data);
     }
 
     _handleLightStateChange(data) {

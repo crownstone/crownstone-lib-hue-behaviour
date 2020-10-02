@@ -1,35 +1,7 @@
 import {Bridge} from "./Bridge";
 
 
-const maxValueOfStates: StateUpdate = {
-    'hue': 65535,
-    'bri': 254,
-    'sat': 254,
-    'xy': [0.5, 0.5],
-    'ct': 500
-}
 
-const minValueOfStates: StateUpdate = {
-    'hue': 0,
-    'bri': 1,
-    'sat': 0,
-    'xy': [0.0, 0.0],
-    'ct': 153
-}
-
-const minMaxValueStates = {
-    'hue': true,
-    'bri': true,
-    'sat': true,
-    'xy': true,
-    'ct': true,
-}
-const possibleStates = {
-    ...minMaxValueStates,
-    'on': true,
-    'effect': true,
-    'alert': true
-}
 
 /**
  * Light object

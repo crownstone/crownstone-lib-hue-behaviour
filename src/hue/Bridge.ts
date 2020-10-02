@@ -1,4 +1,4 @@
-import {Framework} from "./Framework";
+import {Framework} from "./CrownstoneHue";
 import {Light} from "./Light"
 import {v3} from "node-hue-api";
 import {FrameworkError} from "./FrameworkError";
@@ -25,7 +25,7 @@ const DISCOVERY_URL = "https://discovery.meethue.com/";
  * @param ipAddress - The last known ip-address of the bridge.
  * @param bridgeId - The unique id of the bridge.
  * @param reachable - Boolean if Bridge is reachable or not.
- * @param framework - Link to the Framework object from where the Bridge was created.
+ * @param framework - Link to the CrownstoneHue object from where the Bridge was created.
  *
  */
 export class Bridge {

@@ -1,3 +1,8 @@
+// Deze hoort niet in de src
+
+
+
+
 import {Bridge} from "./index";
 import {Framework} from "./index";
 import {BehaviourModule} from "./BehaviourModule";
