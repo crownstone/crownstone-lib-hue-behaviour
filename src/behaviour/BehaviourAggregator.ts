@@ -82,13 +82,13 @@ class LightBehaviour extends Light {
 
 }
 
-export class BehaviourModule {
+export class BehaviourAggregator {
     private moduleRunning: boolean;
     behaviours: object = {};
     pollingRate: number;
     lightsInRoom: object;
 
-    lights: Light[];
+    light: Light; // TODO: this should only have a single light reference
 
     constructor(pollingRate: number = 500) {
         this.moduleRunning = false;
