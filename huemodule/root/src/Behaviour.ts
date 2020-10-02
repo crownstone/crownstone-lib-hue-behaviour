@@ -1,7 +1,10 @@
 import {EventBus} from "./util/EventBus";
+import {SunCalc} from "SunCalc";
 
 const oneBriPercentage = 2.54;
 const numberToWeekDay = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat"}
+const latitude = 51.889669;
+const longitude = 4.576249;
 
 export class Behaviour {
     behaviour: HueBehaviourWrapper;
@@ -139,9 +142,9 @@ export class Behaviour {
     _getSwitchingTime(operator: "from" | "to"): number {
         switch (this.behaviour.data.time[operator].type) {
             case "SUNRISE":
-                return getSunriseTime().getMinutes() + this.behaviour.data.time[operator].offsetMinutes + (getSunriseTime().getHours() * 60);
+                return getSunriseTimeInMinutes(this.tick()) + this.behaviour.data.time[operator].offsetMinutes;
             case "SUNSET":
-                return getSunsetTime().getMinutes() + this.behaviour.data.time[operator].offsetMinutes + (getSunsetTime().getHours() * 60);
+                return getSunsetTimeInMinutes(this.tick()) + this.behaviour.data.time[operator].offsetMinutes;
             case "CLOCK":
                 return this.behaviour.data.time[operator].data.minutes + (this.behaviour.data.time[operator].data.hours * 60);
             default:
@@ -238,12 +241,14 @@ export class Behaviour {
 }
 
 
-function getSunsetTime(): Date {
-    return new Date(2020, 9, 22, 20, 10, 0);
+function getSunsetTimeInMinutes(tick): Number {
+    const sunTimes = SunCalc.getTimes(new Date(tick),latitude,longitude);
+    return (sunTimes.sunset.getHours() * 60) + sunTimes.sunset.getMinutes() ;
 }
 
-function getSunriseTime(): Date {
-    return new Date(2020, 9, 22, 6, 10, 0);
+function getSunriseTimeInMinutes(tick): Number {
+    const sunTimes = SunCalc.getTimes(new Date(tick),latitude,longitude);
+    return (sunTimes.sunrise.getHours() * 60) + sunTimes.sunrise.getMinutes() ;
 
 }
 
