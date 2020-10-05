@@ -225,6 +225,11 @@ export class BehaviourSupport {
     return this;
   }
 
+  setActiveDays(activeDays:ActiveDays){
+    this.rule.activeDays = activeDays;
+    return this;
+  }
+
   //########Getters###########
 
   getLocationIds() : number[] {
@@ -344,14 +349,14 @@ export class BehaviourSupport {
     }
   }
 
-  isActivePresenceObject(presenceLocations): boolean {
+  isActivePresenceObject(presenceLocations,msSincePresenceUpdate): boolean {
     switch (this.rule.data.presence.type) {
       case "IGNORE":
         return true;
       case "NOBODY":
-        return !BehaviourUtil.isSomeonePresent(presenceLocations);
+        return (!BehaviourUtil.isSomeonePresent(presenceLocations) && msSincePresenceUpdate >= this.rule.data.presence.delay * 1000);
       case "SOMEBODY":
-        return BehaviourUtil.isSomeonePresent(presenceLocations);
+        return (BehaviourUtil.isSomeonePresent(presenceLocations))?true:(msSincePresenceUpdate < this.rule.data.presence.delay * 1000);
       default:
         return false;
     }

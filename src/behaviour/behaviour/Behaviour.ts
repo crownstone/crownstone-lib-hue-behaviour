@@ -8,6 +8,7 @@ export class Behaviour {
   isActive: boolean;
   presenceLocations: PresenceProfile[] = []; // Empty when no one is present for this behaviour.
   timestamp: number | null = null;
+  lastPresenceUpdate: number = 0;
 
   sphereLocation: SphereLocation
 
@@ -73,11 +74,13 @@ export class Behaviour {
     if (presenceEvent.data.type === "SPHERE") {
       if ("data" in presenceObject && presenceObject.data.type === "SPHERE") {
         this.presenceLocations.push(presenceEvent.data);
+        this.lastPresenceUpdate = this.timestamp;
       }
     } else if (presenceEvent.data.type === "LOCATION") {
       if ("data" in presenceObject && presenceObject.data.type === "LOCATION") {
         if (presenceObject.data.locationIds.includes(presenceEvent.data.locationId)) {
           this.presenceLocations.push(presenceEvent.data);
+          this.lastPresenceUpdate = this.timestamp;
         }
       }
     }
@@ -94,12 +97,14 @@ export class Behaviour {
       let presenceProfile = this.presenceLocations[i];
       if (presenceProfile.profileIdx === presenceEvent.data.profileIdx) {
         if (presenceEvent.data.type === "SPHERE" && presenceProfile.type === "SPHERE") {
-          this.presenceLocations.splice(i,1);
+          this.presenceLocations.splice(i, 1);
+          this.lastPresenceUpdate = this.timestamp;
           break;
         }
         if (presenceEvent.data.type === "LOCATION" && presenceProfile.type === "LOCATION") {
           if (presenceEvent.data.locationId === presenceProfile.locationId) {
-            this.presenceLocations.splice(i,1);
+            this.presenceLocations.splice(i, 1);
+            this.lastPresenceUpdate = this.timestamp;
             break;
           }
         }
@@ -129,20 +134,21 @@ export class Behaviour {
   _behaviourActiveCheck(): void {
     const behaviourObj = new BehaviourSupport(this.behaviour);
     if (this.behaviour.type === "BEHAVIOUR") {
-      if (behaviourObj.isActiveTimeObject(this.timestamp,this.sphereLocation)) {
-        if (behaviourObj.isActivePresenceObject(this.presenceLocations)) {
+      if (behaviourObj.isActiveTimeObject(this.timestamp, this.sphereLocation)) {
+        if (behaviourObj.isActivePresenceObject(this.presenceLocations,(this.timestamp - this.lastPresenceUpdate))){
           this.isActive = true;
           return;
         }
-      } else if (behaviourObj.hasLocationEndCondition(),this.isActive && BehaviourUtil.isSomeonePresent(this.presenceLocations)) {
-        this.isActive = true;
-        return;
-
+      } else if (behaviourObj.hasLocationEndCondition(), this.isActive) {
+        if (BehaviourUtil.isSomeonePresent(this.presenceLocations)
+          || (this.timestamp - this.lastPresenceUpdate) < this.behaviour.data.endCondition.presence.delay * 1000) {
+          this.isActive = true;
+          return;
+        }
       }
+
+
+      this.isActive = false;
     }
-    this.isActive = false;
   }
-
-
 }
-
