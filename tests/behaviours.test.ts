@@ -259,7 +259,15 @@ describe('Time testing', () => {
     describe('Sunset, Sunrise testing', () => {
       test('Behaviour should be active when activation is between sunset -> sunrise.', () => {
         const behaviourSupport = new BehaviourSupport()
-        behaviourSupport.setTimeFromSunset().setTimeToSunrise().setDimPercentage(90).ignorePresence();
+        behaviourSupport.setTimeFromSunset().setTimeToSunrise().setDimPercentage(90).ignorePresence().setActiveDays({
+          Mon: true,
+          Tue: true,
+          Wed: true,
+          Thu: true,
+          Fri: true,
+          Sat: true,
+          Sun: true
+        });
         const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
         const time = new Date(2020, 9, 5, 19, 12);
         behaviour.tick(Date.parse(time.toString()));
@@ -268,7 +276,15 @@ describe('Time testing', () => {
 
       test('Behaviour should be active when activation between sunrise +10 offset -> sunset.', () => {
         const behaviourSupport = new BehaviourSupport()
-        behaviourSupport.setTimeToSunset().setTimeFromSunrise(10).setDimPercentage(90).ignorePresence();
+        behaviourSupport.setTimeToSunset().setTimeFromSunrise(10).setDimPercentage(90).ignorePresence().setActiveDays({
+          Mon: true,
+          Tue: false,
+          Wed: false,
+          Thu: false,
+          Fri: false,
+          Sat: false,
+          Sun: true
+        });
         const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
         const time = new Date(2020, 9, 5, 8, 4);
         behaviour.tick(Date.parse(time.toString()));
@@ -276,7 +292,15 @@ describe('Time testing', () => {
       });
       test('Behaviour should be active when  time between sunrise -10 offset -> sunset.', () => {
         const behaviourSupport = new BehaviourSupport()
-        behaviourSupport.setTimeToSunset().setTimeFromSunrise(-10).setDimPercentage(90).ignorePresence();
+        behaviourSupport.setTimeToSunset().setTimeFromSunrise(-10).setDimPercentage(90).ignorePresence().setActiveDays({
+          Mon: true,
+          Tue: true,
+          Wed: true,
+          Thu: true,
+          Fri: true,
+          Sat: true,
+          Sun: false
+        });
         const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
         const time = new Date(2020, 9, 5, 7, 44);
         behaviour.tick(Date.parse(time.toString()));
@@ -284,7 +308,15 @@ describe('Time testing', () => {
       });
       test('Behaviour should be inactive when time is before start time, sunrise  -> sunset.', () => {
         const behaviourSupport = new BehaviourSupport()
-        behaviourSupport.setTimeToSunset().setTimeFromSunrise().setDimPercentage(90).ignorePresence();
+        behaviourSupport.setTimeToSunset().setTimeFromSunrise().setDimPercentage(90).ignorePresence().setActiveDays({
+          Mon: true,
+          Tue: true,
+          Wed: true,
+          Thu: true,
+          Fri: true,
+          Sat: true,
+          Sun: false
+        });
         const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
         const time = new Date(2020, 9, 5, 7, 53);
         behaviour.tick(Date.parse(time.toString()));
@@ -292,7 +324,15 @@ describe('Time testing', () => {
       });
       test('Behaviour should be inactive when time is after sunset end time, sunrise -> sunset + 10 offset.', () => {
         const behaviourSupport = new BehaviourSupport()
-        behaviourSupport.setTimeToSunset(+10).setTimeFromSunrise().setDimPercentage(90).ignorePresence();
+        behaviourSupport.setTimeToSunset(+10).setTimeFromSunrise().setDimPercentage(90).ignorePresence().setActiveDays({
+          Mon: true,
+          Tue: true,
+          Wed: true,
+          Thu: true,
+          Fri: true,
+          Sat: true,
+          Sun: true
+        });
         const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
         const time = new Date(2020, 9, 5, 19, 22);
         behaviour.tick(Date.parse(time.toString()));
@@ -347,4 +387,3 @@ describe('Time testing', () => {
     });
   });
 });
- 
