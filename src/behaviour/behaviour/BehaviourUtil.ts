@@ -1,5 +1,5 @@
 //TODO: stop hier alle functies in die niet perse in je behaviour class hoeven staan zodat deze makkelijker te lezen is
-import {SunCalc} from "SunCalc";
+const SunCalc = require('suncalc');
 
 // TODO: globals in all caps maakt het duidelijk dat ze niet een locale variabele zijn
 const WEEKDAY_MAP = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat"}
@@ -12,7 +12,7 @@ export const BehaviourUtil = {
   },
 
   isSomeonePresent(presenceLocations): boolean {
-    return (this.presenceLocations.length > 0);
+    return (presenceLocations.length > 0);
   },
 
   mapBehaviourActionToHue: function(value: number) {

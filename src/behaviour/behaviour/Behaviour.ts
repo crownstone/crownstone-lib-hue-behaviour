@@ -76,7 +76,7 @@ export class Behaviour {
       }
     } else if (presenceEvent.data.type === "LOCATION") {
       if ("data" in presenceObject && presenceObject.data.type === "LOCATION") {
-        if (presenceEvent.data.locationId in presenceObject.data.locationIds) {
+        if (presenceObject.data.locationIds.includes(presenceEvent.data.locationId)) {
           this.presenceLocations.push(presenceEvent.data);
         }
       }
@@ -94,12 +94,12 @@ export class Behaviour {
       let presenceProfile = this.presenceLocations[i];
       if (presenceProfile.profileIdx === presenceEvent.data.profileIdx) {
         if (presenceEvent.data.type === "SPHERE" && presenceProfile.type === "SPHERE") {
-          this.presenceLocations[i] = undefined;
+          this.presenceLocations.splice(i,1);
           break;
         }
         if (presenceEvent.data.type === "LOCATION" && presenceProfile.type === "LOCATION") {
           if (presenceEvent.data.locationId === presenceProfile.locationId) {
-            this.presenceLocations[i] = undefined;
+            this.presenceLocations.splice(i,1);
             break;
           }
         }
