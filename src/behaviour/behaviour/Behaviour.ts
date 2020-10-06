@@ -128,26 +128,25 @@ export class Behaviour {
 
 
   /**
-   * Checks if the behaviour is active according to its rules.
+   * Checks if the behaviour is active according to the defined rules.
    *
    */
   _behaviourActiveCheck(): void {
     const behaviourObj = new BehaviourSupport(this.behaviour);
+    const msSinceLastUpdate = this.timestamp - this.lastPresenceUpdate;
     if (this.behaviour.type === "BEHAVIOUR") {
       if (behaviourObj.isActiveTimeObject(this.timestamp, this.sphereLocation)) {
-        if (behaviourObj.isActivePresenceObject(this.presenceLocations,(this.timestamp - this.lastPresenceUpdate))){
+        if (behaviourObj.isActivePresenceObject(this.presenceLocations,msSinceLastUpdate)){
           this.isActive = true;
           return;
         }
       } else if (behaviourObj.hasLocationEndCondition(), this.isActive) {
         if (BehaviourUtil.isSomeonePresent(this.presenceLocations)
-          || (this.timestamp - this.lastPresenceUpdate) < this.behaviour.data.endCondition.presence.delay * 1000) {
+          || msSinceLastUpdate < this.behaviour.data.endCondition.presence.delay * 1000) {
           this.isActive = true;
           return;
         }
       }
-
-
       this.isActive = false;
     }
   }

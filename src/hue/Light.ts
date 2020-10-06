@@ -1,5 +1,6 @@
 import {Bridge} from "./Bridge";
 import {minValueOfStates,maxValueOfStates,minMaxValueStates,possibleStates} from "../constants/HueConstants";
+import {BehaviourAggregator} from "../behaviour/BehaviourAggregator";
 
 
 
@@ -30,6 +31,7 @@ export class Light {
     supportedStates: object;
     connectedBridge: Bridge;
     lastUpdate: number;
+    behaviourAggregator: BehaviourAggregator;
 
     constructor(name: string, uniqueId: string, state: HueFullState, id: number, bridgeId: string, capabilities: object, supportedStates: object, connectedBridge: any) {
         this.name = name;
@@ -41,6 +43,7 @@ export class Light {
         this.supportedStates = supportedStates;
         this.connectedBridge = connectedBridge;
         this.lastUpdate = Date.now();
+        this.behaviourAggregator = new BehaviourAggregator(500,this);
     }
 
     private _setLastUpdate(): void {

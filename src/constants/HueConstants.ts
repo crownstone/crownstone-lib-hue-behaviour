@@ -1,3 +1,6 @@
+
+export const APP_NAME: string = 'Hub';
+export const DEVICE_NAME: string = 'Hub1';
 export const maxValueOfStates = {
   'hue': 65535,
   'bri': 254,
@@ -27,3 +30,5 @@ export const possibleStates = {
   'effect': true,
   'alert': true
 }
+
+export const DISCOVERY_URL = "https://discovery.meethue.com/";

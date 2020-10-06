@@ -6,14 +6,14 @@ interface ConfLights {
   [hueUniqueId: string]: ConfLightObject;
 }
 
-interface ConfBridges {
-  [uniqueId: string]: ConfBridgeObject
-}
-
 interface ConfLightObject {
   name: string;
   id: number;
   behaviours: HueBehaviourWrapper[];
+}
+
+interface ConfBridges {
+  [uniqueId: string]: ConfBridgeObject
 }
 
 interface ConfBridgeObject {

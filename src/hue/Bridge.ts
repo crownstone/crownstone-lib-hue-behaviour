@@ -2,12 +2,12 @@ import {CrownstoneHue} from "../CrownstoneHue";
 import {Light} from "./Light"
 import {v3} from "node-hue-api";
 import {CrownstoneHueError} from "../util/CrownstoneHueError";
-
+import {DISCOVERY_URL,APP_NAME,DEVICE_NAME} from "../constants/HueConstants"
+import {persistence} from "../util/Persistence";
 const hueApi = v3.api;
 const fetch = require('node-fetch');
 
 
-const DISCOVERY_URL = "https://discovery.meethue.com/";
 
 
 /**
@@ -40,9 +40,8 @@ export class Bridge {
     bridgeId: string
     reachable: boolean = false;
 
-    framework: CrownstoneHue;
 
-    constructor(name: string, username: string, clientKey: string, macAddress: string, ipAddress: string, bridgeId: string, framework: CrownstoneHue) {
+    constructor(name: string, username: string, clientKey: string, macAddress: string, ipAddress: string, bridgeId: string) {
         this.name = name;
         this.username = username;
         this.ipAddress = ipAddress;
@@ -51,7 +50,6 @@ export class Bridge {
         this.bridgeId = bridgeId;
 
 
-        this.framework = framework;
     }
 
     /**
@@ -64,7 +62,7 @@ export class Bridge {
                 await this.link();
             } else {
                 await this.connect();
-                await this.createLightsFromConfig();
+                // await this.createLightsFromConfig();
             }
         } catch (err) {
             if (typeof (err.getHueErrorType) === "function" && err.getHueErrorType() === 1) {
@@ -94,9 +92,8 @@ export class Bridge {
             "reachable": true
         })
 
-        await this.framework.connectedBridges.push(this);
-        await this.framework.saveBridgeInformation(this);
-        await this.framework.updateConfigFile();
+        await persistence.saveFullBridgeInformation(this);
+        await persistence.saveConfiguration();
     }
 
     /**
@@ -128,16 +125,19 @@ export class Bridge {
      * id refers to the id of the light on the bridge and NOT the uniqueId of a light.
      * Gets info of the light from Bridge and creates a Light object and pushes it to the list.
      * Throws error on invalid Id.
+     *
+     * @Returns light object.
      */
-    async configureLight(id: number): Promise<void> {
+    async configureLight(id: number): Promise<Light> {
         if (this.authenticated) {
             try {
                 const lightInfo = await this.api.lights.getLight(id);
                 this.lights[lightInfo.uniqueid] = {};
                 const light = new Light(lightInfo.name, lightInfo.uniqueid, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this)
                 this.lights[lightInfo.uniqueid] = light;
-                await this.framework.addLightInfo(this.bridgeId, light)
-                await this.framework.updateConfigFile();
+                await persistence.addLightInfo(this.bridgeId, light)
+                await persistence.saveConfiguration();
+                return light;
             } catch (err) {
                 if (typeof (err.getHueErrorType) === "function") {
                     if (err.message.includes(`Light ${id} not found`)) {
@@ -155,8 +155,9 @@ export class Bridge {
         }
     }
 
+    //todo behaviour cleanup
     async removeLight(uniqueLightId: string): Promise<void> {
-        await this.framework.removeLightFromConfig(this, uniqueLightId);
+        await persistence.removeLightFromConfig(this, uniqueLightId);
         delete this.lights[uniqueLightId];
     }
 
@@ -210,7 +211,7 @@ export class Bridge {
     async createNewUser(): Promise<void> {
         await this._createUnAuthenticatedApi();
         try {
-            let createdUser = await this.api.users.createUser(this.framework.APP_NAME, this.framework.DEVICE_NAME);
+            let createdUser = await this.api.users.createUser(APP_NAME, DEVICE_NAME);
             this.update({"username": createdUser.username, "clientKey": createdUser.clientkey})
 
         } catch (err) {
@@ -239,18 +240,18 @@ export class Bridge {
         }
     }
 
-    async createLightsFromConfig(): Promise<void> {
-        let lightsInConfig = this.framework.getConfigSettings()
-        lightsInConfig = lightsInConfig["Bridges"][this.bridgeId]["lights"];
-        const lightIds: string[] = Object.keys(lightsInConfig);
-
-        for (const uniqueId of lightIds) {
-            this.lights[uniqueId] = {};
-            const light = lightsInConfig[uniqueId];
-            const lightInfo = await this.api.lights.getLight(light.id);
-            this.lights[uniqueId] = new Light(lightInfo.name, uniqueId, lightInfo.state, light.id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this);
-        }
-    }
+    // async createLightsFromConfig(): Promise<void> {
+    //     let lightsInConfig = this.framework.getConfigSettings()
+    //     lightsInConfig = lightsInConfig["Bridges"][this.bridgeId]["lights"];
+    //     const lightIds: string[] = Object.keys(lightsInConfig);
+    //
+    //     for (const uniqueId of lightIds) {
+    //         this.lights[uniqueId] = {};
+    //         const light = lightsInConfig[uniqueId];
+    //         const lightInfo = await this.api.lights.getLight(light.id);
+    //         this.lights[uniqueId] = new Light(lightInfo.name, uniqueId, lightInfo.state, light.id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this);
+    //     }
+    // }
 
     /**
      * Rediscovers Bridge in case of failed connection
@@ -281,7 +282,7 @@ export class Bridge {
             } else {
                 this.ipAddress = result.internalipaddress;
                 await this._createAuthenticatedApi()
-                await this.framework.updateBridgeIpAddress(this.bridgeId, this.ipAddress);
+                await persistence.updateBridgeIpAddress(this.bridgeId, this.ipAddress);
             }
         }
     }
