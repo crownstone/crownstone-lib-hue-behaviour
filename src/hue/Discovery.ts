@@ -24,8 +24,7 @@ export const Discovery = {
             "",
             "",
             item.ipaddress,
-            "",
-            this
+            ""
           ))
         })
         return bridges;

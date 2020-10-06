@@ -26,15 +26,18 @@
       "lights": {
         "00:17:88:01:04:71:04:39-0b": {
           "name": "Hue color lamp 3",
-          "id": 3
+          "id": 3,
+          "behaviours": []
         },
         "00:17:88:01:04:71:09:99-0b": {
           "name": "Hue color lamp 1",
-          "id": 1
+          "id": 1,
+          "behaviours": []
         },
         "00:17:88:01:04:71:09:9c-0b": {
           "name": "Hue color lamp 2",
-          "id": 2
+          "id": 2,
+          "behaviours": []
         }
       }
     },
@@ -48,7 +51,8 @@
       "lights": {
         "AS:TE:ST:f4:FA:DA": {
           "name": "TEST",
-          "id": "4"
+          "id": "4",
+          "behaviours": []
         }
       }
     }

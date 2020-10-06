@@ -5,9 +5,7 @@ import {CrownstoneHueError} from "./util/CrownstoneHueError";
 import {persistence} from "./util/Persistence";
 
 //config locations/names
-const CONF_NAME: string = "saveConfig.json";
 const CONF_BRIDGE_LOCATION: string = "Bridges";
-
 /**
  * CrownstoneHue object
  *
@@ -19,94 +17,102 @@ const CONF_BRIDGE_LOCATION: string = "Bridges";
  *
  */
 export class CrownstoneHue {
-    bridges: Bridge[];
-    sphereLocation: SphereLocation;
-    constructor() {
-    }
+  bridges: Bridge[] = [];
+  sphereLocation: SphereLocation;
 
-    /**
-     * To be called for initialization of the CrownstoneHue.
-     *
-     * @returns a List of Bridge objects configured from the config file.
-     *
-     */
-    async init(sphereLocation:SphereLocation): Promise<Bridge[]> {
-        this.sphereLocation = sphereLocation
-        await persistence.loadConfiguration();
-        await this._setupModule();
+  constructor() {
+  }
 
-        return this.bridges;
-    }
-    //TODO Change, less nested loops.
-    async _setupModule(){
-        let errors = [];
-        if ("Bridges" in persistence.configuration) {
-            for(const uniqueId of Object.keys(persistence.configuration["Bridges"])){
-                const bridge = persistence.configuration.Bridges[uniqueId]
-                let bridgeObject = this.createBridgeFromConfig(uniqueId);
-                try {
-                    await bridgeObject.init();
-                   for (const lightId of Object.keys(bridge.lights)) {
-                          const light = await bridgeObject.configureLight(bridge.lights[lightId].id);
-                          for(const behaviour of bridge.lights[lightId].behaviours){
-                              light.behaviourAggregator.addBehaviour(behaviour,this.sphereLocation);
-                          }
-                          light.behaviourAggregator.init();
-                    }
-                   this.bridges[uniqueId] = bridgeObject;
-                } catch(e){
-                    errors.push(e);
-                }
+  /**
+   * To be called for initialization of the CrownstoneHue.
+   *
+   * @returns a List of Bridge objects configured from the config file.
+   *
+   */
+  async init(sphereLocation: SphereLocation): Promise<Bridge[]> {
+    this.sphereLocation = sphereLocation
+    await persistence.loadConfiguration();
+    await this._setupModule();
+
+    return this.bridges;
+  }
+
+  //TODO Change, less nested loops. Error passing.
+  async _setupModule() {
+    let errors = [];
+    if ("Bridges" in persistence.configuration) {
+      for (const uniqueId of Object.keys(persistence.configuration["Bridges"])) {
+        const bridge = persistence.configuration.Bridges[uniqueId]
+        let bridgeObject = this.createBridgeFromConfig(uniqueId);
+        try {
+          await bridgeObject.init();
+          for (const lightId of Object.keys(bridge.lights)) {
+            const light = await bridgeObject.configureLight(bridge.lights[lightId].id);
+            if ("behaviours" in bridge.lights[lightId]) {
+              for (const behaviour of bridge.lights[lightId].behaviours) {
+                light.behaviourAggregator.addBehaviour(behaviour, this.sphereLocation);
+              }
             }
+            light.behaviourAggregator.init();
+
+          }
+          this.bridges.push(bridgeObject);
+        } catch (e) {
+          errors.push(e);
         }
-
+      }
     }
 
-    getConfigSettings(): object {
-        return persistence.configuration;
+  }
+
+  setDumbHouseMode(on: boolean) {
+
+  }
+
+  addBehaviour() {
+
+  };
+
+  updateBehaviour() {
+  };
+
+  removeBehaviour() {
+
+  };
+
+  presenceChange() {
+  };
+
+  addBridge(bridgeId: string) {
+  }
+
+  removeBridge(bridgeId: string) {
+  }
+
+  addLight() {
+  };
+
+  removeLight() {
+  };
+
+
+  getConnectedBridges(): Bridge[] {
+    return this.bridges;
+  }
+
+  createBridgeFromConfig(bridgeId: string): Bridge {
+    const bridgeConfig = persistence.configuration[CONF_BRIDGE_LOCATION][bridgeId]
+    if (bridgeConfig.name != "", bridgeConfig.macAddress != "", bridgeConfig.ipAddress != "") {
+      if (bridgeConfig.username === undefined || bridgeConfig.username === null) {
+        bridgeConfig.username = "";
+      }
+      if (bridgeConfig.clientKey === undefined || bridgeConfig.clientKey === null) {
+        bridgeConfig.clientKey = "";
+      }
+      let bridge = new Bridge(bridgeConfig.name, bridgeConfig.username, bridgeConfig.clientKey, bridgeConfig.macAddress, bridgeConfig.ipAddress, bridgeId);
+      return bridge;
     }
-
-    setDumbHouseMode(on: boolean) {
-
-    }
-
-    addBehaviour(){
-
-    };
-    updateBehaviour(){};
-    removeBehaviour(){
-
-    };
-    presenceChange(){};
-    addBridge(bridgeId: string) {
-    }
-    removeBridge(bridgeId: string) {
-    }
-    addLight(){};
-    removeLight(){};
-
-
-
-
-    getConnectedBridges(): Bridge[] {
-        return this.bridges;
-    }
-
-    createBridgeFromConfig(bridgeId: string): Bridge {
-        const bridgeConfig = persistence.configuration[CONF_BRIDGE_LOCATION][bridgeId]
-        if (bridgeConfig.name != "", bridgeConfig.macAddress != "", bridgeConfig.ipAddress != "") {
-            if (bridgeConfig.username === undefined || bridgeConfig.username === null) {
-                bridgeConfig.username = "";
-            }
-            if (bridgeConfig.clientKey === undefined || bridgeConfig.clientKey === null) {
-                bridgeConfig.clientKey = "";
-            }
-            let bridge = new Bridge(bridgeConfig.name, bridgeConfig.username, bridgeConfig.clientKey, bridgeConfig.macAddress, bridgeConfig.ipAddress, bridgeId);
-            return bridge;
-        }
-    }
-
-
+  }
 
 
 }
