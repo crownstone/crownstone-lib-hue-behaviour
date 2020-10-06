@@ -118,11 +118,11 @@ export class Behaviour {
    *
    * @Returns a Hue Light state
    */
-  getComposedState(): StateUpdate {
+  getComposedState(): HueLightState {
     return (this.isActive) ? this._createComposedState() : {on: false}
   }
 
-  _createComposedState(): StateUpdate {
+  _createComposedState(): HueLightState {
     return {on: true, bri: BehaviourUtil.mapBehaviourActionToHue(this.behaviour.data.action.data)}
   }
 

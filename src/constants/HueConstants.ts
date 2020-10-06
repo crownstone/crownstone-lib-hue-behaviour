@@ -1,4 +1,4 @@
-export const maxValueOfStates: StateUpdate = {
+export const maxValueOfStates = {
   'hue': 65535,
   'bri': 254,
   'sat': 254,
@@ -6,7 +6,7 @@ export const maxValueOfStates: StateUpdate = {
   'ct': 500
 }
 
-export const minValueOfStates: StateUpdate = {
+export const minValueOfStates = {
   'hue': 0,
   'bri': 1,
   'sat': 0,

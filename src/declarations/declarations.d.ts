@@ -3,29 +3,25 @@ interface DiscoverResult {
   id: string,
   internalipaddress: string
 }
-
-interface HueState {
+interface HueLightState {
   on: boolean,
   bri?: number,
   hue?: number,
   sat?: number,
-  effect?: string,
   xy?: [number, number],
   ct?: number,
+}
+
+interface HueFullState extends HueLightState{
+  effect?: string,
   alert?: string,
   colormode?: string,
   mode?: string,
-  reachable?: boolean
+  reachable: boolean
 }
 
-interface StateUpdate {
-  on?: boolean,
-  bri?: number,
-  hue?: number,
-  sat?: number,
+interface StateUpdate extends HueLightState{
   effect?: string,
-  xy?: [number, number],
-  ct?: number,
   alert?: string,
   bri_inc?: number;
   hue_inc?: number;

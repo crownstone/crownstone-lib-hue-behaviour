@@ -23,7 +23,7 @@ import {minValueOfStates,maxValueOfStates,minMaxValueStates,possibleStates} from
 export class Light {
     name: string;
     readonly uniqueId: string;
-    private state: HueState;
+    private state: HueFullState;
     readonly id: number;
     bridgeId: string;
     capabilities: object;
@@ -31,7 +31,7 @@ export class Light {
     connectedBridge: Bridge;
     lastUpdate: number;
 
-    constructor(name: string, uniqueId: string, state: HueState, id: number, bridgeId: string, capabilities: object, supportedStates: object, connectedBridge: any) {
+    constructor(name: string, uniqueId: string, state: HueFullState, id: number, bridgeId: string, capabilities: object, supportedStates: object, connectedBridge: any) {
         this.name = name;
         this.uniqueId = uniqueId;
         this.state = state;
@@ -59,7 +59,7 @@ export class Light {
         }
     }
 
-    getState(): HueState {
+    getState(): HueFullState {
         return this.state;
     }
 
