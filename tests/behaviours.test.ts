@@ -2,13 +2,13 @@
  * @jest-environment node
  */
 import {eventBus} from "../src/util/EventBus";
+import {ON_PRESENCE_CHANGE} from "../src/constants/EventConstants";
 
 const Behaviour = require('../src/behaviour/behaviour/Behaviour').Behaviour
 const BehaviourSupport = require('../src/behaviour/behaviour/BehaviourSupport').BehaviourSupport
 const BehaviourUtil = require('../src/behaviour/behaviour/BehaviourUtil')
 
 const SPHERE_LOCATION = {latitude: 51.916064, longitude: 4.472683} // Rotterdam
-const PRESENCE_DETECT_TOPIC = "onPresenceDetect"
 const EVENT_ENTER_SPHERE = {type: "ENTER", data: {type: "SPHERE", profileIdx: 0}}
 const EVENT_ENTER_LOCATION = {type: "ENTER", data: {type: "LOCATION", profileIdx: 0, locationId: 1}}
 const EVENT_ENTER_LOCATION_TWO = {type: "ENTER", data: {type: "LOCATION", profileIdx: 0, locationId: 2}}
@@ -25,7 +25,7 @@ describe("End Condition testing", () => {
     const time = new Date()
     time.setHours(9);
     time.setMinutes(10);
-    eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_ENTER_SPHERE);
+    eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_SPHERE);
     behaviour.tick(Date.parse(time.toString()));
     time.setHours(16);
     behaviour.tick(Date.parse(time.toString()));
@@ -40,9 +40,9 @@ describe("End Condition testing", () => {
     const time = new Date()
     time.setHours(9);
     time.setMinutes(10);
-    eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_ENTER_SPHERE);
+    eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_SPHERE);
     behaviour.tick(Date.parse(time.toString()));
-    eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_LEAVE_SPHERE);
+    eventBus.emit(ON_PRESENCE_CHANGE, EVENT_LEAVE_SPHERE);
     time.setHours(16);
     behaviour.tick(Date.parse(time.toString()));
     return expect(behaviour.isActive).toBeFalsy();
@@ -54,7 +54,7 @@ describe("Location testing", () => {
     const behaviourSupport = new BehaviourSupport()
     behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceSomebodyInLocations([1]);
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
-    eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_ENTER_LOCATION);
+    eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_LOCATION);
     behaviour.tick(Date.now());
     return expect(behaviour.isActive).toBeTruthy();
   });
@@ -69,11 +69,11 @@ describe("Location testing", () => {
     const behaviourSupport = new BehaviourSupport()
     behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceSomebodyInLocations([1]);
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
-    eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_ENTER_LOCATION);
-    eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_ENTER_LOCATION);
-    eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_ENTER_LOCATION_TWO);
+    eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_LOCATION);
+    eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_LOCATION);
+    eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_LOCATION_TWO);
     behaviour.tick(Date.now());
-    eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_LEAVE_LOCATION)
+    eventBus.emit(ON_PRESENCE_CHANGE, EVENT_LEAVE_LOCATION)
     behaviour.tick(Date.now());
     return expect(behaviour.isActive).toBeTruthy();
   });
@@ -91,7 +91,7 @@ describe("Sphere testing", () => {
     const behaviourSupport = new BehaviourSupport()
     behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceSomebodyInSphere();
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
-    eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_ENTER_SPHERE);
+    eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_SPHERE);
     behaviour.tick(Date.now());
     return expect(behaviour.isActive).toBeTruthy();
   });
@@ -106,10 +106,10 @@ describe("Sphere testing", () => {
     const behaviourSupport = new BehaviourSupport()
     behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceSomebodyInSphere();
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
-    eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_ENTER_SPHERE);
-    eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_ENTER_SPHERE);
+    eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_SPHERE);
+    eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_SPHERE);
     behaviour.tick(Date.now());
-    eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_LEAVE_SPHERE);
+    eventBus.emit(ON_PRESENCE_CHANGE, EVENT_LEAVE_SPHERE);
     behaviour.tick(Date.now());
     return expect(behaviour.isActive).toBeTruthy();
   });
@@ -126,7 +126,7 @@ describe("Sphere testing", () => {
     const behaviourSupport = new BehaviourSupport()
     behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceNobodyInSphere();
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
-    eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_ENTER_SPHERE);
+    eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_SPHERE);
     behaviour.tick(Date.now());
     return expect(behaviour.isActive).toBeFalsy();
   });
@@ -142,10 +142,10 @@ describe('Delay testing', () => {
       time.setHours(0);
       time.setMinutes(10);
       behaviour.tick(Date.parse(time.toString()));
-      eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_ENTER_SPHERE);
+      eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_SPHERE);
       time.setMinutes(20);
       behaviour.tick(Date.parse(time.toString()));
-      eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_LEAVE_SPHERE);
+      eventBus.emit(ON_PRESENCE_CHANGE, EVENT_LEAVE_SPHERE);
       time.setMinutes(21);
       behaviour.tick(Date.parse(time.toString()));
       return expect(behaviour.isActive).toBeTruthy();
@@ -155,12 +155,12 @@ describe('Delay testing', () => {
       const behaviourSupport = new BehaviourSupport()
       behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceSomebodyInSphere(); // 5 Minutes delay per default.
       const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
-      eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_ENTER_LOCATION);
+      eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_LOCATION);
       const time = new Date()
       time.setHours(0);
       time.setMinutes(20);
       behaviour.tick(Date.parse(time.toString()));
-      eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_LEAVE_LOCATION);
+      eventBus.emit(ON_PRESENCE_CHANGE, EVENT_LEAVE_LOCATION);
       time.setMinutes(25);
       behaviour.tick(Date.parse(time.toString()));
       return expect(behaviour.isActive).toBeFalsy();
@@ -176,10 +176,10 @@ describe('Delay testing', () => {
       time.setHours(0);
       time.setMinutes(10);
       behaviour.tick(Date.parse(time.toString()));
-      eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_ENTER_SPHERE);
+      eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_SPHERE);
       time.setMinutes(11);
       behaviour.tick(Date.parse(time.toString()));
-      eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_LEAVE_SPHERE);
+      eventBus.emit(ON_PRESENCE_CHANGE, EVENT_LEAVE_SPHERE);
       behaviour.tick(Date.parse(time.toString()));
       return expect(behaviour.isActive).toBeFalsy();
     });
@@ -192,9 +192,9 @@ describe('Delay testing', () => {
       time.setHours(0);
       time.setMinutes(10);
       behaviour.tick(Date.parse(time.toString()));
-      eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_ENTER_SPHERE);
+      eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_SPHERE);
       behaviour.tick(Date.parse(time.toString()));
-      eventBus.emit(PRESENCE_DETECT_TOPIC, EVENT_LEAVE_SPHERE);
+      eventBus.emit(ON_PRESENCE_CHANGE, EVENT_LEAVE_SPHERE);
       time.setMinutes(15);
       behaviour.tick(Date.parse(time.toString()));
       return expect(behaviour.isActive).toBeTruthy();

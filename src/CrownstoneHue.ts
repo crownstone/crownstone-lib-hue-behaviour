@@ -3,6 +3,8 @@ import {Bridge} from "./hue/Bridge";
 import {Light} from "./hue/Light";
 import {CrownstoneHueError} from "./util/CrownstoneHueError";
 import {persistence} from "./util/Persistence";
+import {eventBus} from "./util/EventBus";
+import {ON_DUMB_HOUSE_MODE_SWITCH, ON_PRESENCE_CHANGE} from "./constants/EventConstants";
 
 //config locations/names
 const CONF_BRIDGE_LOCATION: string = "Bridges";
@@ -66,7 +68,7 @@ export class CrownstoneHue {
   }
 
   setDumbHouseMode(on: boolean) {
-
+    eventBus.emit(ON_DUMB_HOUSE_MODE_SWITCH,on);
   }
 
   addBehaviour() {
@@ -80,8 +82,9 @@ export class CrownstoneHue {
 
   };
 
-  presenceChange() {
-  };
+  presenceChange(data:PresenceEvent) {
+    eventBus.emit(ON_PRESENCE_CHANGE,data);
+  }
 
   addBridge(bridgeId: string) {
   }

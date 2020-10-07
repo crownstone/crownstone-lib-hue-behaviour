@@ -1,6 +1,7 @@
 import {eventBus} from "../../util/EventBus";
 import {BehaviourUtil} from "./BehaviourUtil";
 import {BehaviourSupport} from "./BehaviourSupport";
+import {ON_PRESENCE_CHANGE} from "../../constants/EventConstants";
 
 
 export class Behaviour {
@@ -17,7 +18,7 @@ export class Behaviour {
   constructor(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation) {
     this.behaviour = behaviour;
     this.sphereLocation = sphereLocation;
-    this.unsubscribe = eventBus.subscribe("onPresenceDetect", this._onPresenceDetect.bind(this));
+    this.unsubscribe = eventBus.subscribe(ON_PRESENCE_CHANGE, this._onPresenceDetect.bind(this));
   }
 
   setSphereLocation(sphereLocation: SphereLocation) {

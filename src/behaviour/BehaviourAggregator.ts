@@ -1,6 +1,7 @@
 import {CrownstoneHue, Light} from "../index";
 import {eventBus} from "../util/EventBus";
 import {Behaviour} from "./behaviour/Behaviour";
+import {ON_DUMB_HOUSE_MODE_SWITCH} from "../constants/EventConstants";
 
 const oneBriPercentage = 2.54;
 
@@ -14,13 +15,12 @@ export class BehaviourAggregator {
     pollingRate: number;
     isInOverride:boolean = false;
     light: Light;
-
+    unsubscribe: EventUnsubscriber;
+    dumbHouseModeActive: boolean = false;
     constructor(pollingRate: number = 500, light) {
         this.light = light;
         this.pollingRate = pollingRate;
-
-
-
+        this.unsubscribe = eventBus.subscribe(ON_DUMB_HOUSE_MODE_SWITCH, this._onDumbHouseModeSwitch.bind(this));
     }
 
     init() {
@@ -30,12 +30,18 @@ export class BehaviourAggregator {
     stop() {
         this.moduleRunning = false;
     }
+    cleanup(){
+        this.unsubscribe();
+    }
 
 
     addBehaviour(behaviour: HueBehaviourWrapper,sphereLocation: SphereLocation) {
         this.behaviours.push(new Behaviour(behaviour,sphereLocation));
     }
 
+    _onDumbHouseModeSwitch(data){
+        this.dumbHouseModeActive = data;
+    }
 
     async _loop() {
         try {
