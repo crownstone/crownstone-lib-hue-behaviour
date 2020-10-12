@@ -1,3 +1,4 @@
+import {Behaviour} from "../behaviour/behaviour/Behaviour";
 
 interface DiscoverResult {
   id: string,
@@ -64,6 +65,12 @@ interface PresenceEvent{
 interface SphereLocation {
   latitude: number,
   longitude: number
+}
+interface PrioritizedList{
+  1: Behaviour[];
+  2: Behaviour[];
+  3: Behaviour[];
+  4: Behaviour[];
 }
 
 type EventUnsubscriber = () => void

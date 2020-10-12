@@ -2,6 +2,13 @@ import {eventBus} from "../../util/EventBus";
 import {BehaviourUtil} from "./BehaviourUtil";
 import {BehaviourSupport} from "./BehaviourSupport";
 import {ON_PRESENCE_CHANGE} from "../../constants/EventConstants";
+import {
+  EventUnsubscriber,
+  HueLightState,
+  PresenceEvent,
+  PresenceProfile,
+  SphereLocation
+} from "../../declarations/declarations";
 
 
 export class Behaviour {
@@ -10,9 +17,7 @@ export class Behaviour {
   presenceLocations: PresenceProfile[] = []; // Empty when no one is present for this behaviour.
   timestamp: number | null = null;
   lastPresenceUpdate: number = 0;
-
   sphereLocation: SphereLocation
-
   unsubscribe: EventUnsubscriber
 
   constructor(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation) {
@@ -41,10 +46,12 @@ export class Behaviour {
    * @param presenceEvent - PresenceEvent object of type ENTER or LEAVE, containing information of who enters/leaves which room or the house.
    */
   _onPresenceDetect(presenceEvent: PresenceEvent): void {
-    if (this.behaviour.data.presence.type !== "IGNORE") {
-      this._handlePresenceEvent(presenceEvent, this.behaviour.data.presence)
-    } else if ("endCondition" in this.behaviour.data && this.behaviour.data.endCondition.presence.type === "SOMEBODY") {
-      this._handlePresenceEvent(presenceEvent, this.behaviour.data.endCondition.presence)
+    if (this.behaviour.type === "BEHAVIOUR") {
+      if (this.behaviour.data.presence.type !== "IGNORE") {
+        this._handlePresenceEvent(presenceEvent, this.behaviour.data.presence)
+      } else if ("endCondition" in this.behaviour.data && this.behaviour.data.endCondition.presence.type === "SOMEBODY") {
+        this._handlePresenceEvent(presenceEvent, this.behaviour.data.endCondition.presence)
+      }
     }
   }
 
@@ -137,7 +144,7 @@ export class Behaviour {
     const msSinceLastUpdate = this.timestamp - this.lastPresenceUpdate;
     if (this.behaviour.type === "BEHAVIOUR") {
       if (behaviourObj.isActiveTimeObject(this.timestamp, this.sphereLocation)) {
-        if (behaviourObj.isActivePresenceObject(this.presenceLocations,msSinceLastUpdate)){
+        if (behaviourObj.isActivePresenceObject(this.presenceLocations, msSinceLastUpdate)) {
           this.isActive = true;
           return;
         }
@@ -149,6 +156,11 @@ export class Behaviour {
         }
       }
       this.isActive = false;
+    } else if (this.behaviour.type === "TWILIGHT") {
+      if (behaviourObj.isActiveTimeObject(this.timestamp, this.sphereLocation)) {
+        this.isActive = true;
+        return;
+      }
     }
   }
 }

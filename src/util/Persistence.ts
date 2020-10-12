@@ -5,10 +5,16 @@
 import {promises as fs} from "fs";
 import {Bridge, CrownstoneHueError, Light} from "..";
 import {EventBus} from "./EventBus";
+import {BridgeFormat} from "../declarations/declarations";
 
 const CONF_NAME: string = "saveConfig.json";
 const CONF_BRIDGE_LOCATION: string = "Bridges";
 let configuration: ConfigurationObject;
+
+interface BridgeToConfig {
+  bridge: BridgeFormat;
+}
+
 class Persistence {
   configuration: ConfigurationObject
 
@@ -82,7 +88,7 @@ class Persistence {
   }
 
 
-  async addBridgeToConfig(bridge: BridgeFormat): Promise<void> {
+  async addBridgeToConfig({bridge}: BridgeToConfig): Promise<void> {
     if (persistence.configuration != undefined) {
       persistence.configuration[CONF_BRIDGE_LOCATION][bridge.bridgeId] = {
         name: bridge.name,

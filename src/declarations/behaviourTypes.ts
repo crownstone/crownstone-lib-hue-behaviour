@@ -101,5 +101,6 @@ interface HueBehaviourWrapper {
     data: HueBehaviour
     activeDays: ActiveDays,
     lightId: string,
+    cloudId: string,
     updatedAt: number
 }

@@ -1,16 +1,12 @@
-import {BehaviourUtil} from "../behaviour/BehaviourUtil";
+import {BehaviourUtil} from "./BehaviourUtil";
 import {EMPTY_RULE,SPHERE_DELAY} from "../../constants/BehaviourSupportConstants"
+import {SphereLocation} from "../../declarations/declarations";
 export class BehaviourSupport {
   rule : HueBehaviourWrapper;
 
-  constructor(behaviour?: HueBehaviourWrapper ) {
-    if (!behaviour){
-      this.rule = EMPTY_RULE;
-    } else {
-      this.rule = behaviour
-
+  constructor(behaviour : HueBehaviourWrapper = EMPTY_RULE  ) {
+      this.rule = {...behaviour}
     }
-  }
 
   //########Setters###########
 

@@ -8,6 +8,7 @@ const Behaviour = require('../src/behaviour/behaviour/Behaviour').Behaviour
 const BehaviourSupport = require('../src/behaviour/behaviour/BehaviourSupport').BehaviourSupport
 const BehaviourUtil = require('../src/behaviour/behaviour/BehaviourUtil')
 
+
 const SPHERE_LOCATION = {latitude: 51.916064, longitude: 4.472683} // Rotterdam
 const EVENT_ENTER_SPHERE = {type: "ENTER", data: {type: "SPHERE", profileIdx: 0}}
 const EVENT_ENTER_LOCATION = {type: "ENTER", data: {type: "LOCATION", profileIdx: 0, locationId: 1}}
@@ -15,7 +16,6 @@ const EVENT_ENTER_LOCATION_TWO = {type: "ENTER", data: {type: "LOCATION", profil
 const EVENT_LEAVE_LOCATION = {type: "LEAVE", data: {type: "LOCATION", profileIdx: 0, locationId: 1}}
 const EVENT_LEAVE_LOCATION_TWO = {type: "LEAVE", data: {type: "LOCATION", profileIdx: 0, locationId: 2}}
 const EVENT_LEAVE_SPHERE = {type: "LEAVE", data: {type: "SPHERE", profileIdx: 0}}
-
 
 describe("End Condition testing", () => {
   test('Behaviour should be active when user is still in sphere as End condition, activation time expired.', () => {
@@ -340,10 +340,10 @@ describe('Time testing', () => {
       });
     });
 
-    describe('Clock testing',()=>{
+    describe('Clock testing', () => {
       test('Behaviour should be active when activation is between 22:00 -> 23:59, Time 22:00.', () => {
         const behaviourSupport = new BehaviourSupport()
-        behaviourSupport.setTimeFromClock(22,0).setTimeToClock(23,59).setDimPercentage(90).ignorePresence();
+        behaviourSupport.setTimeFromClock(22, 0).setTimeToClock(23, 59).setDimPercentage(90).ignorePresence();
         const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
         const time = new Date(2020, 9, 5, 22, 0);
         behaviour.tick(Date.parse(time.toString()));
@@ -352,7 +352,7 @@ describe('Time testing', () => {
 
       test('Behaviour should be active when activation is between 22:00 -> 6:59, Time 6.58.', () => {
         const behaviourSupport = new BehaviourSupport()
-        behaviourSupport.setTimeFromClock(22,0).setTimeToClock(6,59).setDimPercentage(90).ignorePresence().setActiveDays({
+        behaviourSupport.setTimeFromClock(22, 0).setTimeToClock(6, 59).setDimPercentage(90).ignorePresence().setActiveDays({
           Mon: false,
           Tue: false,
           Wed: false,
@@ -360,7 +360,8 @@ describe('Time testing', () => {
           Fri: false,
           Sat: false,
           Sun: true
-        });;
+        });
+        ;
         const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
         const time = new Date(2020, 9, 5, 6, 58);
         behaviour.tick(Date.parse(time.toString()));
@@ -369,7 +370,7 @@ describe('Time testing', () => {
 
       test('Behaviour should be inactive when time is after end time, 22:00 -> 6:59', () => {
         const behaviourSupport = new BehaviourSupport()
-        behaviourSupport.setTimeFromClock(22,0).setTimeToClock(6,59).setDimPercentage(90).ignorePresence().setActiveDays({
+        behaviourSupport.setTimeFromClock(22, 0).setTimeToClock(6, 59).setDimPercentage(90).ignorePresence().setActiveDays({
           Mon: false,
           Tue: false,
           Wed: false,
@@ -377,7 +378,8 @@ describe('Time testing', () => {
           Fri: false,
           Sat: false,
           Sun: true
-        });;
+        });
+        ;
         const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
         const time = new Date(2020, 9, 5, 6, 59);
         behaviour.tick(Date.parse(time.toString()));

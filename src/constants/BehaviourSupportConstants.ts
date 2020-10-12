@@ -13,6 +13,7 @@ export const EMPTY_RULE_ACTIVE_DAYS : ActiveDays ={
 export const EMPTY_RULE: HueBehaviourWrapper={
   activeDays: EMPTY_RULE_ACTIVE_DAYS,
   data: EMPTY_RULE_DATA,
+  cloudId: "12345678900",
   lightId: "22:FF:DD:TT:AA:CC:GG",
   type: "BEHAVIOUR",
   updatedAt: 0

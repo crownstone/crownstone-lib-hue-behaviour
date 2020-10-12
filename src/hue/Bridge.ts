@@ -4,6 +4,7 @@ import {v3} from "node-hue-api";
 import {CrownstoneHueError} from "../util/CrownstoneHueError";
 import {DISCOVERY_URL,APP_NAME,DEVICE_NAME} from "../constants/HueConstants"
 import {persistence} from "../util/Persistence";
+import {DiscoverResult} from "../declarations/declarations";
 const hueApi = v3.api;
 const fetch = require('node-fetch');
 

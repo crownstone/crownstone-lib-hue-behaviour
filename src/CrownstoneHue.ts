@@ -5,9 +5,11 @@ import {CrownstoneHueError} from "./util/CrownstoneHueError";
 import {persistence} from "./util/Persistence";
 import {eventBus} from "./util/EventBus";
 import {ON_DUMB_HOUSE_MODE_SWITCH, ON_PRESENCE_CHANGE} from "./constants/EventConstants";
+import {PresenceEvent, SphereLocation} from "./declarations/declarations";
 
 //config locations/names
 const CONF_BRIDGE_LOCATION: string = "Bridges";
+
 /**
  * CrownstoneHue object
  *
@@ -68,54 +70,97 @@ export class CrownstoneHue {
   }
 
   setDumbHouseMode(on: boolean) {
-    eventBus.emit(ON_DUMB_HOUSE_MODE_SWITCH,on);
+    eventBus.emit(ON_DUMB_HOUSE_MODE_SWITCH, on);
   }
 
-  addBehaviour() {
-
-  };
-
-  updateBehaviour() {
-  };
-
-  removeBehaviour() {
-
-  };
-
-  presenceChange(data:PresenceEvent) {
-    eventBus.emit(ON_PRESENCE_CHANGE,data);
-  }
-
-  addBridge(bridgeId: string) {
-  }
-
-  removeBridge(bridgeId: string) {
-  }
-
-  addLight() {
-  };
-
-  removeLight() {
-  };
-
-
-  getConnectedBridges(): Bridge[] {
-    return this.bridges;
-  }
-
-  createBridgeFromConfig(bridgeId: string): Bridge {
-    const bridgeConfig = persistence.configuration[CONF_BRIDGE_LOCATION][bridgeId]
-    if (bridgeConfig.name != "", bridgeConfig.macAddress != "", bridgeConfig.ipAddress != "") {
-      if (bridgeConfig.username === undefined || bridgeConfig.username === null) {
-        bridgeConfig.username = "";
+  addBehaviour(behaviour: HueBehaviourWrapper) {
+    for (const bridge of this.bridges) {
+      const light = bridge.lights[behaviour.lightId];
+      if (light !== undefined) {
+        light.behaviourAggregator.addBehaviour(behaviour, this.sphereLocation);
+        break;
       }
-      if (bridgeConfig.clientKey === undefined || bridgeConfig.clientKey === null) {
-        bridgeConfig.clientKey = "";
+    }
+  };
+
+  updateBehaviour(behaviour: HueBehaviourWrapper) {
+    for (const bridge of this.bridges) {
+      const light = bridge.lights[behaviour.lightId];
+      if (light !== undefined) {
+        light.behaviourAggregator.updateBehaviour(behaviour);
+        break;
       }
-      let bridge = new Bridge(bridgeConfig.name, bridgeConfig.username, bridgeConfig.clientKey, bridgeConfig.macAddress, bridgeConfig.ipAddress, bridgeId);
-      return bridge;
     }
   }
+
+  removeBehaviour(behaviour: HueBehaviourWrapper) {
+    for (const bridge of this.bridges) {
+      const light = bridge.lights[behaviour.lightId];
+      if (light !== undefined) {
+        light.behaviourAggregator.removeBehaviour(behaviour.cloudId);
+        break;
+      }
+    }
+};
+
+presenceChange(data
+:
+PresenceEvent
+)
+{
+  eventBus.emit(ON_PRESENCE_CHANGE, data);
+}
+
+addBridge(bridgeId
+:
+string
+)
+{
+}
+
+removeBridge(bridgeId
+:
+string
+)
+{
+}
+
+addLight()
+{
+}
+;
+
+removeLight()
+{
+}
+;
+
+
+getConnectedBridges()
+:
+Bridge[]
+{
+  return this.bridges;
+}
+
+createBridgeFromConfig(bridgeId
+:
+string
+):
+Bridge
+{
+  const bridgeConfig = persistence.configuration[CONF_BRIDGE_LOCATION][bridgeId]
+  if (bridgeConfig.name != "", bridgeConfig.macAddress != "", bridgeConfig.ipAddress != "") {
+    if (bridgeConfig.username === undefined || bridgeConfig.username === null) {
+      bridgeConfig.username = "";
+    }
+    if (bridgeConfig.clientKey === undefined || bridgeConfig.clientKey === null) {
+      bridgeConfig.clientKey = "";
+    }
+    let bridge = new Bridge(bridgeConfig.name, bridgeConfig.username, bridgeConfig.clientKey, bridgeConfig.macAddress, bridgeConfig.ipAddress, bridgeId);
+    return bridge;
+  }
+}
 
 
 }
