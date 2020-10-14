@@ -2,6 +2,7 @@ type PresenceTypeSomeone = "SOMEBODY" | "NOBODY"
 type PresenceType = PresenceTypeSomeone | "IGNORE" | "SPECIFIC_USERS"
 type SunTimes = "SUNSET" | "SUNRISE"
 type TimeDataType = SunTimes | "CLOCK"
+type BehaviourType = "BEHAVIOUR" | "TWILIGHT";
 
 interface PresenceNone {
     type: "IGNORE"
@@ -97,7 +98,7 @@ interface HueTwilight {
 
 
 interface HueBehaviourWrapper {
-    type: "BEHAVIOUR"
+    type: BehaviourType
     data: HueBehaviour
     activeDays: ActiveDays,
     lightId: string,

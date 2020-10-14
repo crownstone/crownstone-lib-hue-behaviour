@@ -251,6 +251,13 @@ export class BehaviourSupport {
     }
     return false;
   }
+  hasEndCondition(): boolean {
+    if (this.rule.data.endCondition && this.rule.data.endCondition.presence && this.rule.data.endCondition.presence.data.type) {
+      return this.rule.data.endCondition.presence.data.type === "LOCATION" || this.rule.data.endCondition.presence.data.type === "SPHERE"
+    }
+    return false;
+  }
+
 
 
   /**

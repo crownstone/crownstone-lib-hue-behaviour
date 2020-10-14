@@ -134,7 +134,7 @@ export class Bridge {
             try {
                 const lightInfo = await this.api.lights.getLight(id);
                 this.lights[lightInfo.uniqueid] = {};
-                const light = new Light(lightInfo.name, lightInfo.uniqueid, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this)
+                const light = new Light(lightInfo.name, lightInfo.uniqueid, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this.api)
                 this.lights[lightInfo.uniqueid] = light;
                 await persistence.addLightInfo(this.bridgeId, light)
                 await persistence.saveConfiguration();
@@ -171,7 +171,7 @@ export class Bridge {
         if (this.authenticated) {
             const lights = await this.api.lights.getAll();
             return lights.map(light => {
-                return new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this)
+                return new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this.api)
             });
         } else {
             throw new CrownstoneHueError(405);
@@ -234,7 +234,7 @@ export class Bridge {
             let lights = await this.api.lights.getAll();
 
             lights.forEach(light => {
-                this.lights[light.uniqueId] = new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this)
+                this.lights[light.uniqueId] = new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this.api)
             });
         } else {
             throw new CrownstoneHueError(405);

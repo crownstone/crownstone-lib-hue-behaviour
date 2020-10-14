@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "outDir": "./dist",
+    "resolveJsonModule": true,
+    "rootDir": "."
+  },
+  "references": [
+    {
+      "path": "../"
+    }
+  ]
+}

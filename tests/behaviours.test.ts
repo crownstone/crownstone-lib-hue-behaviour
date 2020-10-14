@@ -3,19 +3,19 @@
  */
 import {eventBus} from "../src/util/EventBus";
 import {ON_PRESENCE_CHANGE} from "../src/constants/EventConstants";
+import {
+  EVENT_ENTER_LOCATION,
+  EVENT_ENTER_LOCATION_TWO,
+  EVENT_ENTER_SPHERE,
+  EVENT_LEAVE_LOCATION, EVENT_LEAVE_SPHERE,
+  SPHERE_LOCATION
+} from "./constants/testConstants";
 
 const Behaviour = require('../src/behaviour/behaviour/Behaviour').Behaviour
 const BehaviourSupport = require('../src/behaviour/behaviour/BehaviourSupport').BehaviourSupport
 const BehaviourUtil = require('../src/behaviour/behaviour/BehaviourUtil')
 
 
-const SPHERE_LOCATION = {latitude: 51.916064, longitude: 4.472683} // Rotterdam
-const EVENT_ENTER_SPHERE = {type: "ENTER", data: {type: "SPHERE", profileIdx: 0}}
-const EVENT_ENTER_LOCATION = {type: "ENTER", data: {type: "LOCATION", profileIdx: 0, locationId: 1}}
-const EVENT_ENTER_LOCATION_TWO = {type: "ENTER", data: {type: "LOCATION", profileIdx: 0, locationId: 2}}
-const EVENT_LEAVE_LOCATION = {type: "LEAVE", data: {type: "LOCATION", profileIdx: 0, locationId: 1}}
-const EVENT_LEAVE_LOCATION_TWO = {type: "LEAVE", data: {type: "LOCATION", profileIdx: 0, locationId: 2}}
-const EVENT_LEAVE_SPHERE = {type: "LEAVE", data: {type: "SPHERE", profileIdx: 0}}
 
 describe("End Condition testing", () => {
   test('Behaviour should be active when user is still in sphere as End condition, activation time expired.', () => {
@@ -361,7 +361,7 @@ describe('Time testing', () => {
           Sat: false,
           Sun: true
         });
-        ;
+
         const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
         const time = new Date(2020, 9, 5, 6, 58);
         behaviour.tick(Date.parse(time.toString()));
@@ -379,7 +379,7 @@ describe('Time testing', () => {
           Sat: false,
           Sun: true
         });
-        ;
+
         const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
         const time = new Date(2020, 9, 5, 6, 59);
         behaviour.tick(Date.parse(time.toString()));

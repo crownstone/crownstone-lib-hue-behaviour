@@ -4,10 +4,12 @@
     "target": "es5",
     "outDir": "dist",
     "rootDir": "src",
-    "sourceMap": true
+    "sourceMap": true,
+    "composite": true
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "tests"
   ],
   "include": [
     "src/**/*.ts"

@@ -148,19 +148,19 @@ export class Behaviour {
           this.isActive = true;
           return;
         }
-      } else if (behaviourObj.hasLocationEndCondition(), this.isActive) {
+      } else if (behaviourObj.hasEndCondition() && this.isActive) {
         if (BehaviourUtil.isSomeonePresent(this.presenceLocations)
           || msSinceLastUpdate < this.behaviour.data.endCondition.presence.delay * 1000) {
           this.isActive = true;
           return;
         }
       }
-      this.isActive = false;
     } else if (this.behaviour.type === "TWILIGHT") {
       if (behaviourObj.isActiveTimeObject(this.timestamp, this.sphereLocation)) {
         this.isActive = true;
         return;
       }
     }
+    this.isActive = false;
   }
 }

@@ -2,6 +2,8 @@ import {Bridge} from "./Bridge";
 import {minValueOfStates,maxValueOfStates,minMaxValueStates,possibleStates} from "../constants/HueConstants";
 import {BehaviourAggregator} from "../behaviour/BehaviourAggregator";
 import {HueFullState, StateUpdate} from "../declarations/declarations";
+import Timeout = NodeJS.Timeout;
+import * as Api from "node-hue-api/lib/api/Api";
 
 
 
@@ -18,7 +20,7 @@ import {HueFullState, StateUpdate} from "../declarations/declarations";
  * @param bridgeId - The id of the Bridge the Light is connected to.
  * @param capabilities - Capabilities what the light is capable off,  For each light type it's different. Info added on creation from Bridge.
  * @param supportedStates - supported states of the light. For each light type it's different. Info added on creation from Bridge.
- * @param connectedBridge - Link to the bridge object it is connected to.
+ * @param api  - Link to the api object it is connected to.
  * @param lastUpdate - Timestamp of when the state was last changed.
  *
  */
@@ -30,11 +32,12 @@ export class Light {
     bridgeId: string;
     capabilities: object;
     supportedStates: object;
-    connectedBridge: Bridge;
+    api: Api;
     lastUpdate: number;
+    intervalId : Timeout;
     behaviourAggregator: BehaviourAggregator;
 
-    constructor(name: string, uniqueId: string, state: HueFullState, id: number, bridgeId: string, capabilities: object, supportedStates: object, connectedBridge: any) {
+    constructor(name: string, uniqueId: string, state: HueFullState, id: number, bridgeId: string, capabilities: object, supportedStates: object, api: Api) {
         this.name = name;
         this.uniqueId = uniqueId;
         this.state = state;
@@ -42,24 +45,31 @@ export class Light {
         this.bridgeId = bridgeId;
         this.capabilities = capabilities;
         this.supportedStates = supportedStates;
-        this.connectedBridge = connectedBridge;
+        this.api = api;
         this.lastUpdate = Date.now();
         this.behaviourAggregator = new BehaviourAggregator(this);
+        this.intervalId = setInterval(() => this.renewState(), 500);
+
     }
 
     private _setLastUpdate(): void {
         this.lastUpdate = Date.now();
 
     }
+    cleanup(){
+        clearInterval(this.intervalId);
+        this.behaviourAggregator.cleanup();
+    }
 
     /**
      * Obtains the state from the light on the bridge and updates the state object if different.
      */
     async renewState(): Promise<void> {
-        const newState = await this.connectedBridge.api.lights.getLightState(this.id);
+        const newState = await this.api.lights.getLightState(this.id) as HueFullState;
         if (this.state != newState) {
             this.state = newState
             this._setLastUpdate()
+            this.behaviourAggregator.lightStateChanged(this.state);
         }
     }
 
@@ -106,7 +116,7 @@ export class Light {
      */
     async setState(state: StateUpdate): Promise<boolean> {
         state = this._manipulateMinMaxValueStates(state);
-        const result = await this.connectedBridge.api.lights.setLightState(this.id.toString(), state);
+        const result = await this.api.lights.setLightState(this.id.toString(), state);
         if (result) {
             this._updateState(state);
         }

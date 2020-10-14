@@ -101,66 +101,51 @@ export class CrownstoneHue {
         break;
       }
     }
-};
+  };
 
-presenceChange(data
-:
-PresenceEvent
-)
-{
-  eventBus.emit(ON_PRESENCE_CHANGE, data);
-}
-
-addBridge(bridgeId
-:
-string
-)
-{
-}
-
-removeBridge(bridgeId
-:
-string
-)
-{
-}
-
-addLight()
-{
-}
-;
-
-removeLight()
-{
-}
-;
-
-
-getConnectedBridges()
-:
-Bridge[]
-{
-  return this.bridges;
-}
-
-createBridgeFromConfig(bridgeId
-:
-string
-):
-Bridge
-{
-  const bridgeConfig = persistence.configuration[CONF_BRIDGE_LOCATION][bridgeId]
-  if (bridgeConfig.name != "", bridgeConfig.macAddress != "", bridgeConfig.ipAddress != "") {
-    if (bridgeConfig.username === undefined || bridgeConfig.username === null) {
-      bridgeConfig.username = "";
-    }
-    if (bridgeConfig.clientKey === undefined || bridgeConfig.clientKey === null) {
-      bridgeConfig.clientKey = "";
-    }
-    let bridge = new Bridge(bridgeConfig.name, bridgeConfig.username, bridgeConfig.clientKey, bridgeConfig.macAddress, bridgeConfig.ipAddress, bridgeId);
-    return bridge;
+  presenceChange(data: PresenceEvent) {
+    eventBus.emit(ON_PRESENCE_CHANGE, data);
   }
-}
+
+  addBridge(bridgeId: string
+  ) {
+  }
+
+  removeBridge(bridgeId: string) {
+  }
+
+  addLight() {
+  };
+
+  removeLight(lightId:string) {
+    for (const bridge of this.bridges) {
+      const light = bridge.lights[lightId];
+      if (light !== undefined) {
+        light.cleanup();
+        delete bridge.lights[lightId];
+        break;
+      }
+    }
+  }
+
+
+  getConnectedBridges(): Bridge[] {
+    return this.bridges;
+  }
+
+  createBridgeFromConfig(bridgeId: string): Bridge {
+    const bridgeConfig = persistence.configuration[CONF_BRIDGE_LOCATION][bridgeId]
+    if (bridgeConfig.name != "", bridgeConfig.macAddress != "", bridgeConfig.ipAddress != "") {
+      if (bridgeConfig.username === undefined || bridgeConfig.username === null) {
+        bridgeConfig.username = "";
+      }
+      if (bridgeConfig.clientKey === undefined || bridgeConfig.clientKey === null) {
+        bridgeConfig.clientKey = "";
+      }
+      let bridge = new Bridge(bridgeConfig.name, bridgeConfig.username, bridgeConfig.clientKey, bridgeConfig.macAddress, bridgeConfig.ipAddress, bridgeId);
+      return bridge;
+    }
+  }
 
 
 }

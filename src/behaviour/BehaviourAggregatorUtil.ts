@@ -27,7 +27,7 @@ export const BehaviourAggregatorUtil = {
    *
    * @returns a Behaviour with latest starting time of the two.
    */
-  compareStartingTime(behaviourA, behaviourB):Behaviour {
+  compareStartingTime(behaviourA:Behaviour, behaviourB:Behaviour):Behaviour {
     const behaviourSupportA = new BehaviourSupport(behaviourA.behaviour);
     const behaviourSupportB = new BehaviourSupport(behaviourB.behaviour);
 
@@ -54,7 +54,7 @@ export const BehaviourAggregatorUtil = {
    *
    * @returns Behaviour with lowest percentage.
    */
-  compareByDimPercentage(behaviourA, behaviourB):Behaviour{
+  compareByDimPercentage(behaviourA:Behaviour, behaviourB:Behaviour):Behaviour{
     return(behaviourA.behaviour.data.action.data <= behaviourB.behaviour.data.action.data)?behaviourA:behaviourB;
   },
   /** Gets the behaviour that should the active behaviour.
@@ -62,13 +62,15 @@ export const BehaviourAggregatorUtil = {
    * @param prioritizedBehaviour
    * @param prioritizedTwilight
    */
-  getActiveBehaviour(prioritizedBehaviour,prioritizedTwilight):Behaviour{
+  getActiveBehaviour(prioritizedBehaviour:Behaviour,prioritizedTwilight:Behaviour):Behaviour{
     if (prioritizedBehaviour !== undefined && prioritizedTwilight !== undefined) {
       return this.compareByDimPercentage(prioritizedBehaviour, prioritizedTwilight);
     } else if (prioritizedBehaviour !== undefined) {
       return prioritizedBehaviour;
     } else if (prioritizedTwilight !== undefined) {
       return prioritizedTwilight;
+    } else {
+      return undefined;
     }
   },
 
