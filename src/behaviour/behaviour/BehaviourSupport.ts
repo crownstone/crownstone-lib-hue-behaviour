@@ -261,7 +261,7 @@ export class BehaviourSupport {
 
 
   /**
-   * Retrieves the Behaviour's (de)activation time in minutes.
+   * Retrieves the SwitchBehaviour's (de)activation time in minutes.
 
    * @Param operator -  Either from or to
    *
@@ -290,7 +290,7 @@ export class BehaviourSupport {
       return false;
     }
 
-    //Checks if Behaviour is activated yesterday and is still active.
+    //Checks if SwitchBehaviour is activated yesterday and is still active.
     if (((toTimeInMinutes - fromTimeInMinutes) < 0) && (currentTimeInMinutes < toTimeInMinutes)) {
       return this.rule.activeDays[BehaviourUtil.getWeekday(timestamp,-1)];
     }

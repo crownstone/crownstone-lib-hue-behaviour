@@ -8,7 +8,7 @@
 // import {BehaviourModule} from "./BehaviourModule";
 // import {Light} from "./index";
 // import {setLightState} from "node-hue-api/lib/api/http/endpoints/lights";
-// import {Behaviour} from "./Behaviour";
+// import {SwitchBehaviour} from "./SwitchBehaviour";
 // import {EventBus} from "./util/EventBus";
 // const eventBus = new EventBus();
 //
@@ -49,7 +49,7 @@
 // const module = new BehaviourModule();
 // let lights = [];
 // async function simulation() {
-//     const behaviour = new Behaviour(BehaviourWrapperSim,eventBus);
+//     const behaviour = new SwitchBehaviour(BehaviourWrapperSim,eventBus);
 //
 //     let date = new Date(2020,8 ,30,20,10,0);
 //     behaviour.tick(Date.parse(date.toISOString()))

@@ -57,13 +57,13 @@ describe("Scenarios", () =>{
     await behaviourAggregator._handleBehaviours();
     expect(light.state.bri/2.54).toBe(60);
 
-    //Behaviour  with 100% gets active.
+    //SwitchBehaviour  with 100% gets active.
     behaviourAggregator.timestamp  = Date.parse(new Date(2020, 9, 4, 13, 15).toString());
     behaviourAggregator._sendTickToBehaviours();
     await behaviourAggregator._handleBehaviours();
     expect(light.state.bri/2.54).toBe(60);
 
-    //Behaviour  with 30% gets active.
+    //SwitchBehaviour  with 30% gets active.
     behaviourAggregator.timestamp  = Date.parse(new Date(2020, 9, 4, 13, 20).toString());
     behaviourAggregator._sendTickToBehaviours();
     await behaviourAggregator._handleBehaviours();
@@ -100,7 +100,7 @@ describe("Scenarios", () =>{
     await behaviourAggregator._handleBehaviours();
     expect(light.state.on).toBeFalsy();
 
-    //Behaviour activates
+    //SwitchBehaviour activates
     behaviourAggregator.timestamp  = Date.parse(new Date(2020, 9, 4, 13, 10).toString());
     behaviourAggregator._sendTickToBehaviours();
     await behaviourAggregator._handleBehaviours();
@@ -134,7 +134,7 @@ describe("Scenarios", () =>{
     light.renewState();
     await behaviourAggregator._handleBehaviours();
     expect(light.state.bri/2.54).toStrictEqual(80);
-    //Behaviour activates
+    //SwitchBehaviour activates
     behaviourAggregator.timestamp  = Date.parse(new Date(2020, 9, 4, 13, 10).toString());
     behaviourAggregator._sendTickToBehaviours();
     await behaviourAggregator._handleBehaviours();
@@ -146,7 +146,7 @@ describe("Scenarios", () =>{
     await behaviourAggregator._handleBehaviours();
     expect(light.state.on).toBeFalsy();
 
-    //Behaviour activates
+    //SwitchBehaviour activates
     behaviourAggregator.timestamp  = Date.parse(new Date(2020, 9, 4, 13, 20).toString());
     behaviourAggregator._sendTickToBehaviours();
     await behaviourAggregator._handleBehaviours();

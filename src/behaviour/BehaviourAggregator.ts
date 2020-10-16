@@ -1,6 +1,6 @@
 // import {CrownstoneHue, Light} from "../index";
 // import {eventBus} from "../util/EventBus";
-// import {Behaviour} from "./behaviour/Behaviour";
+// import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
 // import {ON_DUMB_HOUSE_MODE_SWITCH} from "../constants/EventConstants";
 // import {BehaviourSupport} from "./behaviour/BehaviourSupport";
 // import {
@@ -22,12 +22,12 @@
 //
 // export class BehaviourAggregator {
 //   private running: boolean = false;
-//   behaviours: Behaviour[] = [];
+//   behaviours: SwitchBehaviour[] = [];
 //   pollingRate: number;
 //   light: Light;
 //   unsubscribe: EventUnsubscriber;
 //   dumbHouseModeActive: boolean = false;
-//   prioritizedBehaviour: Behaviour = undefined;
+//   prioritizedBehaviour: SwitchBehaviour = undefined;
 //   timestamp = 0;
 //   currentState: HueLightState;
 //   override: string = NO_OVERRIDE;
@@ -54,7 +54,7 @@
 //
 //
 //   addBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): void {
-//     this.behaviours.push(new Behaviour(behaviour, sphereLocation));
+//     this.behaviours.push(new SwitchBehaviour(behaviour, sphereLocation));
 //   }
 //
 //   removeBehaviour(cloudId: string): void {
@@ -137,14 +137,14 @@
 //
 //   }
 //
-//   async _setNewBehaviour(behaviour: Behaviour) {
+//   async _setNewBehaviour(behaviour: SwitchBehaviour) {
 //     this.override = NO_OVERRIDE;
 //     this.prioritizedBehaviour = behaviour;
 //     await this.light.setState(this.getComposedState());
 //     this.currentState = this.getComposedState();
 //   }
 //
-//   _getBehaviour(): Behaviour {
+//   _getBehaviour(): SwitchBehaviour {
 //     if (this.behaviours === []) {
 //       return undefined;
 //     }
@@ -169,9 +169,9 @@
 //   /** Returns the prioritized behaviour
 //    *
 //    * @param behaviours - a list of active behaviours to be iterated through.
-//    * @Returns a Behaviour or undefined when given list was empty.
+//    * @Returns a SwitchBehaviour or undefined when given list was empty.
 //    */
-//   _getPrioritizedBehaviour(behaviours: Behaviour[]): Behaviour {
+//   _getPrioritizedBehaviour(behaviours: SwitchBehaviour[]): SwitchBehaviour {
 //     if (behaviours === []) {
 //       return undefined;
 //     } else {
@@ -186,7 +186,7 @@
 //    * @param behaviours - a list of active twilights to be iterated through.
 //    * @Returns a twilight or undefined when given list was empty.
 //    */
-//   _getPrioritizedTwilight(twilights: Behaviour[]): Behaviour {
+//   _getPrioritizedTwilight(twilights: SwitchBehaviour[]): SwitchBehaviour {
 //     if (twilights === []) {
 //       return undefined;
 //     } else {

@@ -11,14 +11,14 @@ import {
   SPHERE_LOCATION
 } from "./constants/testConstants";
 
-const Behaviour = require('../src/behaviour/behaviour/Behaviour').Behaviour
+const Behaviour = require('../src/behaviour/behaviour/SwitchBehaviour').SwitchBehaviour
 const BehaviourSupport = require('../src/behaviour/behaviour/BehaviourSupport').BehaviourSupport
 const BehaviourUtil = require('../src/behaviour/behaviour/BehaviourUtil')
 
 
 
 describe("End Condition testing", () => {
-  test('Behaviour should be active when user is still in sphere as End condition, activation time expired.', () => {
+  test('SwitchBehaviour should be active when user is still in sphere as End condition, activation time expired.', () => {
     const behaviourSupport = new BehaviourSupport()
     behaviourSupport.setTimeFromClock(9, 10).setTimeToClock(16, 10).setDimPercentage(90).setPresenceIgnore().setEndConditionWhilePeopleInSphere();
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
@@ -33,7 +33,7 @@ describe("End Condition testing", () => {
 
   });
 
-  test('Behaviour should be inactive when user leaves sphere as End condition, activation time expired.', () => {
+  test('SwitchBehaviour should be inactive when user leaves sphere as End condition, activation time expired.', () => {
     const behaviourSupport = new BehaviourSupport()
     behaviourSupport.setTimeFromClock(9, 10).setTimeToClock(16, 10).setDimPercentage(90).setPresenceIgnore().setEndConditionWhilePeopleInSphere();
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
@@ -50,7 +50,7 @@ describe("End Condition testing", () => {
 });
 
 describe("Location testing", () => {
-  test('Behaviour should be active when user is in location.', () => {
+  test('SwitchBehaviour should be active when user is in location.', () => {
     const behaviourSupport = new BehaviourSupport()
     behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceSomebodyInLocations([1]);
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
@@ -58,14 +58,14 @@ describe("Location testing", () => {
     behaviour.tick(Date.now());
     return expect(behaviour.isActive).toBeTruthy();
   });
-  test('Behaviour should be inactive when user is not in location.', () => {
+  test('SwitchBehaviour should be inactive when user is not in location.', () => {
     const behaviourSupport = new BehaviourSupport()
     behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceSomebodyInLocations([1]);
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
     behaviour.tick(Date.now());
     return expect(behaviour.isActive).toBeFalsy();
   });
-  test('Behaviour should be active when multiple users are in location and one left.', () => {
+  test('SwitchBehaviour should be active when multiple users are in location and one left.', () => {
     const behaviourSupport = new BehaviourSupport()
     behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceSomebodyInLocations([1]);
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
@@ -77,7 +77,7 @@ describe("Location testing", () => {
     behaviour.tick(Date.now());
     return expect(behaviour.isActive).toBeTruthy();
   });
-  test('Behaviour should be active when nobody is in location.', () => {
+  test('SwitchBehaviour should be active when nobody is in location.', () => {
     const behaviourSupport = new BehaviourSupport()
     behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceNobodyInLocations([1]);
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
@@ -87,7 +87,7 @@ describe("Location testing", () => {
 });
 
 describe("Sphere testing", () => {
-  test('Behaviour should be active when user is in sphere.', () => {
+  test('SwitchBehaviour should be active when user is in sphere.', () => {
     const behaviourSupport = new BehaviourSupport()
     behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceSomebodyInSphere();
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
@@ -95,14 +95,14 @@ describe("Sphere testing", () => {
     behaviour.tick(Date.now());
     return expect(behaviour.isActive).toBeTruthy();
   });
-  test('Behaviour should be inactive when user is not in sphere.', () => {
+  test('SwitchBehaviour should be inactive when user is not in sphere.', () => {
     const behaviourSupport = new BehaviourSupport()
     behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceSomebodyInSphere();
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
     behaviour.tick(Date.now());
     return expect(behaviour.isActive).toBeFalsy();
   });
-  test('Behaviour should be active when multiple users are in sphere and one left.', () => {
+  test('SwitchBehaviour should be active when multiple users are in sphere and one left.', () => {
     const behaviourSupport = new BehaviourSupport()
     behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceSomebodyInSphere();
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
@@ -114,7 +114,7 @@ describe("Sphere testing", () => {
     return expect(behaviour.isActive).toBeTruthy();
   });
 
-  test('Behaviour should be active when nobody is in sphere.', () => {
+  test('SwitchBehaviour should be active when nobody is in sphere.', () => {
     const behaviourSupport = new BehaviourSupport()
     behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceNobodyInSphere();
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
@@ -122,7 +122,7 @@ describe("Sphere testing", () => {
     return expect(behaviour.isActive).toBeTruthy();
   });
 
-  test('Behaviour should be inactive when somebody is in sphere.', () => {
+  test('SwitchBehaviour should be inactive when somebody is in sphere.', () => {
     const behaviourSupport = new BehaviourSupport()
     behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceNobodyInSphere();
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
@@ -134,7 +134,7 @@ describe("Sphere testing", () => {
 
 describe('Delay testing', () => {
   describe('Somebody', () => {
-    test('Behaviour should be active when user just left sphere', () => {
+    test('SwitchBehaviour should be active when user just left sphere', () => {
       const behaviourSupport = new BehaviourSupport()
       behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceSomebodyInSphere();
       const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
@@ -151,7 +151,7 @@ describe('Delay testing', () => {
       return expect(behaviour.isActive).toBeTruthy();
     });
 
-    test('Behaviour should be inactive when user left location and delay period is exceeded.', () => {
+    test('SwitchBehaviour should be inactive when user left location and delay period is exceeded.', () => {
       const behaviourSupport = new BehaviourSupport()
       behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceSomebodyInSphere(); // 5 Minutes delay per default.
       const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
@@ -168,7 +168,7 @@ describe('Delay testing', () => {
   });
 
   describe('Nobody', () => {
-    test('Behaviour should be inactive when user just left the sphere', () => {
+    test('SwitchBehaviour should be inactive when user just left the sphere', () => {
       const behaviourSupport = new BehaviourSupport()
       behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceNobodyInSphere();
       const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
@@ -184,7 +184,7 @@ describe('Delay testing', () => {
       return expect(behaviour.isActive).toBeFalsy();
     });
 
-    test('Behaviour should be active when user left the sphere and timeout expired', () => {
+    test('SwitchBehaviour should be active when user left the sphere and timeout expired', () => {
       const behaviourSupport = new BehaviourSupport()
       behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceNobodyInSphere();
       const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
@@ -204,7 +204,7 @@ describe('Delay testing', () => {
 
 describe('Time testing', () => {
   describe('All day testing', () => {
-    test('Behaviour should be active as it started today', () => {
+    test('SwitchBehaviour should be active as it started today', () => {
       const behaviourSupport = new BehaviourSupport()
       behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceIgnore().setActiveDays({
         Mon: false,
@@ -220,7 +220,7 @@ describe('Time testing', () => {
       behaviour.tick(Date.parse(time.toString()));
       return expect(behaviour.isActive).toBeTruthy();
     });
-    test('Behaviour should be active as it started yesterday', () => {
+    test('SwitchBehaviour should be active as it started yesterday', () => {
       const behaviourSupport = new BehaviourSupport()
       behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceIgnore().setActiveDays({
         Mon: false,
@@ -236,7 +236,7 @@ describe('Time testing', () => {
       behaviour.tick(Date.parse(time.toString()));
       return expect(behaviour.isActive).toBeTruthy();
     });
-    test('Behaviour should be inactive because it is a new day', () => {
+    test('SwitchBehaviour should be inactive because it is a new day', () => {
       const behaviourSupport = new BehaviourSupport()
       behaviourSupport.setTimeAllDay().setDimPercentage(90).setPresenceIgnore().setActiveDays({
         Mon: false,
@@ -257,7 +257,7 @@ describe('Time testing', () => {
 
   describe('Range testing', () => {
     describe('Sunset, Sunrise testing', () => {
-      test('Behaviour should be active when activation is between sunset -> sunrise.', () => {
+      test('SwitchBehaviour should be active when activation is between sunset -> sunrise.', () => {
         const behaviourSupport = new BehaviourSupport()
         behaviourSupport.setTimeFromSunset().setTimeToSunrise().setDimPercentage(90).ignorePresence().setActiveDays({
           Mon: true,
@@ -274,7 +274,7 @@ describe('Time testing', () => {
         return expect(behaviour.isActive).toBeTruthy();
       });
 
-      test('Behaviour should be active when activation between sunrise +10 offset -> sunset.', () => {
+      test('SwitchBehaviour should be active when activation between sunrise +10 offset -> sunset.', () => {
         const behaviourSupport = new BehaviourSupport()
         behaviourSupport.setTimeToSunset().setTimeFromSunrise(10).setDimPercentage(90).ignorePresence().setActiveDays({
           Mon: true,
@@ -290,7 +290,7 @@ describe('Time testing', () => {
         behaviour.tick(Date.parse(time.toString()));
         return expect(behaviour.isActive).toBeTruthy();
       });
-      test('Behaviour should be active when  time between sunrise -10 offset -> sunset.', () => {
+      test('SwitchBehaviour should be active when  time between sunrise -10 offset -> sunset.', () => {
         const behaviourSupport = new BehaviourSupport()
         behaviourSupport.setTimeToSunset().setTimeFromSunrise(-10).setDimPercentage(90).ignorePresence().setActiveDays({
           Mon: true,
@@ -306,7 +306,7 @@ describe('Time testing', () => {
         behaviour.tick(Date.parse(time.toString()));
         return expect(behaviour.isActive).toBeTruthy();
       });
-      test('Behaviour should be inactive when time is before start time, sunrise  -> sunset.', () => {
+      test('SwitchBehaviour should be inactive when time is before start time, sunrise  -> sunset.', () => {
         const behaviourSupport = new BehaviourSupport()
         behaviourSupport.setTimeToSunset().setTimeFromSunrise().setDimPercentage(90).ignorePresence().setActiveDays({
           Mon: true,
@@ -322,7 +322,7 @@ describe('Time testing', () => {
         behaviour.tick(Date.parse(time.toString()));
         return expect(behaviour.isActive).toBeFalsy();
       });
-      test('Behaviour should be inactive when time is after sunset end time, sunrise -> sunset + 10 offset.', () => {
+      test('SwitchBehaviour should be inactive when time is after sunset end time, sunrise -> sunset + 10 offset.', () => {
         const behaviourSupport = new BehaviourSupport()
         behaviourSupport.setTimeToSunset(+10).setTimeFromSunrise().setDimPercentage(90).ignorePresence().setActiveDays({
           Mon: true,
@@ -341,7 +341,7 @@ describe('Time testing', () => {
     });
 
     describe('Clock testing', () => {
-      test('Behaviour should be active when activation is between 22:00 -> 23:59, Time 22:00.', () => {
+      test('SwitchBehaviour should be active when activation is between 22:00 -> 23:59, Time 22:00.', () => {
         const behaviourSupport = new BehaviourSupport()
         behaviourSupport.setTimeFromClock(22, 0).setTimeToClock(23, 59).setDimPercentage(90).ignorePresence();
         const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
@@ -350,7 +350,7 @@ describe('Time testing', () => {
         return expect(behaviour.isActive).toBeTruthy();
       });
 
-      test('Behaviour should be active when activation is between 22:00 -> 6:59, Time 6.58.', () => {
+      test('SwitchBehaviour should be active when activation is between 22:00 -> 6:59, Time 6.58.', () => {
         const behaviourSupport = new BehaviourSupport()
         behaviourSupport.setTimeFromClock(22, 0).setTimeToClock(6, 59).setDimPercentage(90).ignorePresence().setActiveDays({
           Mon: false,
@@ -368,7 +368,7 @@ describe('Time testing', () => {
         return expect(behaviour.isActive).toBeTruthy();
       });
 
-      test('Behaviour should be inactive when time is after end time, 22:00 -> 6:59', () => {
+      test('SwitchBehaviour should be inactive when time is after end time, 22:00 -> 6:59', () => {
         const behaviourSupport = new BehaviourSupport()
         behaviourSupport.setTimeFromClock(22, 0).setTimeToClock(6, 59).setDimPercentage(90).ignorePresence().setActiveDays({
           Mon: false,

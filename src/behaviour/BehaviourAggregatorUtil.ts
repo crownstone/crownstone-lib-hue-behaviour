@@ -1,20 +1,31 @@
-import {Behaviour} from "./behaviour/Behaviour";
+import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
 import {BehaviourSupport} from "./behaviour/BehaviourSupport";
 import {PrioritizedList} from "../declarations/declarations";
 
+
+interface TimeCompareResult {
+  result: "BOTH" | "SINGLE";
+  Behaviour?: SwitchBehaviour
+}
 
 export const BehaviourAggregatorUtil = {
 
 
   /** Loops through a list of active behaviours, comparing them with each other to find the one with the latest starting time.
+   * If two or more have same starting time, check for the lowest dim percentage.
    *
    * @param behaviours - a list of behaviours or twilights to be iterated through.
-   * @Returns a Behaviour
+   * @Returns a SwitchBehaviour
    */
-  filterByStartingTime(behaviours: Behaviour[]): Behaviour {
+  filterBehaviours(behaviours: SwitchBehaviour[]): SwitchBehaviour {
     let filteredBehaviour = behaviours[0];
-    for(let i = 1; i < behaviours.length; i++){
-      filteredBehaviour = this.compareStartingTime(filteredBehaviour,behaviours[i]);
+    for (let i = 1; i < behaviours.length; i++) {
+      const result = this.compareStartingTime(filteredBehaviour, behaviours[i]);
+      if (result.result === "BOTH") {
+        filteredBehaviour = this.compareByDimPercentage(filteredBehaviour, behaviours[i]);
+      } else {
+        filteredBehaviour = result.behaviour;
+      }
     }
     return filteredBehaviour
   },
@@ -22,29 +33,32 @@ export const BehaviourAggregatorUtil = {
 
   /** Compares A with B, finding the latest starting time.
    * If somehow the starting time is the same, behaviourA will be returned.
-   * @param behaviourA - Behaviour to be compared with B
-   * @param behaviourB - Behaviour to be compared with A
+   * @param behaviourA - SwitchBehaviour to be compared with B
+   * @param behaviourB - SwitchBehaviour to be compared with A
    *
-   * @returns a Behaviour with latest starting time of the two.
+   * @returns a SwitchBehaviour with latest starting time of the two.
    */
-  compareStartingTime(behaviourA:Behaviour, behaviourB:Behaviour):Behaviour {
+  compareStartingTime(behaviourA: SwitchBehaviour, behaviourB: SwitchBehaviour): TimeCompareResult {
     const behaviourSupportA = new BehaviourSupport(behaviourA.behaviour);
     const behaviourSupportB = new BehaviourSupport(behaviourB.behaviour);
 
     if (behaviourB === undefined) {
-      return behaviourA;
+      return <TimeCompareResult>{result: "SINGLE", behaviour: behaviourA};
     }
-    if(!behaviourSupportA.isActiveAllDay() && behaviourSupportB.isActiveAllDay()){
-      return behaviourA;
+    if (!behaviourSupportA.isActiveAllDay() && behaviourSupportB.isActiveAllDay()) {
+      return <TimeCompareResult>{result: "SINGLE", behaviour: behaviourA};
     }
-    if(behaviourSupportA.isActiveAllDay() && !behaviourSupportB.isActiveAllDay()){
-      return behaviourB;
+    if (behaviourSupportA.isActiveAllDay() && !behaviourSupportB.isActiveAllDay()) {
+      return <TimeCompareResult>{result: "SINGLE", behaviour: behaviourB};
     }
-    if(behaviourSupportA.isActiveAllDay() && behaviourSupportB.isActiveAllDay()){
-      return behaviourA;
+    if ((behaviourSupportA.isActiveAllDay() && behaviourSupportB.isActiveAllDay())
+      || behaviourSupportA.getSwitchingTime("from", behaviourA.timestamp, behaviourA.sphereLocation) === behaviourSupportB.getSwitchingTime("from", behaviourB.timestamp, behaviourB.sphereLocation)) {
+      return <TimeCompareResult>{result: "BOTH"}
     }
-    return (behaviourSupportA.getSwitchingTime("from", behaviourA.timestamp, behaviourA.sphereLocation) >=
-      behaviourSupportB.getSwitchingTime("from",  behaviourB.timestamp, behaviourB.sphereLocation))?behaviourA:behaviourB;
+    return (behaviourSupportA.getSwitchingTime("from", behaviourA.timestamp, behaviourA.sphereLocation)
+      > behaviourSupportB.getSwitchingTime("from", behaviourB.timestamp, behaviourB.sphereLocation))
+      ? <TimeCompareResult>{result: "SINGLE", behaviour: behaviourA}
+      : <TimeCompareResult>{result: "SINGLE", behaviour: behaviourB};
   },
 
   /** Compares given behaviours for their dim percentage.
@@ -52,17 +66,17 @@ export const BehaviourAggregatorUtil = {
    * @param behaviourA
    * @param behaviourB
    *
-   * @returns Behaviour with lowest percentage.
+   * @returns SwitchBehaviour with lowest percentage.
    */
-  compareByDimPercentage(behaviourA:Behaviour, behaviourB:Behaviour):Behaviour{
-    return(behaviourA.behaviour.data.action.data <= behaviourB.behaviour.data.action.data)?behaviourA:behaviourB;
+  compareByDimPercentage(behaviourA: SwitchBehaviour, behaviourB: SwitchBehaviour): SwitchBehaviour {
+    return (behaviourA.behaviour.data.action.data <= behaviourB.behaviour.data.action.data) ? behaviourA : behaviourB;
   },
   /** Gets the behaviour that should the active behaviour.
    *
    * @param prioritizedBehaviour
    * @param prioritizedTwilight
    */
-  getActiveBehaviour(prioritizedBehaviour:Behaviour,prioritizedTwilight:Behaviour):Behaviour{
+  getActiveBehaviour(prioritizedBehaviour: SwitchBehaviour, prioritizedTwilight: SwitchBehaviour): SwitchBehaviour {
     if (prioritizedBehaviour !== undefined && prioritizedTwilight !== undefined) {
       return this.compareByDimPercentage(prioritizedBehaviour, prioritizedTwilight);
     } else if (prioritizedBehaviour !== undefined) {
@@ -74,13 +88,13 @@ export const BehaviourAggregatorUtil = {
     }
   },
 
-  /** Prioritizes Behaviours based on Behaviour overlapping rules.
+  /** Prioritizes Behaviours based on SwitchBehaviour overlapping rules.
    *
    * @param behaviours - To be prioritized
    *
    * @returns A prioritized behaviours object with 4 priority levels and a list of behaviours on each level.
    */
-  prioritizeBehaviours(behaviours: Behaviour[]): PrioritizedList {
+  prioritizeBehaviours(behaviours: SwitchBehaviour[]): PrioritizedList {
     let prioritizedList = {1: [], 2: [], 3: [], 4: []};
     for (const behaviour of behaviours) {
       const behaviourSupport = new BehaviourSupport(behaviour.behaviour);
@@ -100,18 +114,34 @@ export const BehaviourAggregatorUtil = {
    *
    * @param prioritizedList
    *
-   * @Returns Behaviour
+   * @Returns SwitchBehaviour
    */
-  getBehaviourWithHighestPriority(prioritizedList: PrioritizedList):Behaviour{
+  getBehaviourWithHighestPriority(prioritizedList: PrioritizedList): SwitchBehaviour {
     for (let i = 1; i <= 4; i++) {
       if (prioritizedList[i].length > 0) {
         if (prioritizedList[i].length === 1) {
           return prioritizedList[i][0];
         } else if (prioritizedList[i].length > 1) {
-          return BehaviourAggregatorUtil.filterByStartingTime(prioritizedList[i]);
+          return BehaviourAggregatorUtil.filterBehaviours(prioritizedList[i]);
         }
       }
     }
+  },
+
+
+  /** Returns the prioritized behaviour
+   *
+   * @param behaviours - a list of active behaviours to be iterated through.
+   * @Returns a SwitchBehaviour or undefined when given list was empty.
+   */
+  getPrioritizedBehaviour(behaviours: SwitchBehaviour[]): SwitchBehaviour {
+    if (behaviours === []) {
+      return undefined;
+    } else {
+      const prioritizedList = BehaviourAggregatorUtil.prioritizeBehaviours(behaviours);
+      return BehaviourAggregatorUtil.getBehaviourWithHighestPriority(prioritizedList);
+    }
   }
+
 
 }

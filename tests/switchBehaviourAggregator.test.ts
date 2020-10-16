@@ -3,7 +3,6 @@
  */
 import {eventBus} from "../src/util/EventBus";
 import {ON_PRESENCE_CHANGE} from "../src/constants/EventConstants";
-
 import {
   switchOn10AllDay,
   switchOn20Between19002200, switchOn40WhenInRoom5n6,
@@ -30,7 +29,7 @@ import {
   EVENT_LEAVE_SPHERE,
   SPHERE_LOCATION
 } from "./constants/testConstants";
-import {Behaviour} from "../src/behaviour/behaviour/Behaviour";
+import {SwitchBehaviour} from "../src/behaviour/behaviour/SwitchBehaviour";
 
 const BehaviourSupport = require('../src/behaviour/behaviour/BehaviourSupport').BehaviourSupport
 
@@ -39,7 +38,7 @@ const BehaviourSupport = require('../src/behaviour/behaviour/BehaviourSupport').
 //     behaviourAggregator.addBehaviour(behaviourA.rule,SPHERE_LOCATION)    >> Throws no Error?!
 //
 describe("Overlapping checks", () => {
-  describe("Behaviour only", () => {
+  describe("SwitchBehaviour only", () => {
     test("Single behaviour all day", async () => {
       const behaviourAggregator = new SwitchBehaviourAggregator();
       const behaviourSupport = new BehaviourSupport()

@@ -9,39 +9,26 @@ import {
   PresenceProfile,
   SphereLocation
 } from "../../declarations/declarations";
+import {BehaviourBase} from "./BehaviourBase";
 
 
-export class Behaviour {
-  behaviour: HueBehaviourWrapper;
-  isActive: boolean;
+export class SwitchBehaviour extends BehaviourBase{
   presenceLocations: PresenceProfile[] = []; // Empty when no one is present for this behaviour.
-  timestamp: number | null = null;
   lastPresenceUpdate: number = 0;
-  sphereLocation: SphereLocation
   unsubscribe: EventUnsubscriber
 
   constructor(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation) {
-    this.behaviour = behaviour;
-    this.sphereLocation = sphereLocation;
+    super(behaviour,sphereLocation);
     this.unsubscribe = eventBus.subscribe(ON_PRESENCE_CHANGE, this._onPresenceDetect.bind(this));
-  }
-
-  setSphereLocation(sphereLocation: SphereLocation) {
-    this.sphereLocation = sphereLocation;
   }
 
   cleanup() {
     this.unsubscribe();
   }
 
-  tick(timestamp: number) {
-    this.timestamp = timestamp;
-    this._behaviourActiveCheck();
-  }
-
   /**
    * On Presence detection when someone enters/leaves a SPHERE or LOCATION,
-   * Checks if Behaviour has IGNORE as presence type and if endCondition is set.
+   * Checks if SwitchBehaviour has IGNORE as presence type and if endCondition is set.
    * Calls _handlePresenceEvent() with the appropriate Presence object.
    * @param presenceEvent - PresenceEvent object of type ENTER or LEAVE, containing information of who enters/leaves which room or the house.
    */
@@ -59,7 +46,7 @@ export class Behaviour {
    * Parsing function for Presence Detection Event Handling,
    * Simple check for handling the appropriate event.
    * @param presenceEvent - PresenceEvent object of type ENTER or LEAVE
-   * @param presenceObject - Presence object, can be the one of Behaviour.presence or Behaviour.endCondition.
+   * @param presenceObject - Presence object, can be the one of SwitchBehaviour.presence or SwitchBehaviour.endCondition.
    */
   _handlePresenceEvent(presenceEvent: PresenceEvent, presenceObject): void {
     if (presenceEvent.type === "ENTER") {
@@ -71,12 +58,12 @@ export class Behaviour {
 
   /**
    * On Presence detection when someone enters a SPHERE or LOCATION,
-   * If SPHERE related, Check if Behaviour handles SPHERE based presences, then simply add PresenceProfile to list.
-   * If LOCATION related, Check if Behaviour handles LOCATION based presences,
+   * If SPHERE related, Check if SwitchBehaviour handles SPHERE based presences, then simply add PresenceProfile to list.
+   * If LOCATION related, Check if SwitchBehaviour handles LOCATION based presences,
    *    If true: Check if PresenceProfile locationId matches locationId in Presence object locationIds.
    *        If true: add to presenceLocations list if matches.
    * @param presenceEvent - PresenceEvent object of type ENTER, containing information of who entered a which room or the house.
-   * @param presenceObject - Presence object, can be the one of Behaviour.presence or Behaviour.endCondition.
+   * @param presenceObject - Presence object, can be the one of SwitchBehaviour.presence or SwitchBehaviour.endCondition.
    */
   _onPresenceEnterEvent(presenceEvent: PresenceEvent, presenceObject: Presence): void {
     if (presenceEvent.data.type === "SPHERE") {
@@ -121,21 +108,6 @@ export class Behaviour {
   }
 
   /**
-   * Retrieves the Behaviour's composed state.
-   *
-   *
-   * @Returns a Hue Light state
-   */
-  getComposedState(): HueLightState {
-    return (this.isActive) ? this._createComposedState() : {on: false}
-  }
-
-  _createComposedState(): HueLightState {
-    return {on: true, bri: BehaviourUtil.mapBehaviourActionToHue(this.behaviour.data.action.data)}
-  }
-
-
-  /**
    * Checks if the behaviour is active according to the defined rules.
    *
    */
@@ -154,11 +126,6 @@ export class Behaviour {
           this.isActive = true;
           return;
         }
-      }
-    } else if (this.behaviour.type === "TWILIGHT") {
-      if (behaviourObj.isActiveTimeObject(this.timestamp, this.sphereLocation)) {
-        this.isActive = true;
-        return;
       }
     }
     this.isActive = false;

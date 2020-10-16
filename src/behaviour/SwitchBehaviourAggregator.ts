@@ -1,4 +1,4 @@
-import {Behaviour} from "./behaviour/Behaviour";
+import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
 
 import {
   EventUnsubscriber, HueFullState,
@@ -13,8 +13,8 @@ import Timeout = NodeJS.Timeout;
 const POLLING_RATE = 500;
 
 export class SwitchBehaviourAggregator {
-  behaviours: Behaviour[] = [];
-  prioritizedBehaviour: Behaviour = undefined;
+  behaviours: SwitchBehaviour[] = [];
+  prioritizedBehaviour: SwitchBehaviour = undefined;
   timestamp = 0;
   composedState: HueLightState;
   intervalId:Timeout;
@@ -34,7 +34,7 @@ export class SwitchBehaviourAggregator {
 
 
   addBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): void {
-    this.behaviours.push(new Behaviour(behaviour, sphereLocation));
+    this.behaviours.push(new SwitchBehaviour(behaviour, sphereLocation));
   }
 
   removeBehaviour(cloudId: string): void {
@@ -81,23 +81,8 @@ export class SwitchBehaviourAggregator {
         }
       }
     });
-    this.prioritizedBehaviour = this._getPrioritizedBehaviour(activeBehaviours);
+    this.prioritizedBehaviour = BehaviourAggregatorUtil.getPrioritizedBehaviour(activeBehaviours);
     this.composedState = (this.prioritizedBehaviour !== undefined) ? this.prioritizedBehaviour.getComposedState() : {on: false};
-  }
-
-
-  /** Returns the prioritized behaviour
-   *
-   * @param behaviours - a list of active behaviours to be iterated through.
-   * @Returns a Behaviour or undefined when given list was empty.
-   */
-  _getPrioritizedBehaviour(behaviours: Behaviour[]): Behaviour {
-    if (behaviours === []) {
-      return undefined;
-    } else {
-      const prioritizedList = BehaviourAggregatorUtil.prioritizeBehaviours(behaviours);
-      return BehaviourAggregatorUtil.getBehaviourWithHighestPriority(prioritizedList);
-    }
   }
 
 

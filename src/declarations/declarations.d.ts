@@ -1,4 +1,4 @@
-import {Behaviour} from "../behaviour/behaviour/Behaviour";
+import {SwitchBehaviour} from "../behaviour/behaviour/SwitchBehaviour";
 
 interface DiscoverResult {
   id: string,
@@ -67,10 +67,10 @@ interface SphereLocation {
   longitude: number
 }
 interface PrioritizedList{
-  1: Behaviour[];
-  2: Behaviour[];
-  3: Behaviour[];
-  4: Behaviour[];
+  1: SwitchBehaviour[];
+  2: SwitchBehaviour[];
+  3: SwitchBehaviour[];
+  4: SwitchBehaviour[];
 }
 
 type EventUnsubscriber = () => void
