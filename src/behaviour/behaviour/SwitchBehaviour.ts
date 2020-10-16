@@ -4,12 +4,12 @@ import {BehaviourSupport} from "./BehaviourSupport";
 import {ON_PRESENCE_CHANGE} from "../../constants/EventConstants";
 import {
   EventUnsubscriber,
-  HueLightState,
   PresenceEvent,
   PresenceProfile,
   SphereLocation
 } from "../../declarations/declarations";
 import {BehaviourBase} from "./BehaviourBase";
+import {HueBehaviourWrapper, Presence} from "../../declarations/behaviourTypes";
 
 
 export class SwitchBehaviour extends BehaviourBase{

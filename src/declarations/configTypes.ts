@@ -1,22 +1,24 @@
-interface ConfigurationObject {
+import {HueBehaviourWrapper} from "./behaviourTypes";
+
+export interface ConfigurationObject {
   "Bridges": ConfBridges;
 }
 
-interface ConfLights {
+export interface ConfLights {
   [hueUniqueId: string]: ConfLightObject;
 }
 
-interface ConfLightObject {
+export interface ConfLightObject {
   name: string;
   id: number;
   behaviours: HueBehaviourWrapper[];
 }
 
-interface ConfBridges {
+export interface ConfBridges {
   [uniqueId: string]: ConfBridgeObject
 }
 
-interface ConfBridgeObject {
+export interface ConfBridgeObject {
   name: string;
   ipAddress: string;
   macAddress: string;

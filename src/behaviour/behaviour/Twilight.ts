@@ -1,15 +1,7 @@
-import {eventBus} from "../../util/EventBus";
-import {BehaviourUtil} from "./BehaviourUtil";
 import {BehaviourSupport} from "./BehaviourSupport";
-import {ON_PRESENCE_CHANGE} from "../../constants/EventConstants";
-import {
-  EventUnsubscriber,
-  HueLightState,
-  PresenceEvent,
-  PresenceProfile,
-  SphereLocation
-} from "../../declarations/declarations";
+import {  SphereLocation} from "../../declarations/declarations";
 import {BehaviourBase} from "./BehaviourBase";
+import {HueBehaviourWrapper} from "../../declarations/behaviourTypes";
 
 
 export class Twilight extends BehaviourBase{

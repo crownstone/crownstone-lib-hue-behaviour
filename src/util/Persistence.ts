@@ -6,6 +6,7 @@ import {promises as fs} from "fs";
 import {Bridge, CrownstoneHueError, Light} from "..";
 import {EventBus} from "./EventBus";
 import {BridgeFormat} from "../declarations/declarations";
+import {ConfBridgeObject, ConfigurationObject} from "../declarations/configTypes";
 
 const CONF_NAME: string = "saveConfig.json";
 const CONF_BRIDGE_LOCATION: string = "Bridges";

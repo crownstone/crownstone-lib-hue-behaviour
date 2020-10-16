@@ -1,13 +1,14 @@
 import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
 import {BehaviourSupport} from "./behaviour/BehaviourSupport";
 import {PrioritizedList} from "../declarations/declarations";
+import {Twilight} from "./behaviour/Twilight";
 
 
 interface TimeCompareResult {
   result: "BOTH" | "SINGLE";
   Behaviour?: SwitchBehaviour
 }
-
+export const POLLING_RATE = 500;
 export const BehaviourAggregatorUtil = {
 
 
@@ -15,9 +16,9 @@ export const BehaviourAggregatorUtil = {
    * If two or more have same starting time, check for the lowest dim percentage.
    *
    * @param behaviours - a list of behaviours or twilights to be iterated through.
-   * @Returns a SwitchBehaviour
+   * @Returns a SwitchBehaviour or Twilight
    */
-  filterBehaviours(behaviours: SwitchBehaviour[]): SwitchBehaviour {
+  filterBehaviours(behaviours: SwitchBehaviour[] | Twilight[]): SwitchBehaviour | Twilight {
     let filteredBehaviour = behaviours[0];
     for (let i = 1; i < behaviours.length; i++) {
       const result = this.compareStartingTime(filteredBehaviour, behaviours[i]);
@@ -71,8 +72,8 @@ export const BehaviourAggregatorUtil = {
   compareByDimPercentage(behaviourA: SwitchBehaviour, behaviourB: SwitchBehaviour): SwitchBehaviour {
     return (behaviourA.behaviour.data.action.data <= behaviourB.behaviour.data.action.data) ? behaviourA : behaviourB;
   },
-  /** Gets the behaviour that should the active behaviour.
-   *
+  /** Gets the behaviour that should be the active behaviour.
+   * TODO Rewrite according to override rules
    * @param prioritizedBehaviour
    * @param prioritizedTwilight
    */
@@ -95,7 +96,7 @@ export const BehaviourAggregatorUtil = {
    * @returns A prioritized behaviours object with 4 priority levels and a list of behaviours on each level.
    */
   prioritizeBehaviours(behaviours: SwitchBehaviour[]): PrioritizedList {
-    let prioritizedList = {1: [], 2: [], 3: [], 4: []};
+    let prioritizedList = <PrioritizedList>{1: [], 2: [], 3: [], 4: []};
     for (const behaviour of behaviours) {
       const behaviourSupport = new BehaviourSupport(behaviour.behaviour);
       if (behaviourSupport.isUsingSingleRoomPresence()) {
@@ -122,7 +123,7 @@ export const BehaviourAggregatorUtil = {
         if (prioritizedList[i].length === 1) {
           return prioritizedList[i][0];
         } else if (prioritizedList[i].length > 1) {
-          return BehaviourAggregatorUtil.filterBehaviours(prioritizedList[i]);
+          return <SwitchBehaviour>this.filterBehaviours(prioritizedList[i]);
         }
       }
     }
@@ -138,8 +139,21 @@ export const BehaviourAggregatorUtil = {
     if (behaviours === []) {
       return undefined;
     } else {
-      const prioritizedList = BehaviourAggregatorUtil.prioritizeBehaviours(behaviours);
-      return BehaviourAggregatorUtil.getBehaviourWithHighestPriority(prioritizedList);
+      const prioritizedList = this.prioritizeBehaviours(behaviours);
+      return this.getBehaviourWithHighestPriority(prioritizedList);
+    }
+  },
+
+  /** Returns the prioritized twilight
+   * Uses filterBehaviours to get the twilight that started as last and lowest dim percentage if needed.
+   * @param twilights - a list of active twilights to be iterated through.
+   * @Returns a twilight or undefined when given list was empty.
+   */
+  getPrioritizedTwilight(twilights: Twilight[]): Twilight {
+    if (twilights === []) {
+      return undefined;
+    } else {
+      return this.filterBehaviours(twilights);
     }
   }
 

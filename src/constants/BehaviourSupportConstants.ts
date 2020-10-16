@@ -1,4 +1,7 @@
+import {ActiveDays, HueBehaviour, HueBehaviourWrapper} from "../declarations/behaviourTypes";
+
 export const SPHERE_DELAY = 5 * 60;
+
 
 export const EMPTY_RULE_DATA : HueBehaviour = {
   action:   { type: "BE_ON", data: 100 },
@@ -16,6 +19,6 @@ export const EMPTY_RULE: HueBehaviourWrapper={
   cloudId: "12345678900",
   lightId: "22:FF:DD:TT:AA:CC:GG",
   type: "BEHAVIOUR",
-  updatedAt: 0
+  updatedAt: "0"
 
 }
