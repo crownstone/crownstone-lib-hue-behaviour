@@ -1,5 +1,4 @@
 import {HueFullState, HueLightState} from "../../src/declarations/declarations";
-import {SwitchBehaviourPrioritizer} from "../../src/behaviour/SwitchBehaviourPrioritizer";
 import {Api} from "./Api";
 import {BehaviourAggregator} from "../../src/behaviour/BehaviourAggregator";
 
@@ -14,8 +13,7 @@ export class Light {
   constructor(api) {
     this.api = api;
     this.state = api.lights.getLightState();
-    this.behaviourAggregator = new BehaviourAggregator(this);
-    this.behaviourAggregator.currentState = {...this.state};
+    this.behaviourAggregator = new BehaviourAggregator(this,{...this.state});
   }
 
   setState(state){

@@ -45,7 +45,7 @@ export class SwitchBehaviourPrioritizer extends PrioritizerBase {
       }
     });
     this.prioritizedBehaviour = BehaviourAggregatorUtil.getPrioritizedBehaviour(activeBehaviours);
-    this.composedState = (this.prioritizedBehaviour !== undefined) ? this.prioritizedBehaviour.getComposedState() : {on: false};
+    this.composedState = (!this.prioritizedBehaviour) ? this.prioritizedBehaviour.getComposedState() : {on: false};
   }
 }
 

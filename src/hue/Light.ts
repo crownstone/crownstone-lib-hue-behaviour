@@ -4,6 +4,7 @@ import {BehaviourAggregator} from "../behaviour/BehaviourAggregator";
 import {HueFullState, StateUpdate} from "../declarations/declarations";
 import Timeout = NodeJS.Timeout;
 import * as Api from "node-hue-api/lib/api/Api";
+import {POLLING_RATE} from "../behaviour/BehaviourAggregatorUtil";
 
 
 
@@ -22,6 +23,8 @@ import * as Api from "node-hue-api/lib/api/Api";
  * @param supportedStates - supported states of the light. For each light type it's different. Info added on creation from Bridge.
  * @param api  - Link to the api object it is connected to.
  * @param lastUpdate - Timestamp of when the state was last changed.
+ * @param intervalId - Timeout object for the interval.
+ * @param behaviourAggregator - Handles the behaviours.
  *
  */
 export class Light {
@@ -47,9 +50,11 @@ export class Light {
         this.supportedStates = supportedStates;
         this.api = api;
         this.lastUpdate = Date.now();
-        this.behaviourAggregator = new BehaviourAggregator(this);
-        this.intervalId = setInterval(() => this.renewState(), 500);
-
+        this.behaviourAggregator = new BehaviourAggregator(this,state);
+    }
+    init():void{
+        this.behaviourAggregator.init();
+        this.intervalId = setInterval(() => this.renewState(), POLLING_RATE);
     }
 
     private _setLastUpdate(): void {
@@ -69,7 +74,7 @@ export class Light {
         if (this.state != newState) {
             this.state = newState
             this._setLastUpdate()
-            this.behaviourAggregator.lightStateChanged(this.state);
+            await this.behaviourAggregator.lightStateChanged(this.state);
         }
     }
 
