@@ -37,7 +37,7 @@ export class TwilightPrioritizer extends PrioritizerBase {
       }
     });
     this.prioritizedBehaviour = BehaviourAggregatorUtil.getPrioritizedTwilight(activeBehaviours);
-    this.composedState = (!this.prioritizedBehaviour) ? this.prioritizedBehaviour.getComposedState() : {on: false};
+    this.composedState = (typeof(this.prioritizedBehaviour) !== "undefined") ? this.prioritizedBehaviour.getComposedState() : {on: false};
   }
 
 }

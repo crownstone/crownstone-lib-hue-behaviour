@@ -48,7 +48,7 @@ export const BehaviourAggregatorUtil = {
     const behaviourSupportA = new BehaviourSupport(behaviourA.behaviour);
     const behaviourSupportB = new BehaviourSupport(behaviourB.behaviour);
 
-    if (behaviourB === undefined) {
+    if (typeof(behaviourB) === "undefined") {
       return <TimeCompareResult>{result: "SINGLE", behaviour: behaviourA};
     }
     if (!behaviourSupportA.isActiveAllDay() && behaviourSupportB.isActiveAllDay()) {
@@ -77,22 +77,6 @@ export const BehaviourAggregatorUtil = {
    */
   compareByDimPercentage(behaviourA: SwitchBehaviour|Twilight, behaviourB: SwitchBehaviour|Twilight): SwitchBehaviour|Twilight {
     return (behaviourA.behaviour.data.action.data <= behaviourB.behaviour.data.action.data) ? behaviourA : behaviourB;
-  },
-  /** Gets the behaviour that should be the active behaviour.
-   * TODO Rewrite according to override rules
-   * @param prioritizedBehaviour
-   * @param prioritizedTwilight
-   */
-  getActiveBehaviour(prioritizedBehaviour: SwitchBehaviour, prioritizedTwilight: SwitchBehaviour): SwitchBehaviour {
-    if (prioritizedBehaviour !== undefined && prioritizedTwilight !== undefined) {
-      return this.compareByDimPercentage(prioritizedBehaviour, prioritizedTwilight);
-    } else if (prioritizedBehaviour !== undefined) {
-      return prioritizedBehaviour;
-    } else if (prioritizedTwilight !== undefined) {
-      return prioritizedTwilight;
-    } else {
-      return undefined;
-    }
   },
 
   /** Prioritizes Behaviours based on SwitchBehaviour overlapping rules.
