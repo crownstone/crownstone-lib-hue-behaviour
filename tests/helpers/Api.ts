@@ -22,13 +22,13 @@ export class ApiLight {
   state: HueLightState = {on: false, bri: 100};
 
   getLightState(id?) {
-    return this.state;
+    return {...this.state};
   }
 
   setState(id, state) {
     for (const key of Object.keys(state)) {
       if (this.state[key] !== undefined) {
-        this.state[key] = state.key;
+        this.state[key] = state[key];
       }
     }
   }
@@ -45,15 +45,15 @@ export class UserInteraction {
     this.light = light;
   }
 
-  turnOffLight() {
+  turnLightOff() {
     this.light.setState(0, {on: false})
   }
 
-  turnOnLight() {
+  turnLightOn() {
     this.light.setState(0, {on: true})
   }
 
   dimLight(dimPercentage) {
-    this.light.setState(0, {dim: dimPercentage*2.54})
+    this.light.setState(0, {bri: dimPercentage*2.54})
   }
 }

@@ -1,16 +1,15 @@
 import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
 import {SphereLocation} from "../declarations/declarations";
 import {BehaviourAggregatorUtil, POLLING_RATE} from "./BehaviourAggregatorUtil";
-import {AggregatorBase} from "./AggregatorBase";
-import {HueBehaviourWrapper} from "../declarations/behaviourTypes";
+import {PrioritizerBase} from "./PrioritizerBase";
+import {HueBehaviourWrapper, HueBehaviourWrapperBehaviour} from "../declarations/behaviourTypes";
 
 
-export class SwitchBehaviourAggregator extends AggregatorBase {
+export class SwitchBehaviourPrioritizer extends PrioritizerBase {
   behaviours: SwitchBehaviour[] = [];
   prioritizedBehaviour: SwitchBehaviour = undefined;
 
   cleanup(): void {
-    this.stopLoop();
     for (const behaviour of this.behaviours) {
       behaviour.cleanup();
     }
@@ -18,7 +17,7 @@ export class SwitchBehaviourAggregator extends AggregatorBase {
 
 
 
-  addBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): void {
+  addBehaviour(behaviour: HueBehaviourWrapperBehaviour, sphereLocation: SphereLocation): void {
     this.behaviours.push(new SwitchBehaviour(behaviour, sphereLocation));
   }
 

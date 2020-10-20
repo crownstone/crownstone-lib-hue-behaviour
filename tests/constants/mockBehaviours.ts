@@ -202,7 +202,7 @@ export const twilightDim50AllDay = {
         "Sat": true,
         "Sun": true
     },
-    "cloudId": "5f649e8892170500049526185",
+    "cloudId": "CLOUD-ID-123123",
     "lightId": "5f4e47660bc0da0004b4fe16",
     "sphereId": "5f4d08bbbfeb1e000422a462",
     "createdAt": "2020-09-18T11:48:24.813Z",
@@ -398,8 +398,6 @@ export const switchOn30Range = {
     },
     "cloudId": "5f6491e8892800500f18",
     "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
     "updatedAt": "2020-09-18T11:48:24.489Z"
 }
 
@@ -658,3 +656,62 @@ export const switchOn10AllDay = {
         "createdAt": "2020-09-18T11:48:24.813Z",
         "updatedAt": "2020-09-18T11:48:24.489Z"
     }
+
+export const switchOn80Range13001500 = {
+    "type": "BEHAVIOUR",
+    "data": {
+        "action": {"type": "BE_ON", "data": 80},
+        "time": {
+            "type": "RANGE",
+            "from": {"type":"CLOCK","data":{"hours":13,"minutes":0}},
+            "to": {"type":"CLOCK","data":{"hours":15,"minutes":0}}
+
+        },
+        "presence": {"type": "IGNORE"}
+    },
+    "idOnCrownstone": 0,
+    "profileIndex": 0,
+    "syncedToCrownstone": true,
+    "deleted": false,
+    "activeDays": {
+        "Mon": true,
+        "Tue": true,
+        "Wed": true,
+        "Thu": true,
+        "Fri": true,
+        "Sat": true,
+        "Sun": true
+    },
+    "cloudId": "sadpogos3af",
+    "lightId": "5f4e47660bc0da0004b4fe16",
+    "sphereId": "5f4d08bbbfeb1e000422a462",
+    "createdAt": "2020-09-18T11:48:24.813Z",
+    "updatedAt": "2020-09-18T11:48:24.489Z"
+}
+
+export const twilight70Range12001500 = {
+    "type": "TWILIGHT",
+    "data": {
+        "action": {"type": "DIM_WHEN_TURNED_ON", "data": 70},
+        "time": {
+            "type": "RANGE",
+            "from": {"type":"CLOCK","data":{"hours":12,"minutes":0}},
+            "to": {"type":"CLOCK","data":{"hours":15,"minutes":0}}
+
+        }
+    },
+    "activeDays": {
+        "Mon": true,
+        "Tue": true,
+        "Wed": true,
+        "Thu": true,
+        "Fri": true,
+        "Sat": true,
+        "Sun": true
+    },
+    "cloudId": "sadpogf",
+    "lightId": "5f4e47660bc0da0004b4fe16",
+    "sphereId": "5f4d08bbbfeb1e000422a462",
+    "createdAt": "2020-09-18T11:48:24.813Z",
+    "updatedAt": "2020-09-18T11:48:24.489Z"
+}

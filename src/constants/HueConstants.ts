@@ -31,4 +31,8 @@ export const possibleStates = {
   'alert': true
 }
 
+export const hueStateVariables = {
+  'on':true,
+  ...minMaxValueStates}
+
 export const DISCOVERY_URL = "https://discovery.meethue.com/";

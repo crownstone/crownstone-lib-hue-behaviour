@@ -10,24 +10,14 @@ import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
 import {HueBehaviourWrapper} from "../declarations/behaviourTypes";
 
 
-export class AggregatorBase {
+export class PrioritizerBase {
   behaviours: Twilight[] | SwitchBehaviour[] = [];
   prioritizedBehaviour: Twilight | SwitchBehaviour = undefined;
   timestamp = 0;
   composedState: HueLightState;
-  intervalId: Timeout;
 
-  init(): void {
-    this.intervalId = setInterval(() => this._loop(), POLLING_RATE);
 
-  }
-
-  stopLoop(){
-    clearInterval(this.intervalId);
-  }
-
-  cleanup(): void {
-    this.stopLoop();
+  cleanup(): void  {
   }
 
 
@@ -46,8 +36,8 @@ export class AggregatorBase {
     }
   }
 
-  _loop(): void {
-    this.timestamp = Date.now();
+  tick(timestamp: number): void {
+    this.timestamp = timestamp;
     this._sendTickToBehaviours();
     this._prioritizeBehaviour();
   }

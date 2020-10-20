@@ -1,6 +1,7 @@
 import {HueFullState, HueLightState} from "../../src/declarations/declarations";
-import {SwitchBehaviourAggregator} from "../../src/behaviour/SwitchBehaviourAggregator";
+import {SwitchBehaviourPrioritizer} from "../../src/behaviour/SwitchBehaviourPrioritizer";
 import {Api} from "./Api";
+import {BehaviourAggregator} from "../../src/behaviour/BehaviourAggregator";
 
 /** Simulates an Hue Light object, for testing Purposes
  *
@@ -8,26 +9,28 @@ import {Api} from "./Api";
 
 export class Light {
   state:HueLightState;
-  behaviourAggregator: SwitchBehaviourAggregator
+  behaviourAggregator: BehaviourAggregator
   api: Api;
   constructor(api) {
     this.api = api;
-    this.behaviourAggregator = new SwitchBehaviourAggregator();
+    this.state = api.lights.getLightState();
+    this.behaviourAggregator = new BehaviourAggregator(this);
+    this.behaviourAggregator.currentState = {...this.state};
   }
 
   setState(state){
-    this.api.lights.setState(0,state);
-    this.state = state;
+    this.api.lights.setState(0,{...state});
+    this.state = {...state};
   }
 
-  renewState(){
+  async renewState(){
     let oldState = {} as HueLightState;
     Object.keys(this.state).forEach((key) => {
       oldState[key] = this.state[key]
     })
     this.state = this.api.lights.getLightState();
-    if(oldState !== this.state){
-      // this.behaviourAggregator.lightStateChanged(<HueFullState>this.state);
+    if(oldState.on !== this.state.on || oldState.bri !== this.state.bri ){
+      await this.behaviourAggregator.lightStateChanged(<HueFullState>this.state);
     }
   }
 

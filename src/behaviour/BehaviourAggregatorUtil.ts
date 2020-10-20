@@ -8,8 +8,13 @@ interface TimeCompareResult {
   result: "BOTH" | "SINGLE";
   Behaviour?: SwitchBehaviour
 }
+export const SWITCH_STATE_OVERRIDE = "SWITCH_STATE_OVERRIDE";
+export const DIM_STATE_OVERRIDE = "DIM_STATE_OVERRIDE";
+export const NO_OVERRIDE = "NO_OVERRIDE";
 export const POLLING_RATE = 500;
+
 export const BehaviourAggregatorUtil = {
+
 
 
   /** Loops through a list of active behaviours, comparing them with each other to find the one with the latest starting time.
@@ -52,14 +57,15 @@ export const BehaviourAggregatorUtil = {
     if (behaviourSupportA.isActiveAllDay() && !behaviourSupportB.isActiveAllDay()) {
       return <TimeCompareResult>{result: "SINGLE", behaviour: behaviourB};
     }
-    if ((behaviourSupportA.isActiveAllDay() && behaviourSupportB.isActiveAllDay())
-      || behaviourSupportA.getSwitchingTime("from", behaviourA.timestamp, behaviourA.sphereLocation) === behaviourSupportB.getSwitchingTime("from", behaviourB.timestamp, behaviourB.sphereLocation)) {
+    if (behaviourSupportA.isActiveAllDay() && behaviourSupportB.isActiveAllDay()){
       return <TimeCompareResult>{result: "BOTH"}
     }
-    return (behaviourSupportA.getSwitchingTime("from", behaviourA.timestamp, behaviourA.sphereLocation)
-      > behaviourSupportB.getSwitchingTime("from", behaviourB.timestamp, behaviourB.sphereLocation))
-      ? <TimeCompareResult>{result: "SINGLE", behaviour: behaviourA}
-      : <TimeCompareResult>{result: "SINGLE", behaviour: behaviourB};
+    const timeA = behaviourSupportA.getSwitchingTime("from", behaviourA.timestamp, behaviourA.sphereLocation);
+    const timeB = behaviourSupportB.getSwitchingTime("from", behaviourB.timestamp, behaviourB.sphereLocation);
+    if (timeA === timeB) {
+      return <TimeCompareResult>{result: "BOTH"}
+    }
+    return (timeA > timeB)? <TimeCompareResult>{result: "SINGLE", behaviour: behaviourA}: <TimeCompareResult>{result: "SINGLE", behaviour: behaviourB};
   },
 
   /** Compares given behaviours for their dim percentage.
@@ -67,9 +73,9 @@ export const BehaviourAggregatorUtil = {
    * @param behaviourA
    * @param behaviourB
    *
-   * @returns SwitchBehaviour with lowest percentage.
+   * @returns Behaviour with lowest percentage.
    */
-  compareByDimPercentage(behaviourA: SwitchBehaviour, behaviourB: SwitchBehaviour): SwitchBehaviour {
+  compareByDimPercentage(behaviourA: SwitchBehaviour|Twilight, behaviourB: SwitchBehaviour|Twilight): SwitchBehaviour|Twilight {
     return (behaviourA.behaviour.data.action.data <= behaviourB.behaviour.data.action.data) ? behaviourA : behaviourB;
   },
   /** Gets the behaviour that should be the active behaviour.

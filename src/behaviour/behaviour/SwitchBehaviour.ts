@@ -9,7 +9,7 @@ import {
   SphereLocation
 } from "../../declarations/declarations";
 import {BehaviourBase} from "./BehaviourBase";
-import {HueBehaviourWrapper, Presence} from "../../declarations/behaviourTypes";
+import {HueBehaviourWrapperBehaviour, Presence} from "../../declarations/behaviourTypes";
 
 
 export class SwitchBehaviour extends BehaviourBase{
@@ -17,7 +17,7 @@ export class SwitchBehaviour extends BehaviourBase{
   lastPresenceUpdate: number = 0;
   unsubscribe: EventUnsubscriber
 
-  constructor(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation) {
+  constructor(behaviour: HueBehaviourWrapperBehaviour, sphereLocation: SphereLocation) {
     super(behaviour,sphereLocation);
     this.unsubscribe = eventBus.subscribe(ON_PRESENCE_CHANGE, this._onPresenceDetect.bind(this));
   }

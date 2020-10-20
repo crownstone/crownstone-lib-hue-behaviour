@@ -1,16 +1,16 @@
 import {SphereLocation} from "../declarations/declarations";
 import {BehaviourAggregatorUtil, POLLING_RATE} from "./BehaviourAggregatorUtil";
 import {Twilight} from "./behaviour/Twilight";
-import {AggregatorBase} from "./AggregatorBase";
-import {HueBehaviourWrapper} from "../declarations/behaviourTypes";
+import {PrioritizerBase} from "./PrioritizerBase";
+import {HueBehaviourWrapperTwilight} from "../declarations/behaviourTypes";
 
 
-export class TwilightAggregator extends AggregatorBase {
+export class TwilightPrioritizer extends PrioritizerBase {
   behaviours: Twilight[] = [];
   prioritizedBehaviour: Twilight = undefined;
 
 
-  addBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): void {
+  addBehaviour(behaviour: HueBehaviourWrapperTwilight, sphereLocation: SphereLocation): void {
     this.behaviours.push(new Twilight(behaviour, sphereLocation));
   }
 

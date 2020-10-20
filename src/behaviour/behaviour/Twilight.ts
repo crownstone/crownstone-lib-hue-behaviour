@@ -1,12 +1,12 @@
 import {BehaviourSupport} from "./BehaviourSupport";
 import {  SphereLocation} from "../../declarations/declarations";
 import {BehaviourBase} from "./BehaviourBase";
-import {HueBehaviourWrapper} from "../../declarations/behaviourTypes";
+import {HueBehaviourWrapperTwilight} from "../../declarations/behaviourTypes";
 
 
 export class Twilight extends BehaviourBase{
 
-  constructor(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation) {
+  constructor(behaviour: HueBehaviourWrapperTwilight, sphereLocation: SphereLocation) {
     super(behaviour,sphereLocation);
   }
   /**
@@ -24,3 +24,4 @@ export class Twilight extends BehaviourBase{
     this.isActive = false;
   }
 }
+

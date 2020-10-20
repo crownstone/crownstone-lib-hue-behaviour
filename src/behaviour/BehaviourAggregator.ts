@@ -1,115 +1,148 @@
-import {CrownstoneHue, Light} from "../index";
+import {Light} from "../index";
 import {eventBus} from "../util/EventBus";
 import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
 import {ON_DUMB_HOUSE_MODE_SWITCH} from "../constants/EventConstants";
-import {BehaviourSupport} from "./behaviour/BehaviourSupport";
 import {
   EventUnsubscriber, HueFullState,
   HueLightState,
-  PrioritizedList,
-  SphereLocation,
-  StateUpdate
+  SphereLocation
 } from "../declarations/declarations";
-import {BehaviourAggregatorUtil} from "./BehaviourAggregatorUtil";
+import {
+  BehaviourAggregatorUtil,
+  DIM_STATE_OVERRIDE,
+  NO_OVERRIDE,
+  POLLING_RATE,
+  SWITCH_STATE_OVERRIDE
+} from "./BehaviourAggregatorUtil";
 import {HueBehaviourWrapper} from "../declarations/behaviourTypes";
-
-const POLLING_RATE = 500;
-const SWITCH_STATE_OVERRIDE = "SWITCH_STATE_OVERRIDE";
-const DIM_STATE_OVERRIDE = "DIM_STATE_OVERRIDE";
-const NO_OVERRIDE = "NO_OVERRIDE";
-const delay = ms => {
-  return new Promise(resolve => setTimeout(resolve, ms));
-};
+import {TwilightPrioritizer} from "./TwilightPrioritizer";
+import {SwitchBehaviourPrioritizer} from "./SwitchBehaviourPrioritizer";
+import {Twilight} from "./behaviour/Twilight";
+import Timeout = NodeJS.Timeout;
+import {BehaviourUtil} from "./behaviour/BehaviourUtil";
 
 
-//TODO CHANGE
 export class BehaviourAggregator {
   private running: boolean = false;
-  behaviours: SwitchBehaviour[] = [];
-  pollingRate: number;
+  twilightPrioritizer = new TwilightPrioritizer();
+  switchBehaviourPrioritizer = new SwitchBehaviourPrioritizer();
   light: Light;
   unsubscribe: EventUnsubscriber;
   dumbHouseModeActive: boolean = false;
-  prioritizedBehaviour: SwitchBehaviour = undefined;
+  aggregatedBehaviour: SwitchBehaviour | Twilight = undefined;
   timestamp = 0;
-  currentState: HueLightState;
+  currentState: HueLightState;  // State of the light.
   override: string = NO_OVERRIDE;
+  intervalId: Timeout;
 
   constructor(light) {
     this.light = light;
     this.unsubscribe = eventBus.subscribe(ON_DUMB_HOUSE_MODE_SWITCH, this._onDumbHouseModeSwitch.bind(this));
   }
 
+  /** Starts the aggregator's loop.
+   *
+   */
   init(): void {
     this.running = true;
+    this.intervalId = setInterval(async () => {await this._loop();
+    }, POLLING_RATE);
   }
 
+  /** Stops the aggregator's loop.
+   *
+   */
   stop(): void {
     this.running = false;
+    clearInterval(this.intervalId);
   }
 
+  /** Cleans up the subscriptions from the eventbus for the aggregator and it's behaviours.
+   *
+   */
   cleanup(): void {
     this.unsubscribe();
-    for (const behaviour of this.behaviours) {
-      behaviour.cleanup();
+    this.switchBehaviourPrioritizer.cleanup();
+  }
+
+  async _loop() {
+    this.timestamp = Date.now();
+    this.switchBehaviourPrioritizer.tick(this.timestamp);
+    this.twilightPrioritizer.tick(this.timestamp);
+    if (!this.dumbHouseModeActive) {
+      await this._handleBehaviours();
     }
   }
 
-
   addBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): void {
-    this.behaviours.push(new SwitchBehaviour(behaviour, sphereLocation));
+    if (behaviour.type === "BEHAVIOUR") {
+      this.switchBehaviourPrioritizer.addBehaviour(behaviour, sphereLocation);
+    } else if (behaviour.type === "TWILIGHT") {
+      this.twilightPrioritizer.addBehaviour(behaviour, sphereLocation);
+    }
   }
 
   removeBehaviour(cloudId: string): void {
-    for (let i = 0; i < this.behaviours.length; i++) {
-      if (this.behaviours[i].behaviour.cloudId === cloudId) {
-        this.behaviours[i].cleanup();
-        this.behaviours.splice(i, 1);
-        break;
-      }
-    }
+    this.twilightPrioritizer.removeBehaviour(cloudId);
+    this.switchBehaviourPrioritizer.removeBehaviour(cloudId);
   }
 
   updateBehaviour(behaviour: HueBehaviourWrapper): void {
-    for (let i = 0; i < this.behaviours.length; i++) {
-      if (this.behaviours[i].behaviour.cloudId === behaviour.cloudId) {
-        this.behaviours[i].behaviour = behaviour;
-        break;
-      }
+    if (behaviour.type === "BEHAVIOUR") {
+      this.switchBehaviourPrioritizer.updateBehaviour(behaviour);
+    } else if (behaviour.type === "TWILIGHT") {
+      this.twilightPrioritizer.updateBehaviour(behaviour);
     }
   }
 
-  _onDumbHouseModeSwitch(data): void {
+  _onDumbHouseModeSwitch(data:boolean): void {
     this.dumbHouseModeActive = data;
   }
 
+  _getAggregatedBehaviour() {
+    if (this.twilightPrioritizer.prioritizedBehaviour === undefined && this.switchBehaviourPrioritizer.prioritizedBehaviour === undefined) {
+      return undefined;
+    } else if (this.twilightPrioritizer.prioritizedBehaviour === undefined && this.switchBehaviourPrioritizer.prioritizedBehaviour !== undefined) {
+      return this.switchBehaviourPrioritizer.prioritizedBehaviour;
+    } else if (this.twilightPrioritizer.prioritizedBehaviour !== undefined && this.switchBehaviourPrioritizer.prioritizedBehaviour === undefined) {
+      return this.twilightPrioritizer.prioritizedBehaviour;
+    } else {
+      return BehaviourAggregatorUtil.compareByDimPercentage(this.twilightPrioritizer.prioritizedBehaviour, this.switchBehaviourPrioritizer.prioritizedBehaviour);
+    }
+  }
 
   async _handleBehaviours() {
-    const oldBehaviour = this.prioritizedBehaviour;
-    const newBehaviour = this.prioritizedBehaviour;
-    if (newBehaviour === undefined && oldBehaviour === undefined) {
-      this.override = NO_OVERRIDE;
-      return;
+    const oldBehaviour = this.aggregatedBehaviour;
+    const newBehaviour = this._getAggregatedBehaviour();
+
+    //All behaviours are inactive, override clears.
+    if (this.switchBehaviourPrioritizer.prioritizedBehaviour === undefined) {
+      this.override = NO_OVERRIDE; //can be use setOverride
     }
-    if (oldBehaviour !== undefined && newBehaviour !== undefined) {
-      //Normal behaviour switch.
-      if (newBehaviour.behaviour.cloudId !== oldBehaviour.behaviour.cloudId) {
+
+    if (newBehaviour !== undefined) {
+      if (newBehaviour.behaviour.type === "TWILIGHT") {
+        //Twilight can only dim.
+        if (this.currentState.on && this.currentState.bri > BehaviourUtil.mapBehaviourActionToHue(newBehaviour.behaviour.data.action.data)) {
+          await this._setNewBehaviour(newBehaviour);
+        }
+      } else {
         if (this.override === NO_OVERRIDE) {
           await this._setNewBehaviour(newBehaviour);
-        } else if(this.override === SWITCH_STATE_OVERRIDE){
-
         }
       }
-      return;
     }
 
     //Light is on, but dimmed, user leaves room/behaviour deactivates  >  light should still turn off.
     if (oldBehaviour !== undefined && newBehaviour === undefined) {
       if (this.override === DIM_STATE_OVERRIDE) {
         await this._setNewBehaviour(newBehaviour);
+        this.override = NO_OVERRIDE; //STATE MATCH
       } else if (this.override === SWITCH_STATE_OVERRIDE) {
         this.override = NO_OVERRIDE;
-        return;
+        await this._setNewBehaviour(newBehaviour);
+      } else {
+        await this._setNewBehaviour(newBehaviour);
       }
     }
 
@@ -117,11 +150,15 @@ export class BehaviourAggregator {
       await this._setNewBehaviour(newBehaviour);
     }
 
+
   }
 
-  async _setNewBehaviour(behaviour: SwitchBehaviour) {
-    this.override = NO_OVERRIDE;
-    this.prioritizedBehaviour = behaviour;
+  async _setNewBehaviour(behaviour: SwitchBehaviour | Twilight) {
+    this.aggregatedBehaviour = behaviour;
+    await this._setLightState();
+  }
+
+  async _setLightState() {
     await this.light.setState(this.getComposedState());
     this.currentState = this.getComposedState();
   }
@@ -130,31 +167,53 @@ export class BehaviourAggregator {
    *
    */
   getComposedState(): HueLightState {
-    return (this.prioritizedBehaviour !== undefined) ? this.prioritizedBehaviour.getComposedState() : {on: false}
+    return (this.aggregatedBehaviour !== undefined) ? this.aggregatedBehaviour.getComposedState() : {on: false}
   }
 
 
-  lightStateChanged(state: HueFullState) {
-    const composedState = this.getComposedState();
+  async lightStateChanged(state: HueFullState) {
+    if (!this.dumbHouseModeActive) {
+      if (await this._onSwitchOnWithActiveBehaviour(state)) {
+        return;
+      }
+    }
 
-    //Light gets turned on, behaviour still active
-    if (this.prioritizedBehaviour !== undefined && !this.currentState.on && state.on) {
-      this.light.setState(this.prioritizedBehaviour.getComposedState());
-      this.currentState = this.getComposedState();
-      this.override = NO_OVERRIDE;
-      return;
-    } else if (composedState.on !== state.on) {
+    this._setOverrideOnLightStateChange(state)
+    this.currentState = BehaviourUtil.mapStateObjectToTheOther(state, this.currentState);
+  }
+
+  /** Sets the override variable based on passed light state from a Light object after a renew call.
+   *
+   * @param state
+   */
+  _setOverrideOnLightStateChange(state: HueFullState): void {
+    const composedState = this.getComposedState();
+    if (composedState.on !== state.on && this.switchBehaviourPrioritizer.prioritizedBehaviour !== undefined) {
       this.override = SWITCH_STATE_OVERRIDE
-    } else if (composedState.on === state.on && composedState.bri !== state.bri) {
+    } else if (composedState.on === state.on && composedState.bri !== state.bri && this.switchBehaviourPrioritizer.prioritizedBehaviour !== undefined) {
       this.override = DIM_STATE_OVERRIDE;
     } else {
       this.override = NO_OVERRIDE;
     }
-    this.currentState = {on: state.on, bri: state.bri};
+  }
+
+  /** If a light turns manually on while behaviour is active, behaviour's state will be used as light's state.
+   *
+   * @param state
+   *
+   * @returns True light state is changed
+   */
+  async _onSwitchOnWithActiveBehaviour(state: HueFullState): Promise<boolean> {
+    //Light gets turned on, behaviour still active
+    if (this.aggregatedBehaviour !== undefined && !this.currentState.on && state.on) {
+      await this._setLightState();
+      this.override = NO_OVERRIDE;
+      return true;
+    }
+    return false;
   }
 
 }
-
 
 function debugPrintStateDifference(oldS, newS) {
   let printableState = {};
