@@ -1,5 +1,5 @@
 import {SphereLocation} from "../declarations/declarations";
-import {BehaviourAggregatorUtil, POLLING_RATE} from "./BehaviourAggregatorUtil";
+import {BehaviourAggregatorUtil} from "./BehaviourAggregatorUtil";
 import {Twilight} from "./behaviour/Twilight";
 import {PrioritizerBase} from "./PrioritizerBase";
 import {HueBehaviourWrapperTwilight} from "../declarations/behaviourTypes";

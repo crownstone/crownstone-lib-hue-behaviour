@@ -1,4 +1,4 @@
-import {Light} from "../index";
+import {Light} from "..";
 import {eventBus} from "../util/EventBus";
 import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
 import {ON_DUMB_HOUSE_MODE_SWITCH} from "../constants/EventConstants";

@@ -3,8 +3,7 @@ import {
   SphereLocation,
 } from "../declarations/declarations";
 
-import {POLLING_RATE} from "./BehaviourAggregatorUtil";
-import Timeout = NodeJS.Timeout;
+
 import {Twilight} from "./behaviour/Twilight";
 import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
 import {HueBehaviourWrapper} from "../declarations/behaviourTypes";

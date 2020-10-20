@@ -108,8 +108,7 @@ export class CrownstoneHue {
     eventBus.emit(ON_PRESENCE_CHANGE, data);
   }
 
-  addBridge(bridgeId: string
-  ) {
+  addBridge(bridgeId: string) {
   }
 
   removeBridge(bridgeId: string) {

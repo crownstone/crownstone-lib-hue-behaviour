@@ -63,7 +63,6 @@ describe("Scenarios", () =>{
   })
   //
   test("Scenario 1", async () =>{
-    let savedStatesInTime = [];
     const api = new Api();
     const light = new Light(api);
     const behaviourAggregator = light.behaviourAggregator;
