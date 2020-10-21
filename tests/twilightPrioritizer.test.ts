@@ -4,9 +4,9 @@
 import {twilight40BetweenSunriseSunset, twilight80BetweenSunriseSunset, twilightDim50AllDay
 } from "./constants/mockBehaviours";
 
-import { HueBehaviourWrapperTwilight} from "../src/declarations/behaviourTypes"
+import {HueBehaviourWrapperTwilight} from "../src/declarations/behaviourTypes"
 
-import {  SPHERE_LOCATION} from "./constants/testConstants";
+import {SPHERE_LOCATION} from "./constants/testConstants";
 import {TwilightPrioritizer} from "../src/behaviour/TwilightPrioritizer";
 
 function aggregatorCreator(behaviours):TwilightPrioritizer{

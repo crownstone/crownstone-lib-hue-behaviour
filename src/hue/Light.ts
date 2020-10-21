@@ -50,8 +50,9 @@ export class Light {
         this.supportedStates = supportedStates;
         this.api = api;
         this.lastUpdate = Date.now();
-        this.behaviourAggregator = new BehaviourAggregator(this,state);
+        this.behaviourAggregator = new BehaviourAggregator(async (value:StateUpdate)=>{ await this.setState(value)},state);
     }
+
     init():void{
         this.behaviourAggregator.init();
         this.intervalId = setInterval(() => this.renewState(), POLLING_RATE);
@@ -59,8 +60,8 @@ export class Light {
 
     private _setLastUpdate(): void {
         this.lastUpdate = Date.now();
-
     }
+
     cleanup(){
         clearInterval(this.intervalId);
         this.behaviourAggregator.cleanup();
@@ -72,8 +73,8 @@ export class Light {
     async renewState(): Promise<void> {
         const newState = await this.api.lights.getLightState(this.id) as HueFullState;
         if (this.state != newState) {
-            this.state = newState
-            this._setLastUpdate()
+            this.state = newState;
+            this._setLastUpdate();
             await this.behaviourAggregator.lightStateChanged(this.state);
         }
     }

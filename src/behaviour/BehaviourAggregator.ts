@@ -26,7 +26,6 @@ export class BehaviourAggregator {
   private running: boolean = false;
   twilightPrioritizer = new TwilightPrioritizer();
   switchBehaviourPrioritizer = new SwitchBehaviourPrioritizer();
-  light: Light;
   unsubscribe: EventUnsubscriber;
   dumbHouseModeActive: boolean = false;
   aggregatedBehaviour: SwitchBehaviour | Twilight = undefined;
@@ -34,10 +33,12 @@ export class BehaviourAggregator {
   currentLightState: HueLightState;  // State of the light.
   override: string = NO_OVERRIDE;
   intervalId: Timeout;
+  updateCallBack;
 
-  constructor(light, state) {
-    this.light = light;
+  constructor(callback, state) {
+    this.updateCallBack = callback;
     this.currentLightState = {...state};
+
     this.unsubscribe = eventBus.subscribe(ON_DUMB_HOUSE_MODE_SWITCH, this._onDumbHouseModeSwitch.bind(this));
   }
 
@@ -180,7 +181,7 @@ export class BehaviourAggregator {
   }
 
   async _setLightState() {
-    await this.light.setState(this.getComposedState());
+    await this.updateCallBack(this.getComposedState());
     this.currentLightState = this.getComposedState();
   }
 

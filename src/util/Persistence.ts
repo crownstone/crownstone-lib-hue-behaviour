@@ -3,14 +3,12 @@
 
 
 import {promises as fs} from "fs";
-import {Bridge, CrownstoneHueError, Light} from "..";
-import {EventBus} from "./EventBus";
+import {Bridge, CrownstoneHueError, Light} from ".."; 
 import {BridgeFormat} from "../declarations/declarations";
 import {ConfBridgeObject, ConfigurationObject} from "../declarations/configTypes";
 
 const CONF_NAME: string = "saveConfig.json";
 const CONF_BRIDGE_LOCATION: string = "Bridges";
-let configuration: ConfigurationObject;
 
 interface BridgeToConfig {
   bridge: BridgeFormat;
@@ -72,6 +70,8 @@ class Persistence {
       this.configuration[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]] = {};
       this.configuration[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["name"] = light["name"];
       this.configuration[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["id"] = light["id"];
+      this.configuration[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["behaviours"] = [];
+
     } else {
       throw new CrownstoneHueError(410)
     }
@@ -130,6 +130,36 @@ class Persistence {
     }
   }
 
+  async removeBridge(bridgeId:string):Promise<void>{
+    delete this.configuration[CONF_BRIDGE_LOCATION][bridgeId];
+    await this.saveConfiguration();
+  }
+
+  async saveBehaviour(bridgeId,lightId,behaviour){
+    this.configuration[CONF_BRIDGE_LOCATION][bridgeId].lights[lightId].behaviours.push(behaviour);
+    await this.saveConfiguration();
+  }
+  async updateBehaviour(bridgeId,lightId,updatedBehaviour){
+    for(let i = 0; i < this.configuration[CONF_BRIDGE_LOCATION][bridgeId].lights[lightId].behaviours.length; i++) {
+      const behaviour = this.configuration[CONF_BRIDGE_LOCATION][bridgeId].lights[lightId].behaviours[i];
+      if (behaviour.cloudId === updatedBehaviour.cloudId) {
+        this.configuration[CONF_BRIDGE_LOCATION][bridgeId].lights[lightId].behaviours[i] = updatedBehaviour;
+        await this.saveConfiguration();
+        break;
+      }
+    }
+  }
+
+  async removeBehaviour(bridgeId,lightId,cloudId){
+    for(let i = 0; i < this.configuration[CONF_BRIDGE_LOCATION][bridgeId].lights[lightId].behaviours.length; i++){
+      const behaviour = this.configuration[CONF_BRIDGE_LOCATION][bridgeId].lights[lightId].behaviours[i];
+      if(behaviour.cloudId === cloudId){
+        delete this.configuration[CONF_BRIDGE_LOCATION][bridgeId].lights[lightId].behaviours[i];
+        await this.saveConfiguration();
+        break;
+      }
+    }
+  }
   /**
    * Saves all lights from the connected bridges into the config file.
    *

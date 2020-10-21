@@ -1,8 +1,7 @@
 import {Bridge} from "./Bridge";
 import {discovery} from "node-hue-api/lib/v3";
 import {DiscoverResult} from "../declarations/declarations";
-import {DISCOVERY_URL} from "../constants/HueConstants";
-import {CrownstoneHueError} from "..";
+import {DISCOVERY_URL} from "../constants/HueConstants"; 
 
 export const Discovery = {
 
@@ -10,7 +9,6 @@ export const Discovery = {
    * Searches the local network for bridges.
    *
    * @returns List of discovered bridges.
-   *
    *
    */
   discoverBridges: async function (): Promise<Bridge[]> {
@@ -56,8 +54,7 @@ export const Discovery = {
     });
   },
   /** Used to find a bridge by Id.
-   * Compares found bridges Id's with given Id.
-
+   * Compares found bridges Ids with given Id.
    * Retrieves bridges with getBridgesFromDiscoveryUrl.
    *
    * @param bridgeId - Id of the bridge that has to be found.

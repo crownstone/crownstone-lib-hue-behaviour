@@ -1,6 +1,7 @@
 
 export const APP_NAME: string = 'Hub';
 export const DEVICE_NAME: string = 'Hub1';
+
 export const maxValueOfStates = {
   'hue': 65535,
   'bri': 254,

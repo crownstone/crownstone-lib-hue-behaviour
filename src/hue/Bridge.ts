@@ -2,7 +2,7 @@ import {CrownstoneHue} from "../CrownstoneHue";
 import {Light} from "./Light"
 import {v3} from "node-hue-api";
 import {CrownstoneHueError} from "../util/CrownstoneHueError";
-import {DISCOVERY_URL, APP_NAME, DEVICE_NAME} from "../constants/HueConstants"
+import {APP_NAME, DEVICE_NAME} from "../constants/HueConstants"  //Device naming.
 import {persistence} from "../util/Persistence";
 import {DiscoverResult} from "../declarations/declarations";
 import {Discovery} from "./Discovery";
@@ -62,7 +62,6 @@ export class Bridge {
         await this.link();
       } else {
         await this.connect();
-        // await this.createLightsFromConfig();
       }
     } catch (err) {
       if (typeof (err.getHueErrorType) === "function" && err.getHueErrorType() === 1) {
@@ -84,16 +83,8 @@ export class Bridge {
   async link(): Promise<void> {
     await this.createNewUser()
     await this.connect();
-    const bridgeConfig = await this.api.configuration.getConfiguration();
-    await this.update({
-      "bridgeId": bridgeConfig.bridgeid,
-      "name": bridgeConfig.name,
-      "macAddress": bridgeConfig.mac,
-      "reachable": true
-    })
-
+    await this.updateBridgeInfo();
     await persistence.saveFullBridgeInformation(this);
-    await persistence.saveConfiguration();
   }
 
   /**
@@ -113,7 +104,6 @@ export class Bridge {
       } else {
         throw err;
       }
-
     }
   }
 
@@ -135,7 +125,7 @@ export class Bridge {
         this.lights[lightInfo.uniqueid] = {};
         const light = new Light(lightInfo.name, lightInfo.uniqueid, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this.api)
         this.lights[lightInfo.uniqueid] = light;
-        await persistence.addLightInfo(this.bridgeId, light)
+        persistence.addLightInfo(this.bridgeId, light)
         await persistence.saveConfiguration();
         return light;
       } catch (err) {
@@ -155,14 +145,24 @@ export class Bridge {
     }
   }
 
-  //todo behaviour cleanup
   async removeLight(uniqueLightId: string): Promise<void> {
     await persistence.removeLightFromConfig(this, uniqueLightId);
+    this.lights[uniqueLightId].cleanup();
     delete this.lights[uniqueLightId];
   }
 
   getConnectedLights(): Light[] {
     return Object.values(this.lights);
+  }
+
+  async updateBridgeInfo(){
+    const bridgeConfig = await this.api.configuration.getConfiguration();
+    await this.update({
+      "bridgeId": bridgeConfig.bridgeid,
+      "name": bridgeConfig.name,
+      "macAddress": bridgeConfig.mac,
+      "reachable": true
+    })
   }
 
 
@@ -221,12 +221,11 @@ export class Bridge {
         throw err;
       }
     }
-
   }
 
   /**
    * Retrieves all lights from the bridge and adds them to lights list.
-   *
+   * Does not save the lights into the config.
    */
   async populateLights(): Promise<void> {
     if (this.authenticated) {
@@ -240,19 +239,6 @@ export class Bridge {
     }
   }
 
-  // async createLightsFromConfig(): Promise<void> {
-  //     let lightsInConfig = this.framework.getConfigSettings()
-  //     lightsInConfig = lightsInConfig["Bridges"][this.bridgeId]["lights"];
-  //     const lightIds: string[] = Object.keys(lightsInConfig);
-  //
-  //     for (const uniqueId of lightIds) {
-  //         this.lights[uniqueId] = {};
-  //         const light = lightsInConfig[uniqueId];
-  //         const lightInfo = await this.api.lights.getLight(light.id);
-  //         this.lights[uniqueId] = new Light(lightInfo.name, uniqueId, lightInfo.state, light.id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this);
-  //     }
-  // }
-
   /**
    * Rediscovers Bridge in case of failed connection
    *
@@ -261,13 +247,13 @@ export class Bridge {
    * Success:
    * If bridge is found it updates bridge info and creates the API for it.
    * Fail:
-   * If the bridge is not found in the network it throws Error from discoverBridgeById
+   * If the bridge is not found in the network it throws Error
    *
    */
   private async _rediscoverMyself(): Promise<void> {
     const result = await Discovery.discoverBridgeById(this.bridgeId);
     if(result.internalipaddress === "-1"){
-      throw new CrownstoneHueError(404, "Bridge with id " + this.bridgeId + " not found."); //ToDo find something else to represent it is offline?
+      throw new CrownstoneHueError(404, "Bridge with id " + this.bridgeId + " not found.");
     } else{
     this.ipAddress = result.internalipaddress;
     await this._createAuthenticatedApi()
@@ -279,6 +265,11 @@ export class Bridge {
     return this.lights[uniqueId];
   }
 
+  cleanup() {
+    Object.keys(this.lights).forEach(light =>{
+      this.lights[light].cleanup();
+    })
+  }
 
   update(values: object) {
     if (values["name"] !== undefined) {
