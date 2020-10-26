@@ -115,7 +115,7 @@ export class Bridge {
    * Gets info of the light from Bridge and creates a Light object and pushes it to the list.
    * Throws error on invalid Id.
    *
-   * @Returns light object.
+   * @Returns uninitialized light object. (Call .init())
    */
   async configureLight(id: number): Promise<Light> {
     if (this.authenticated) {

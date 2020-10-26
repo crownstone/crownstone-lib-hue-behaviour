@@ -9,7 +9,7 @@ export const Discovery = {
   /**
    * Searches the local network for bridges.
    *
-   * @returns List of discovered bridges.
+   * @returns List of discovered bridges as Bridge.
    *
    */
   discoverBridges: async function (): Promise<Bridge[]> {

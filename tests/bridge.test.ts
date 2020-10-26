@@ -4,12 +4,60 @@
 import {CrownstoneHueError} from "../src/util/CrownstoneHueError";
 import {persistence} from "../src/util/Persistence";
 import {Discovery} from "../src/hue/Discovery";
+import {api} from "node-hue-api/lib/v3";
+
 import {SPHERE_LOCATION} from "./constants/testConstants";
+import exp = require("constants");
+import {bri} from "node-hue-api/lib/model/lightstate/stateParameters";
+import {APP_NAME, DEVICE_NAME} from "../src/constants/HueConstants";
+import {Bridge} from "../src";
 
 const CrownstoneHue = require('../src/CrownstoneHue').CrownstoneHue;
-const Bridge = require('../src/hue/Bridge').Bridge;
-
 const crownstoneHue = new CrownstoneHue();
+// Begin mocks
+const allLights = [{
+  name: "Light 1",
+  uniqueid: "ABCD123",
+  state: {},
+  id: 0,
+  bridgeId: "ABDCFFFEAKE91",
+  capabilities: {control: {}},
+  getSupportedStates: (() => {
+    return {}
+  })
+}]
+api.createLocal = jest.fn().mockImplementation(ignore => {
+  return {
+    connect: ((ignore?) => {
+      return {
+        users: {
+          createUser: ((a, b) => {
+            return {clientkey: "FakeKey", username: "FakeUsername"}
+          })
+        },
+        configuration: {
+          getConfiguration: (() => {
+            return {
+              bridgeid: "ABDCFFFEAKE91",
+              name: "Philips Hue Fake Bridge",
+              mac: "AB:DC:FA:KE:91"
+            }
+          })
+        },
+        lights: {
+          getAll: (() => {
+            return allLights;
+          }),
+          getLight: ((id) => {
+            return allLights[id]
+          })
+
+        }
+      }
+    })
+  }
+});
+
 persistence.saveConfiguration = jest.fn(async () => {
 });
 persistence.loadConfiguration = jest.fn(async () => {
@@ -40,78 +88,71 @@ persistence.loadConfiguration = jest.fn(async () => {
   persistence.configuration = config;
   return config;
 });
+persistence.saveFullBridgeInformation = jest.fn(async (ignore) => {
+});
+persistence.saveLight = jest.fn(async (ignore) => {
+});
+//End mocks
+
 
 describe("Bridge", () => {
-  let bridge, bridges
-  beforeEach(async () => {
-    bridges = await crownstoneHue.init(SPHERE_LOCATION);
-    bridge = bridges[0]
-    bridge.init();
-    return;
+  test("Bridge init > Connect", async () => {
+    const bridge = new Bridge("Philips Hue", "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo", "F713C35839453184BA3B148E5504C74B", "00:17:88:29:2a:f4", "192.168.178.26", "001788FFFE292AF4")
+    await bridge.init();
+    return expect(bridge.authenticated).toBeTruthy();
   })
 
-  test('Returns the amount of bridges.', async () => {
-    return expect(bridges.length).toBe(1);
-  });
+  test("Bridge init > Link", async () => {
+    const bridge = new Bridge("", "", "", "", "192.168.178.26", "")
+    await bridge.init();
+    return expect(bridge.name).toBe("Philips Hue Fake Bridge");
+  })
 
-  test('Returns discovery result bridges of bridge in network.', async () => {
-    jest.setTimeout(55000);
-    return await Discovery.discoverBridges().then(data => {
-      expect(data.length).toBeGreaterThan(0)
+  test('Returns bridge info', async () => {
+    const bridge = new Bridge("", "", "", "", "192.168.178.26", "")
+    await bridge.init();
+    return expect(bridge.getInfo()).toStrictEqual({
+      name: "Philips Hue Fake Bridge",
+      ipAddress: "192.168.178.26",
+      macAddress: "AB:DC:FA:KE:91",
+      username: "FakeUsername",
+      clientKey: "FakeKey",
+      bridgeId: "ABDCFFFEAKE91",
+      reachable: true
     });
   });
 
-  test('Returns bridge info', () => {
-    const notWorkingBridge = new Bridge("Hue color lamp 3", "user", "key", "mac", "192.168.178.12", "-1", crownstoneHue);
-    return expect(notWorkingBridge.getInfo()).toStrictEqual({
-      name: "Hue color lamp 3",
-      ipAddress: "192.168.178.12",
-      macAddress: "mac",
-      username: "user",
-      clientKey: "key",
-      bridgeId: "-1",
-      reachable: false
-    });
-  });
+  test('getAllLightsFromBridge', async () => {
+    const bridge = new Bridge("", "", "", "", "192.168.178.26", "")
+    await bridge.init();
+    return bridge.getAllLightsFromBridge().then(lights => expect(lights[0].name).toBe("Light 1"))
+  })
 
-  test('Returns no bridge discovered', async () => {
-    jest.setTimeout(20000);
-    const notWorkingBridge = new Bridge("Hue color lamp 3", "user", "key", "mac", "192.168.178.12", "-1", crownstoneHue);
-    try {
-      await notWorkingBridge.init();
-    } catch (e) {
-      return expect(e).toEqual(new CrownstoneHueError(404))
-    }
-  });
+  test('Configure light by Id', async () => {
+    const bridge = new Bridge("", "", "", "", "192.168.178.26", "")
+    await bridge.init();
+    await bridge.configureLight(0).then(light => {
+      expect(light.uniqueId).toBe("ABCD123")
+    })
+  })
 
-  test('Save bridge', async () => {
-    await bridge.populateLights()
-    await persistence.saveFullBridgeInformation(bridge);
-    return expect(bridge.getConnectedLights).toBeUndefined();
-  });
+  test('Get all connected lights', async () => {
+    const bridge = new Bridge("", "", "", "", "192.168.178.26", "")
+    await bridge.init();
+    await bridge.populateLights();
+    return expect(bridge.getConnectedLights().length).toBe(1);
+  })
 
-  test('Get light by id. fail', async () => {
-    return expect(bridge.getLightById("00:17:88:01:10:4a:cd:c8-Db")).toBeUndefined();
-  });
+  test('Rediscovery', async () => {
 
-  test('Manipulate light by id.', async () => {
-    jest.setTimeout(55000);
-    const light = bridge.getLightById("00:17:88:01:10:4a:cd:c8-0b");
-    return expect(light.setState({on: true})).toBeTruthy();
-  });
+    api.createLocal = jest.fn().mockImplementation(() => {
+      return {
+        connect: (() => { return Promise.reject({code:"ETIMEDOUT"})})
+      }
+    })
+    const bridge = new Bridge("Philips Hue", "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo", "F713C35839453184BA3B148E5504C74B", "00:17:88:29:2a:f4", "192.168.178.26", "001788FFFE292AF4")
 
-  test('Remove light by id.', async () => {
-    await persistence.removeLightFromConfig(bridge, "00:17:88:01:10:4a:cd:c8-0b");
-    return expect(persistence.configuration["Bridges"][bridge.bridgeId]["lights"]["00:17:88:01:10:4a:cd:c8-0b"]).toBeUndefined();
-  });
-
-  test('configure light by id.', async () => {
-    await bridge.configureLight(5);
-    return expect(persistence.configuration["Bridges"][bridge.bridgeId]["lights"]["00:17:88:01:10:4a:cd:c8-0b"]).toBeDefined();
-  });
-
-
+    await bridge.init();
+  })
 })
-
-
 
