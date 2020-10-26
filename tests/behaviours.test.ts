@@ -14,7 +14,9 @@ import {
 const Behaviour = require('../src/behaviour/behaviour/SwitchBehaviour').SwitchBehaviour
 const BehaviourSupport = require('../src/behaviour/behaviour/BehaviourSupport').BehaviourSupport
 const BehaviourUtil = require('../src/behaviour/behaviour/BehaviourUtil')
-
+afterEach(() => {
+  eventBus.reset();
+});
 
 
 describe("End Condition testing", () => {

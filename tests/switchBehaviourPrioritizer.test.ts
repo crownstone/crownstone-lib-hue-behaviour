@@ -32,7 +32,9 @@ import {
   EVENT_LEAVE_SPHERE,
   SPHERE_LOCATION
 } from "./constants/testConstants";
-
+afterEach(() => {
+  eventBus.reset();
+});
 const BehaviourSupport = require('../src/behaviour/behaviour/BehaviourSupport').BehaviourSupport
 
 describe("Function checks", () => {

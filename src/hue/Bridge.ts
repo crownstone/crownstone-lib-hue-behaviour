@@ -8,7 +8,6 @@ import {DiscoverResult} from "../declarations/declarations";
 import {Discovery} from "./Discovery";
 
 const hueApi = v3.api;
-const fetch = require('node-fetch');
 
 
 /**
@@ -125,7 +124,7 @@ export class Bridge {
         this.lights[lightInfo.uniqueid] = {};
         const light = new Light(lightInfo.name, lightInfo.uniqueid, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this.api)
         this.lights[lightInfo.uniqueid] = light;
-        persistence.addLightInfo(this.bridgeId, light)
+        persistence.saveLight(this.bridgeId, light)
         await persistence.saveConfiguration();
         return light;
       } catch (err) {

@@ -1,6 +1,4 @@
-import {promises as fs} from 'fs';
 import {Bridge} from "./hue/Bridge";
-import {Light} from "./hue/Light";
 import {CrownstoneHueError} from "./util/CrownstoneHueError";
 import {persistence} from "./util/Persistence";
 import {eventBus} from "./util/EventBus";
@@ -8,8 +6,6 @@ import {ON_DUMB_HOUSE_MODE_SWITCH, ON_PRESENCE_CHANGE} from "./constants/EventCo
 import {PresenceEvent, SphereLocation} from "./declarations/declarations";
 import {HueBehaviourWrapper} from "./declarations/behaviourTypes";
 import {Discovery} from "./hue/Discovery";
-
-const CONF_BRIDGE_LOCATION: string = "Bridges";
 
 /**
  * CrownstoneHue object
@@ -38,22 +34,16 @@ export class CrownstoneHue {
     return this.bridges;
   }
 
-  //TODO Change, less nested loops. Error passing.
   async _setupModule() {
-    let errors = [];
     if ("Bridges" in persistence.configuration) {
-      for (const uniqueId of Object.keys(persistence.configuration["Bridges"])) {
-        try {
-          await this.setupBridgeById(uniqueId);
-        } catch (e) {
-          errors.push(e);
-        }
+      for (const uniqueId of Object.keys(persistence.getAllBridges())) {
+          await this._setupBridgeById(uniqueId);
       }
     }
   }
 
-  async setupBridgeById(uniqueId){
-    const bridge = persistence.configuration.Bridges[uniqueId]
+  async _setupBridgeById(uniqueId){
+    const bridge = persistence.getBridgeById(uniqueId);
     let bridgeObject = this.createBridgeFromConfig(uniqueId);
     await bridgeObject.init();
     for (const lightId of Object.keys(bridge.lights)) {
@@ -113,7 +103,7 @@ export class CrownstoneHue {
     eventBus.emit(ON_PRESENCE_CHANGE, data);
   }
 
-  async addBridge(bridgeId: string):Promise<void> {
+  async addBridgeByBridgeId(bridgeId: string):Promise<void> {
     const discoveryResult = await Discovery.discoverBridgeById(bridgeId);
     if(discoveryResult.internalipaddress !== "-1"){
       const bridge = new Bridge("","","","",discoveryResult.internalipaddress,discoveryResult.id);
@@ -122,6 +112,12 @@ export class CrownstoneHue {
     } else {
       throw new CrownstoneHueError(404, "Bridge with id " + bridgeId + " not found.");
     }
+  }
+
+  async addBridgeByIpAddress(ipAddress: string):Promise<void> {
+      const bridge = new Bridge("","","","",ipAddress,"");
+      await bridge.init();
+      this.bridges.push(bridge);
   }
 
   async removeBridge(bridgeId: string) {
@@ -173,7 +169,7 @@ export class CrownstoneHue {
   }
 
   createBridgeFromConfig(bridgeId: string): Bridge {
-    const bridgeConfig = persistence.configuration[CONF_BRIDGE_LOCATION][bridgeId]
+    const bridgeConfig = persistence.getBridgeById(bridgeId);
     if (bridgeConfig.name != "", bridgeConfig.macAddress != "", bridgeConfig.ipAddress != "") {
       if (bridgeConfig.username === undefined || bridgeConfig.username === null) {
         bridgeConfig.username = "";

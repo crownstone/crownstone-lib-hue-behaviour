@@ -5,7 +5,7 @@
 import {promises as fs} from "fs";
 import {Bridge, CrownstoneHueError, Light} from ".."; 
 import {BridgeFormat} from "../declarations/declarations";
-import {ConfBridgeObject, ConfigurationObject} from "../declarations/configTypes";
+import {ConfBridgeObject, ConfBridges, ConfigurationObject} from "../declarations/configTypes";
 
 const CONF_NAME: string = "saveConfig.json";
 const CONF_BRIDGE_LOCATION: string = "Bridges";
@@ -52,7 +52,7 @@ class Persistence {
     this.configuration[CONF_BRIDGE_LOCATION][bridgeId] = config;
     if (bridge.lights != {}) {
       bridge.getConnectedLights().forEach(light => {
-        this.addLightInfo(bridge.bridgeId, light)
+        this.saveLight(bridge.bridgeId, light)
       })
     }
     await this.saveConfiguration()
@@ -65,7 +65,7 @@ class Persistence {
    * @param bridgeId - The id of the bridge the light is connected to.
    * @param light - Light object of the light to be saved
    */
-  addLightInfo(bridgeId: string, light: Light): void {
+  saveLight(bridgeId: string, light: Light): void {
     if (this.configuration != undefined) {
       this.configuration[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]] = {};
       this.configuration[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["name"] = light["name"];
@@ -88,6 +88,13 @@ class Persistence {
     }
   }
 
+  getBridgeById(bridgeId:string):ConfBridgeObject{
+    return this.configuration[CONF_BRIDGE_LOCATION][bridgeId];
+  }
+
+  getAllBridges():ConfBridges{
+    return this.configuration["Bridges"];
+  }
 
   async addBridgeToConfig({bridge}: BridgeToConfig): Promise<void> {
     if (persistence.configuration != undefined) {
@@ -102,7 +109,7 @@ class Persistence {
       }
       if (bridge.lights != undefined || bridge.lights != {}) {
         Object.values(bridge.lights).forEach((light) => {
-          this.addLightInfo(bridge.bridgeId, light)
+          this.saveLight(bridge.bridgeId, light)
         });
       }
       await persistence.saveConfiguration();
@@ -167,7 +174,7 @@ class Persistence {
   async saveAllLightsFromConnectedBridges(bridges): Promise<void> {
     bridges.forEach(bridge => {
       Object.keys(bridge.lights).forEach(light => {
-        this.addLightInfo(bridge.bridgeId, bridge.lights[light])
+        this.saveLight(bridge.bridgeId, bridge.lights[light])
       })
     });
     await persistence.saveConfiguration()

@@ -1,4 +1,4 @@
-import {HueFullState, HueLightState} from "../../src/declarations/declarations";
+import {HueFullState, HueLightState, StateUpdate} from "../../src/declarations/declarations";
 import {Api} from "./Api";
 import {BehaviourAggregator} from "../../src/behaviour/BehaviourAggregator";
 
@@ -13,7 +13,7 @@ export class Light {
   constructor(api) {
     this.api = api;
     this.state = api.lights.getLightState();
-    this.behaviourAggregator = new BehaviourAggregator(this,{...this.state});
+    this.behaviourAggregator = new BehaviourAggregator(async (value:StateUpdate)=>{ await this.setState(value)},{...this.state});
   }
 
   setState(state){
