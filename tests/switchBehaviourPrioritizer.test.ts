@@ -42,13 +42,13 @@ describe("Function checks", () => {
     const behaviourAggregator = new SwitchBehaviourPrioritizer();
     const behaviourSupport = new BehaviourSupport(switchOn10AllDay)
     behaviourAggregator.addBehaviour(behaviourSupport.rule, SPHERE_LOCATION);
-    expect(behaviourAggregator.behaviours[0].behaviour.cloudId).toBe(switchOn10AllDay.cloudId);
+    return expect(behaviourAggregator.behaviours[0].behaviour.cloudId).toBe(switchOn10AllDay.cloudId);
   })
 
   test("Remove behaviour", () => {
     const behaviourAggregator = aggregatorCreator([switchOn10AllDay])
     behaviourAggregator.removeBehaviour("ACTUALCLOUDID-149");
-    expect(behaviourAggregator.behaviours.length).toBe(0);
+    return  expect(behaviourAggregator.behaviours.length).toBe(0);
   })
 
   test("Update behaviour", () => {
@@ -57,7 +57,7 @@ describe("Function checks", () => {
     updatedBehaviour.data.action.data = 100;
     behaviourAggregator.updateBehaviour(updatedBehaviour);
     expect(behaviourAggregator.behaviours.length).toBe(1);
-    expect(behaviourAggregator.behaviours[0].behaviour.data.action.data).toBe(100);
+    return expect(behaviourAggregator.behaviours[0].behaviour.data.action.data).toBe(100);
   })
 
 
@@ -68,7 +68,7 @@ describe("Function checks", () => {
       behaviourAggregator.tick(Date.parse(new Date(2020, 9, 4, 13, 0).toString()));
       eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_SPHERE);
 
-      expect(behaviourAggregator.composedState).toStrictEqual({on: true, bri: 100 * 2.54});
+      return expect(behaviourAggregator.composedState).toStrictEqual({on: true, bri: 100 * 2.54});
     })
   });
 
@@ -118,7 +118,7 @@ describe('Scenarios', function () {
     eventBus.emit(ON_PRESENCE_CHANGE, EVENT_LEAVE_LOCATION_THREE);
     eventBus.emit(ON_PRESENCE_CHANGE, EVENT_LEAVE_SPHERE);
     behaviourAggregator.tick(Date.parse(new Date(2020, 9, 4, 20, 50).toString()));
-    expect(behaviourAggregator.composedState).toStrictEqual({on: true, bri: 20 * 2.54})
+    return expect(behaviourAggregator.composedState).toStrictEqual({on: true, bri: 20 * 2.54})
   })
 
   test("Scenario 2", () => {
@@ -141,7 +141,7 @@ describe('Scenarios', function () {
     eventBus.emit(ON_PRESENCE_CHANGE, EVENT_LEAVE_LOCATION_TWO);
     eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_LOCATION_FOUR);
     behaviourAggregator.tick(Date.parse(new Date(2020, 9, 4, 20, 40).toString()));
-    expect(behaviourAggregator.composedState).toStrictEqual({on: true, bri: 50 * 2.54})
+    return expect(behaviourAggregator.composedState).toStrictEqual({on: true, bri: 50 * 2.54})
   })
 
   //1 = living
@@ -191,6 +191,6 @@ describe('Scenarios', function () {
     eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_LOCATION_FOUR);
 
     behaviourAggregator.tick(Date.parse(new Date(2020, 9, 4, 20, 50).toString()));
-    expect(behaviourAggregator.composedState).toStrictEqual({on: true, bri: 50 * 2.54})
+    return expect(behaviourAggregator.composedState).toStrictEqual({on: true, bri: 50 * 2.54})
   })
 });

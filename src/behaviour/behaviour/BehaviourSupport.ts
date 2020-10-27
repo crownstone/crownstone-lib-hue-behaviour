@@ -11,7 +11,24 @@ export class BehaviourSupport {
   }
 
   //########Setters###########
-
+  setTypeBehaviour(){
+    this.rule.type = "BEHAVIOUR"
+    if(!("presence" in this.rule.data)){
+      this.rule.type["Presence"] = {}
+      this.setTimeAllDay();
+    }
+    return this;
+  }
+  setTypeTwilight(){
+    this.rule.type= "BEHAVIOUR"
+    delete this.rule.data["presence"];
+    delete this.rule.data["endCondition"];
+    return this;
+  }
+  setLightId(value:string){
+    this.rule.lightId = value;
+    return this;
+  }
   setActionState(value: number) {
     this.rule.data.action.data = value;
     return this;
@@ -190,6 +207,12 @@ export class BehaviourSupport {
 
     if (this.rule.type === "BEHAVIOUR") {
       this.rule.data.presence = {type: "SOMEBODY", data: {type: "SPHERE"}, delay: SPHERE_DELAY};
+    }
+    return this;
+  }
+  setPresenceDelay(delay:number){
+    if (this.rule.type === "BEHAVIOUR" && this.rule.data.presence.type !== "IGNORE") {
+      this.rule.data.presence.delay = delay;
     }
     return this;
   }

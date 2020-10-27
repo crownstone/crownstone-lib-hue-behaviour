@@ -6,7 +6,7 @@ export const maxValueOfStates = {
   'hue': 65535,
   'bri': 254,
   'sat': 254,
-  'xy': [0.5, 0.5],
+  'xy': [1.0, 1.0],
   'ct': 500
 }
 
@@ -37,3 +37,5 @@ export const hueStateVariables = {
   ...minMaxValueStates}
 
 export const DISCOVERY_URL = "https://discovery.meethue.com/";
+
+export const LIGHT_POLLING_RATE = 500;

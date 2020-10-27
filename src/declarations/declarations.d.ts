@@ -29,6 +29,7 @@ interface StateUpdate extends HueLightState{
   sat_inc?: number;
   ct_inc?: number;
   xy_inc?: [number, number];
+  transitiontime?:number
 }
 
 

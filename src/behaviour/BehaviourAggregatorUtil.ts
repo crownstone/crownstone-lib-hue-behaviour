@@ -11,7 +11,7 @@ interface TimeCompareResult {
 export const SWITCH_STATE_OVERRIDE = "SWITCH_STATE_OVERRIDE";
 export const DIM_STATE_OVERRIDE = "DIM_STATE_OVERRIDE";
 export const NO_OVERRIDE = "NO_OVERRIDE";
-export const POLLING_RATE = 500;
+export const AGGREGATOR_POLLING_RATE = 500;
 
 export const BehaviourAggregatorUtil = {
 

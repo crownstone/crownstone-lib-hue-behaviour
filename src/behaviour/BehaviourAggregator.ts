@@ -11,7 +11,7 @@ import {
   BehaviourAggregatorUtil,
   DIM_STATE_OVERRIDE,
   NO_OVERRIDE,
-  POLLING_RATE,
+  AGGREGATOR_POLLING_RATE,
   SWITCH_STATE_OVERRIDE
 } from "./BehaviourAggregatorUtil";
 import {HueBehaviourWrapper} from "../declarations/behaviourTypes";
@@ -49,7 +49,7 @@ export class BehaviourAggregator {
     this.running = true;
     this.intervalId = setInterval(async () => {
       await this._loop();
-    }, POLLING_RATE);
+    }, AGGREGATOR_POLLING_RATE);
   }
 
   /** Stops the aggregator's loop.

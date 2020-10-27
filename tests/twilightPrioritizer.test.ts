@@ -37,7 +37,7 @@ describe("Function checks", () =>{
     updatedBehaviour.data.action.data = 100;
     behaviourAggregator.updateBehaviour(updatedBehaviour);
     expect(behaviourAggregator.behaviours.length).toBe(1);
-    expect(behaviourAggregator.behaviours[0].behaviour.data.action.data).toBe(100);
+    return expect(behaviourAggregator.behaviours[0].behaviour.data.action.data).toBe(100);
   })
 
 
@@ -45,7 +45,7 @@ describe("Function checks", () =>{
     test("Multiple twilights | time vs all day", async () => {
       const behaviourAggregator = aggregatorCreator([twilightDim50AllDay,twilight40BetweenSunriseSunset,twilight80BetweenSunriseSunset]);
       behaviourAggregator.tick(Date.parse(new Date(2020, 9, 4, 13, 0).toString()));
-      expect(behaviourAggregator.composedState).toStrictEqual({on: true, bri: 40 * 2.54});
+      return  expect(behaviourAggregator.composedState).toStrictEqual({on: true, bri: 40 * 2.54});
     })
   });
 

@@ -1,10 +1,16 @@
 import {Bridge} from "./Bridge";
-import {minValueOfStates,maxValueOfStates,minMaxValueStates,possibleStates} from "../constants/HueConstants";
+import {
+    minValueOfStates,
+    maxValueOfStates,
+    minMaxValueStates,
+    possibleStates,
+    LIGHT_POLLING_RATE
+} from "../constants/HueConstants";
 import {BehaviourAggregator} from "../behaviour/BehaviourAggregator";
 import {HueFullState, StateUpdate} from "../declarations/declarations";
 import Timeout = NodeJS.Timeout;
-import * as Api from "node-hue-api/lib/api/Api";
-import {POLLING_RATE} from "../behaviour/BehaviourAggregatorUtil";
+import * as Api from "node-hue-api/lib/api/Api"; 
+import {lightUtil} from "../util/LightUtil";
 
 
 
@@ -55,7 +61,7 @@ export class Light {
 
     init():void{
         this.behaviourAggregator.init();
-        this.intervalId = setInterval(() => this.renewState(), POLLING_RATE);
+        this.intervalId = setInterval(() => this.renewState(), LIGHT_POLLING_RATE);
     }
 
     private _setLastUpdate(): void {
@@ -80,48 +86,23 @@ export class Light {
     }
 
     getState(): HueFullState {
-        return this.state;
+        return {...this.state};
     }
 
-    private _isAllowedStateType(state): boolean {
-        return possibleStates[state] || false;
-    }
 
     private _updateState(state: StateUpdate): void {
-
         Object.keys(state).forEach(key => {
-            if (this._isAllowedStateType(key)) {
+            if (lightUtil.isAllowedStateType(key)) {
                 this.state[key] = state[key];
             }
         });
         this._setLastUpdate()
     }
-
-
-    /**
-     * Checks if state value is out of it's range and then return right value.
-     *
-     * @return State value between it's min and max.
-     */
-   private _manipulateMinMaxValueStates(state:StateUpdate): StateUpdate {
-        Object.keys(state).forEach(key => {
-            if ((minMaxValueStates[key] || false)) {
-                if (key === "xy") {
-                    state[key] = [Math.min(maxValueOfStates[key][0], Math.max(minValueOfStates[key][0], state[key][0])), Math.min(maxValueOfStates[key][1], Math.max(minValueOfStates[key][1], state[key][1]))];
-                } else {
-                    state[key] = Math.min(maxValueOfStates[key], Math.max(minValueOfStates[key], state[key]));
-                }
-            }
-        });
-
-        return state;
-    }
-
     /**
      * Sets the state of the light.
      */
     async setState(state: StateUpdate): Promise<boolean> {
-        state = this._manipulateMinMaxValueStates(state);
+        state = lightUtil.manipulateMinMaxValueStates(state);
         const result = await this.api.lights.setLightState(this.id.toString(), state);
         if (result) {
             this._updateState(state);
@@ -149,8 +130,6 @@ export class Light {
     getUniqueId(): string {
         return this.uniqueId;
     }
-
-
     getSupportedStates(): object {
         return this.supportedStates;
     }

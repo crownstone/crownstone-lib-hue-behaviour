@@ -29,7 +29,7 @@ describe("Function checks", () =>{
     behaviourAggregator.addBehaviour(<HueBehaviourWrapperTwilight>twilightDim50AllDay,SPHERE_LOCATION);
     behaviourAggregator.addBehaviour(<HueBehaviourWrapperBehaviour>switchOn10AllDay,SPHERE_LOCATION);
     expect(behaviourAggregator.twilightPrioritizer.behaviours[0].behaviour.cloudId).toBe(twilightDim50AllDay.cloudId);
-    expect(behaviourAggregator.switchBehaviourPrioritizer.behaviours[0].behaviour.cloudId).toBe(switchOn10AllDay.cloudId);
+    return expect(behaviourAggregator.switchBehaviourPrioritizer.behaviours[0].behaviour.cloudId).toBe(switchOn10AllDay.cloudId);
   })
 
   test("Remove behaviour", ()=>{
@@ -38,7 +38,7 @@ describe("Function checks", () =>{
     const behaviourAggregator = light.behaviourAggregator;
     behaviourAggregator.addBehaviour(<HueBehaviourWrapperTwilight>twilightDim50AllDay,SPHERE_LOCATION)
     behaviourAggregator.removeBehaviour("CLOUD-ID-123123");
-    expect(behaviourAggregator.twilightPrioritizer.behaviours.length).toBe(0);
+    return expect(behaviourAggregator.twilightPrioritizer.behaviours.length).toBe(0);
   })
 
   test("Update twilight", ()=>{
@@ -50,7 +50,7 @@ describe("Function checks", () =>{
     updatedBehaviour.data.action.data = 100;
     behaviourAggregator.updateBehaviour(updatedBehaviour);
     expect(behaviourAggregator.twilightPrioritizer.behaviours.length).toBe(1);
-    expect(behaviourAggregator.twilightPrioritizer.behaviours[0].behaviour.data.action.data).toBe(100);
+    return expect(behaviourAggregator.twilightPrioritizer.behaviours[0].behaviour.data.action.data).toBe(100);
   })
 
   test("Dumb house mode",() =>{
@@ -65,7 +65,7 @@ describe("Function checks", () =>{
     behaviourAggregator._loop();
 
     expect(behaviourAggregator.dumbHouseModeActive).toBeTruthy();
-    expect(light.state.on).toBeFalsy();
+    return expect(light.state.on).toBeFalsy();
 
   })
 
@@ -79,7 +79,7 @@ describe("Function checks", () =>{
     behaviourAggregator.init();
     jest.advanceTimersByTime(500);
     expect(setInterval).toBeCalledTimes(1);
-    expect(behaviourAggregator.switchBehaviourPrioritizer.prioritizedBehaviour).toBeDefined();
+    return expect(behaviourAggregator.switchBehaviourPrioritizer.prioritizedBehaviour).toBeDefined();
   })
 
 
