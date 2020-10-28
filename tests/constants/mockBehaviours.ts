@@ -123,7 +123,7 @@ export const switchOnAllDayIgnorePresence = {
 
 
 
-export const twilightDim50AllDay = {
+export const twilightDim50AllDay : HueBehaviourWrapperTwilight = {
     "type": "TWILIGHT",
     "data": {
         "action": {"type": "DIM_WHEN_TURNED_ON", "data": 50},
