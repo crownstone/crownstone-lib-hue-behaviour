@@ -70,4 +70,20 @@ describe('Integration Test', () => {
       ].getState()["on"]).toBeFalsy();
     bridges.forEach((bridge)=> bridge.cleanup())
   }, 60000)
+
+  test('Test', async () => {
+    let behaviour = new BehaviourSupport();
+    behaviour.setLightId("00:17:88:01:10:4a:cd:c8-0b").setActionState(10).setTimeAllDay().setPresenceIgnore()
+    const crownstoneHue = new CrownstoneHue();
+    const bridges = await crownstoneHue.init(SPHERE_LOCATION);
+    await crownstoneHue.addBehaviour(behaviour.rule);
+    const lights = bridges[0].getConnectedLights();
+    console.log(lights[1].getState());
+    await timeout(1000*12);
+    console.log(lights[1].getState());
+    await timeout(1000*12);
+    console.log(lights[1].getState());
+
+    bridges.forEach((bridge)=> bridge.cleanup())
+  }, 60000)
 })

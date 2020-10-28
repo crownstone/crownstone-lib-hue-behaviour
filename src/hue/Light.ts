@@ -78,10 +78,10 @@ export class Light {
      */
     async renewState(): Promise<void> {
         const newState = await this.api.lights.getLightState(this.id) as HueFullState;
-        if (this.state != newState) {
+        if (!lightUtil.stateEqual(this.state,newState)) {
             this.state = newState;
             this._setLastUpdate();
-            await this.behaviourAggregator.lightStateChanged(this.state);
+            await this.behaviourAggregator.lightStateChanged({...this.state});
         }
     }
 

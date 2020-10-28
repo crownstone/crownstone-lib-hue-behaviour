@@ -38,20 +38,6 @@ export const BehaviourUtil = {
 
 
 
-  stateEqual(stateA,stateB){
-    let returnType = false;
-    for(const key of Object.keys(stateA)){
-      if((hueStateVariables[key])){
-        if(stateA[key] === stateB[key]){
-          returnType = true;
-        } else{
-          returnType = false;
-          break;
-        }
-      }
-    }
-    return returnType;
-  },
 
   /** returns the sunset time in minutes, given the timestamp and sphereLocation
    * @param sphereLocation

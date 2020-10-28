@@ -1,5 +1,11 @@
 import {StateUpdate} from "../declarations/declarations";
-import {maxValueOfStates, minMaxValueStates, minValueOfStates, possibleStates} from "../constants/HueConstants";
+import {
+  hueStateVariables,
+  maxValueOfStates,
+  minMaxValueStates,
+  minValueOfStates,
+  possibleStates
+} from "../constants/HueConstants";
 
 export const lightUtil = {
   /**
@@ -20,6 +26,25 @@ export const lightUtil = {
 
   return state;
 },
+
+  stateEqual(stateA,stateB){
+    let returnType = false;
+    for(const key of Object.keys(stateA)){
+      if((hueStateVariables[key])){
+        if(stateA[key] === stateB[key]){
+          returnType = true;
+        } else if(key === "xy"){
+          if(stateA[key][0] === stateB[key][0] && stateA[key][1] === stateB[key][1] ){
+            returnType = true;
+          }
+        } else{
+          returnType = false;
+          break;
+        }
+      }
+    }
+    return returnType;
+  },
 
   isAllowedStateType(state): boolean {
   return possibleStates[state] || false;

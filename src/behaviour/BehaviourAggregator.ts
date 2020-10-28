@@ -123,7 +123,7 @@ export class BehaviourAggregator {
     if (typeof(newBehaviour) !== "undefined") {
       if (newBehaviour.behaviour.type === "TWILIGHT") {
         await this._twilightHandling(newBehaviour);
-      } else if (newBehaviour.behaviour.type === "BEHAVIOUR" && this.override === NO_OVERRIDE) {
+      } else if (newBehaviour.behaviour.type === "BEHAVIOUR" && this.override === NO_OVERRIDE && typeof(oldBehaviour) !== "undefined" && oldBehaviour.behaviour.cloudId != newBehaviour.behaviour.cloudId) {
         await this._activateNewBehaviour(newBehaviour);
       }
     }
