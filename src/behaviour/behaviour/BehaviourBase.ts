@@ -1,13 +1,8 @@
 
 import {BehaviourUtil} from "./BehaviourUtil";
-import {
-  HueLightState,
-  SphereLocation
-} from "../../declarations/declarations";
-import {HueBehaviourWrapper} from "../../declarations/behaviourTypes";
 
 
-export abstract class BehaviourBase {
+export abstract class BehaviourBase{
   behaviour: HueBehaviourWrapper;
   isActive: boolean;
   timestamp: number | null = null;

@@ -3,18 +3,12 @@ import {eventBus} from "../util/EventBus";
 import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
 import {ON_DUMB_HOUSE_MODE_SWITCH} from "../constants/EventConstants";
 import {
-  EventUnsubscriber, HueFullState,
-  HueLightState,
-  SphereLocation
-} from "../declarations/declarations";
-import {
   BehaviourAggregatorUtil,
   DIM_STATE_OVERRIDE,
   NO_OVERRIDE,
   AGGREGATOR_POLLING_RATE,
   SWITCH_STATE_OVERRIDE
 } from "./BehaviourAggregatorUtil";
-import {HueBehaviourWrapper} from "../declarations/behaviourTypes";
 import {TwilightPrioritizer} from "./TwilightPrioritizer";
 import {SwitchBehaviourPrioritizer} from "./SwitchBehaviourPrioritizer";
 import {Twilight} from "./behaviour/Twilight";

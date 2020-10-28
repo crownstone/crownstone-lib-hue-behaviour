@@ -1,8 +1,8 @@
 import {Bridge} from "./Bridge";
-import {discovery} from "node-hue-api/lib/v3";
-import {DiscoverResult} from "../declarations/declarations";
+import {v3} from "node-hue-api";
 import {DISCOVERY_URL} from "../constants/HueConstants";
 const fetch = require('node-fetch');
+const discovery = v3.discovery;
 
 export const Discovery = {
 

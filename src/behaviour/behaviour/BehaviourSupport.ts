@@ -1,7 +1,5 @@
 import {BehaviourUtil} from "./BehaviourUtil";
 import {EMPTY_RULE, SPHERE_DELAY} from "../../constants/BehaviourSupportConstants"
-import {SphereLocation} from "../../declarations/declarations";
-import {ActiveDays, HueBehaviourWrapper, Time, TimeData} from "../../declarations/behaviourTypes";
 
 export class BehaviourSupport {
   rule: HueBehaviourWrapper;
@@ -13,6 +11,7 @@ export class BehaviourSupport {
   //########Setters###########
   setTypeBehaviour(){
     this.rule.type = "BEHAVIOUR"
+    this.rule.data.action.type = "BE_ON";
     if(!("presence" in this.rule.data)){
       this.rule.type["Presence"] = {}
       this.setTimeAllDay();
@@ -20,9 +19,14 @@ export class BehaviourSupport {
     return this;
   }
   setTypeTwilight(){
-    this.rule.type= "BEHAVIOUR"
+    this.rule.type= "BEHAVIOUR";
+    this.rule.data.action.type = "DIM_WHEN_TURNED_ON";
     delete this.rule.data["presence"];
     delete this.rule.data["endCondition"];
+    return this;
+  }
+  setCloudId(value:string){
+    this.rule.cloudId = value;
     return this;
   }
   setLightId(value:string){

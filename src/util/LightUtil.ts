@@ -1,4 +1,3 @@
-import {StateUpdate} from "../declarations/declarations";
 import {
   hueStateVariables,
   maxValueOfStates,

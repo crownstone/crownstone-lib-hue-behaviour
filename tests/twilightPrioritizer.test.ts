@@ -4,15 +4,13 @@
 import {twilight40BetweenSunriseSunset, twilight80BetweenSunriseSunset, twilightDim50AllDay
 } from "./constants/mockBehaviours";
 
-import {HueBehaviourWrapperTwilight} from "../src/declarations/behaviourTypes"
-
 import {SPHERE_LOCATION} from "./constants/testConstants";
 import {TwilightPrioritizer} from "../src/behaviour/TwilightPrioritizer";
 
 function aggregatorCreator(behaviours):TwilightPrioritizer{
   const behaviourAggregator = new TwilightPrioritizer();
   for(const behaviour of behaviours){
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperTwilight>{...behaviour},SPHERE_LOCATION);
+    behaviourAggregator.addBehaviour({...behaviour},SPHERE_LOCATION);
   }
   return behaviourAggregator;
 }
@@ -33,7 +31,7 @@ describe("Function checks", () =>{
 
   test("Update twilight", ()=>{
     const behaviourAggregator = aggregatorCreator([twilightDim50AllDay])
-    let updatedBehaviour = <HueBehaviourWrapperTwilight>{...twilightDim50AllDay};
+    let updatedBehaviour = {...twilightDim50AllDay};
     updatedBehaviour.data.action.data = 100;
     behaviourAggregator.updateBehaviour(updatedBehaviour);
     expect(behaviourAggregator.behaviours.length).toBe(1);

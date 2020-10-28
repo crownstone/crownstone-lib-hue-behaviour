@@ -1,12 +1,8 @@
-import {
-  HueLightState,
-  SphereLocation,
-} from "../declarations/declarations";
+
 
 
 import {Twilight} from "./behaviour/Twilight";
 import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
-import {HueBehaviourWrapper} from "../declarations/behaviourTypes";
 
 
 export class PrioritizerBase {

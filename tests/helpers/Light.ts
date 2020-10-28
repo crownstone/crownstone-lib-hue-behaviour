@@ -1,15 +1,15 @@
-import {HueFullState, HueLightState, StateUpdate} from "../../src/declarations/declarations";
-import {Api} from "./Api";
+import {mockApi} from "./Api";
 import {BehaviourAggregator} from "../../src/behaviour/BehaviourAggregator";
 
 /** Simulates an Hue Light object, for testing Purposes
  *
  */
-
-export class Light {
-  state:HueLightState;
+interface StateUpdate{on:boolean, bri:number}
+interface  HueLightState extends StateUpdate{}
+export class mockLight {
+  state: HueLightState;
   behaviourAggregator: BehaviourAggregator
-  api: Api;
+  api: mockApi;
   constructor(api) {
     this.api = api;
     this.state = api.lights.getLightState();
@@ -28,7 +28,7 @@ export class Light {
     })
     this.state = this.api.lights.getLightState();
     if(oldState.on !== this.state.on || oldState.bri !== this.state.bri ){
-      await this.behaviourAggregator.lightStateChanged(<HueFullState>this.state);
+      await this.behaviourAggregator.lightStateChanged({...this.state});
     }
   }
 

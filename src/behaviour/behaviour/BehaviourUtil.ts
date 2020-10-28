@@ -1,4 +1,3 @@
-import {SphereLocation} from "../../declarations/declarations";
 import {hueStateVariables} from "../../constants/HueConstants";
 
 const SunCalc = require('suncalc');

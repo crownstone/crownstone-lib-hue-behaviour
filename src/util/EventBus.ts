@@ -1,4 +1,3 @@
-import {EventUnsubscriber} from "../declarations/declarations";
 
 
 class IdGenerator {

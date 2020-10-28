@@ -14,11 +14,8 @@ import {
   switchOnWhenAny1Home
 } from "./constants/mockBehaviours";
 
-import {HueBehaviourWrapper} from "../src/declarations/behaviourTypes"
 
 import {SwitchBehaviourPrioritizer} from "../src/behaviour/SwitchBehaviourPrioritizer";
-import {Api} from "./helpers/Api";
-import {Light} from "./helpers/Light";
 import {
   EVENT_ENTER_LOCATION, EVENT_ENTER_LOCATION_FIVE,
   EVENT_ENTER_LOCATION_FOUR, EVENT_ENTER_LOCATION_SIX,

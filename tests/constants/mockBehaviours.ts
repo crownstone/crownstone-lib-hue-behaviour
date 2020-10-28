@@ -9,10 +9,6 @@ export const switchOnWhenAny1Home = {
         },
         "presence": {"type": "SOMEBODY", "data": {"type": "SPHERE"}, "delay": 300}
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": true,
         "Tue": true,
@@ -23,10 +19,7 @@ export const switchOnWhenAny1Home = {
         "Sun": true
     },
     "cloudId": "5f6491e889280050004952618",
-    "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
+    "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
 export const switchOn80WhenAny1Home = {
@@ -39,10 +32,6 @@ export const switchOn80WhenAny1Home = {
         },
         "presence": {"type": "SOMEBODY", "data": {"type": "SPHERE"}, "delay": 300}
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": true,
         "Tue": true,
@@ -53,10 +42,7 @@ export const switchOn80WhenAny1Home = {
         "Sun": true
     },
     "cloudId": "5f649e6889280050004952618",
-    "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
+    "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
 export const switchOnOnlyAtWeekend = {
@@ -69,10 +55,6 @@ export const switchOnOnlyAtWeekend = {
         },
         "presence": {"type": "SOMEBODY", "data": {"type": "SPHERE"}, "delay": 300}
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": false,
         "Tue": false,
@@ -83,33 +65,7 @@ export const switchOnOnlyAtWeekend = {
         "Sun": true
     },
     "cloudId": "5f6494e889280050004952618",
-    "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
-}
-
-export const BehaviourDayOverlap ={
-    "type": "BEHAVIOUR",
-    "data": "{\"action\":{\"type\":\"BE_ON\",\"data\":100},\"time\":{\"type\":\"RANGE\",\"from\":{\"type\":\"CLOCK\",\"data\":{\"hours\":19,\"minutes\":15}},\"to\":{\"type\":\"CLOCK\",\"data\":{\"hours\":4,\"minutes\":0}}},\"presence\":{\"type\":\"IGNORE\"}}",
-    "idOnCrownstone": 1,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
-    "activeDays": {
-        "Mon": false,
-        "Tue": false,
-        "Wed": false,
-        "Thu": false,
-        "Fri": false,
-        "Sat": false,
-        "Sun": false
-    },
-    "cloudId": "5f6d9597372a27600046f8799",
-    "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-25T07:00:39.895Z",
-    "updatedAt": "2020-09-25T07:00:44.288Z"
+    "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
 export const switchOnBetweenRangeWithSpherePresence = {
@@ -127,10 +83,6 @@ export const switchOnBetweenRangeWithSpherePresence = {
                     }
 
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": true,
         "Tue": true,
@@ -141,10 +93,7 @@ export const switchOnBetweenRangeWithSpherePresence = {
         "Sun": true
     },
     "cloudId": "5f649e8892800500054952618",
-    "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
+    "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
 
@@ -158,10 +107,6 @@ export const switchOnAllDayIgnorePresence = {
         },
         "presence": {"type": "IGNORE"}
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": true,
         "Tue": true,
@@ -172,10 +117,7 @@ export const switchOnAllDayIgnorePresence = {
         "Sun": true
     },
     "cloudId": "5f649e8892800500049526185",
-    "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
+    "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
 
@@ -189,10 +131,6 @@ export const twilightDim50AllDay = {
             "type": "ALL_DAY"
         }
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": true,
         "Tue": true,
@@ -204,11 +142,28 @@ export const twilightDim50AllDay = {
     },
     "cloudId": "CLOUD-ID-123123",
     "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
 }
 
+export const twilightDim50AllDayUpdated100 = {
+    "type": "TWILIGHT",
+    "data": {
+        "action": {"type": "DIM_WHEN_TURNED_ON", "data": 100},
+        "time": {
+            "type": "ALL_DAY"
+        }
+    },
+    "activeDays": {
+        "Mon": true,
+        "Tue": true,
+        "Wed": true,
+        "Thu": true,
+        "Fri": true,
+        "Sat": true,
+        "Sun": true
+    },
+    "cloudId": "CLOUD-ID-123123",
+    "lightId": "5f4e47660bc0da0004b4fe16",
+}
 
 export const twilight40BetweenSunriseSunset = {
     "type": "TWILIGHT",
@@ -220,10 +175,6 @@ export const twilight40BetweenSunriseSunset = {
             "to":{"type": "SUNSET", "offsetMinutes": 0}
         }
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": true,
         "Tue": true,
@@ -234,10 +185,7 @@ export const twilight40BetweenSunriseSunset = {
         "Sun": true
     },
     "cloudId": "5f649e8892a70500049526185",
-    "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
+    "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
 
@@ -253,10 +201,6 @@ export const twilight80BetweenSunriseSunset = {
             "to":{"type": "SUNSET", "offsetMinutes": 0}
         }
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": true,
         "Tue": true,
@@ -267,10 +211,7 @@ export const twilight80BetweenSunriseSunset = {
         "Sun": true
     },
     "cloudId": "5f649e8892a70500049526185",
-    "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
+    "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
 
@@ -286,10 +227,6 @@ export const twilight60BetweenRange= {
             "to":{"type": "SUNSET", "offsetMinutes": 0}
         }
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": true,
         "Tue": true,
@@ -300,10 +237,7 @@ export const twilight60BetweenRange= {
         "Sun": true
     },
     "cloudId": "REALCLOUDID-1",
-    "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
+    "lightId": "5f4e47660bc0da0004b4fe16"
 }
 export const switchOn100Range = {
     "type": "BEHAVIOUR",
@@ -317,10 +251,6 @@ export const switchOn100Range = {
         },
         "presence": {"type": "IGNORE"}
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": true,
         "Tue": true,
@@ -331,10 +261,7 @@ export const switchOn100Range = {
         "Sun": true
     },
     "cloudId": "5252",
-    "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
+    "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
 
@@ -350,10 +277,6 @@ export const switchOn70Range1310sunset = {
         },
         "presence": {"type": "IGNORE"}
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": true,
         "Tue": true,
@@ -365,9 +288,6 @@ export const switchOn70Range1310sunset = {
     },
     "cloudId": "sadpogosaf",
     "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
 }
 
 
@@ -383,10 +303,6 @@ export const switchOn30Range = {
         },
         "presence": {"type": "IGNORE"}
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": true,
         "Tue": true,
@@ -414,10 +330,6 @@ export const switchOn50Range23500500 = {
         },
         "presence": {"type": "IGNORE"}
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": true,
         "Tue": true,
@@ -428,10 +340,7 @@ export const switchOn50Range23500500 = {
         "Sun": true
     },
     "cloudId": "ACTUALCLOUDID-3",
-    "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
+    "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
 
@@ -445,10 +354,6 @@ export const switchOnAllDayRoom1 = {
         },
         "presence": {"type": "SOMEBODY", "data":{"type":"LOCATION","locationIds": [1]},"delay": 300}
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": true,
         "Tue": true,
@@ -459,10 +364,7 @@ export const switchOnAllDayRoom1 = {
         "Sun": true
     },
     "cloudId": "ACTUALCLOUDID-6",
-    "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
+    "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
 export const switchOn80AllDayRoom1n2 = {
@@ -475,10 +377,6 @@ export const switchOn80AllDayRoom1n2 = {
         },
         "presence": {"type": "SOMEBODY", "data":{"type":"LOCATION","locationIds": [1,2]},"delay": 300}
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": true,
         "Tue": true,
@@ -489,10 +387,7 @@ export const switchOn80AllDayRoom1n2 = {
         "Sun": true
     },
     "cloudId": "ACTUALCLOUDID-12",
-    "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
+    "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
 export const switchOn60AllDayRoom3 = {
@@ -505,10 +400,6 @@ export const switchOn60AllDayRoom3 = {
         },
         "presence": {"type": "SOMEBODY", "data":{"type":"LOCATION","locationIds": [3]},"delay": 300}
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": true,
         "Tue": true,
@@ -519,10 +410,7 @@ export const switchOn60AllDayRoom3 = {
         "Sun": true
     },
     "cloudId": "ACTUALCLOUDID-9",
-    "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
+    "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
 export const switchOn40WhenInRoom5n6 = {
@@ -535,10 +423,6 @@ export const switchOn40WhenInRoom5n6 = {
     },
     "presence": {"type": "SOMEBODY", "data":{"type":"LOCATION","locationIds": [5,6]},"delay": 300}
   },
-  "idOnCrownstone": 0,
-  "profileIndex": 0,
-  "syncedToCrownstone": true,
-  "deleted": false,
   "activeDays": {
     "Mon": true,
     "Tue": true,
@@ -549,10 +433,7 @@ export const switchOn40WhenInRoom5n6 = {
     "Sun": true
   },
   "cloudId": "ACTUALCLOUDID-9",
-  "lightId": "5f4e47660bc0da0004b4fe16",
-  "sphereId": "5f4d08bbbfeb1e000422a462",
-  "createdAt": "2020-09-18T11:48:24.813Z",
-  "updatedAt": "2020-09-18T11:48:24.489Z"
+  "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
 export const switchOn50Sphere = {
@@ -567,10 +448,6 @@ export const switchOn50Sphere = {
             "type": "SOMEBODY", "data": {"type": "SPHERE", "delay": 300}
         },
     },
-        "idOnCrownstone": 0,
-        "profileIndex": 0,
-        "syncedToCrownstone": true,
-        "deleted": false,
         "activeDays": {
             "Mon": true,
             "Tue": true,
@@ -581,10 +458,7 @@ export const switchOn50Sphere = {
             "Sun": true
         },
         "cloudId": "ACTUALCLOUDID-169",
-        "lightId": "5f4e47660bc0da0004b4fe16",
-        "sphereId": "5f4d08bbbfeb1e000422a462",
-        "createdAt": "2020-09-18T11:48:24.813Z",
-        "updatedAt": "2020-09-18T11:48:24.489Z"
+        "lightId": "5f4e47660bc0da0004b4fe16"
     }
 
 
@@ -603,10 +477,6 @@ export const switchOn20Between19002200 = {
             "type": "IGNORE"
         }
     },
-        "idOnCrownstone": 0,
-        "profileIndex": 0,
-        "syncedToCrownstone": true,
-        "deleted": false,
         "activeDays": {
             "Mon": true,
             "Tue": true,
@@ -617,10 +487,7 @@ export const switchOn20Between19002200 = {
             "Sun": true
         },
         "cloudId": "ACTUALCLOUDID-129",
-        "lightId": "5f4e47660bc0da0004b4fe16",
-        "sphereId": "5f4d08bbbfeb1e000422a462",
-        "createdAt": "2020-09-18T11:48:24.813Z",
-        "updatedAt": "2020-09-18T11:48:24.489Z"
+        "lightId": "5f4e47660bc0da0004b4fe16"
     }
 
 
@@ -637,10 +504,6 @@ export const switchOn10AllDay = {
             "type": "IGNORE"
         },
     },
-        "idOnCrownstone": 0,
-        "profileIndex": 0,
-        "syncedToCrownstone": true,
-        "deleted": false,
         "activeDays": {
             "Mon": true,
             "Tue": true,
@@ -651,10 +514,7 @@ export const switchOn10AllDay = {
             "Sun": true
         },
         "cloudId": "ACTUALCLOUDID-149",
-        "lightId": "5f4e47660bc0da0004b4fe16",
-        "sphereId": "5f4d08bbbfeb1e000422a462",
-        "createdAt": "2020-09-18T11:48:24.813Z",
-        "updatedAt": "2020-09-18T11:48:24.489Z"
+        "lightId": "5f4e47660bc0da0004b4fe16"
     }
 
 export const switchOn80Range13001500 = {
@@ -669,10 +529,6 @@ export const switchOn80Range13001500 = {
         },
         "presence": {"type": "IGNORE"}
     },
-    "idOnCrownstone": 0,
-    "profileIndex": 0,
-    "syncedToCrownstone": true,
-    "deleted": false,
     "activeDays": {
         "Mon": true,
         "Tue": true,
@@ -683,10 +539,7 @@ export const switchOn80Range13001500 = {
         "Sun": true
     },
     "cloudId": "sadpogos3af",
-    "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
+    "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
 export const twilight70Range12001500 = {
@@ -711,7 +564,4 @@ export const twilight70Range12001500 = {
     },
     "cloudId": "sadpogf",
     "lightId": "5f4e47660bc0da0004b4fe16",
-    "sphereId": "5f4d08bbbfeb1e000422a462",
-    "createdAt": "2020-09-18T11:48:24.813Z",
-    "updatedAt": "2020-09-18T11:48:24.489Z"
 }

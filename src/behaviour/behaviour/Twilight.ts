@@ -1,7 +1,5 @@
 import {BehaviourSupport} from "./BehaviourSupport";
-import {  SphereLocation} from "../../declarations/declarations";
 import {BehaviourBase} from "./BehaviourBase";
-import {HueBehaviourWrapperTwilight} from "../../declarations/behaviourTypes";
 
 
 export class Twilight extends BehaviourBase{

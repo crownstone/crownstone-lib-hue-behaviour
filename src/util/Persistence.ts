@@ -4,8 +4,6 @@
 
 import {promises as fs} from "fs";
 import {Bridge, CrownstoneHueError, Light} from ".."; 
-import {BridgeFormat} from "../declarations/declarations";
-import {ConfBridgeObject, ConfBridges, ConfigurationObject} from "../declarations/configTypes";
 
 const CONF_NAME: string = "saveConfig.json";
 const CONF_BRIDGE_LOCATION: string = "Bridges";

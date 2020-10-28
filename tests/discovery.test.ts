@@ -1,5 +1,4 @@
 import {Bridge, Discovery} from "../src";
-import {DiscoverResult} from "../src/declarations/declarations";
 import {discovery} from "node-hue-api/lib/v3";
 jest.mock('node-fetch');
 import fetch from 'node-fetch';

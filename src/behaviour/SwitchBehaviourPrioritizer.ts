@@ -1,8 +1,6 @@
 import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
-import {SphereLocation} from "../declarations/declarations";
 import {BehaviourAggregatorUtil} from "./BehaviourAggregatorUtil";
 import {PrioritizerBase} from "./PrioritizerBase";
-import {HueBehaviourWrapperBehaviour} from "../declarations/behaviourTypes";
 
 
 export class SwitchBehaviourPrioritizer extends PrioritizerBase {

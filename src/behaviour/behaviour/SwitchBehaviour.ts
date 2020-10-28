@@ -2,17 +2,10 @@ import {eventBus} from "../../util/EventBus";
 import {BehaviourUtil} from "./BehaviourUtil";
 import {BehaviourSupport} from "./BehaviourSupport";
 import {ON_PRESENCE_CHANGE} from "../../constants/EventConstants";
-import {
-  EventUnsubscriber,
-  PresenceEvent,
-  PresenceProfile,
-  SphereLocation
-} from "../../declarations/declarations";
 import {BehaviourBase} from "./BehaviourBase";
-import {HueBehaviourWrapperBehaviour, Presence} from "../../declarations/behaviourTypes";
 
 
-export class SwitchBehaviour extends BehaviourBase{
+export class SwitchBehaviour extends BehaviourBase implements SwitchBehaviourInterface{
   presenceLocations: PresenceProfile[] = []; // Empty when no one is present for this behaviour.
   lastPresenceUpdate: number = 0;
   unsubscribe: EventUnsubscriber
@@ -131,3 +124,4 @@ export class SwitchBehaviour extends BehaviourBase{
     this.isActive = false;
   }
 }
+

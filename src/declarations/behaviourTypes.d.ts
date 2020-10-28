@@ -1,71 +1,71 @@
-export type PresenceTypeSomeone = "SOMEBODY" | "NOBODY"
-export type PresenceType = PresenceTypeSomeone | "IGNORE" | "SPECIFIC_USERS"
-export type SunTimes = "SUNSET" | "SUNRISE"
-export type TimeDataType = SunTimes | "CLOCK"
-export type BehaviourType = "BEHAVIOUR" | "TWILIGHT";
+type PresenceTypeSomeone = "SOMEBODY" | "NOBODY"
+type PresenceType = PresenceTypeSomeone | "IGNORE" | "SPECIFIC_USERS"
+type SunTimes = "SUNSET" | "SUNRISE"
+type TimeDataType = SunTimes | "CLOCK"
+type BehaviourType = "BEHAVIOUR" | "TWILIGHT";
 
-export interface PresenceNone {
+interface PresenceNone {
     type: "IGNORE"
 }
-export interface PresenceGeneric {
+interface PresenceGeneric {
     type: PresenceType,
     data: PresenceData,
     delay: number
 }
 
-export interface PresenceSomebody extends PresenceGeneric{
+interface PresenceSomebody extends PresenceGeneric{
     type: "SOMEBODY"
 }
 
-export type Presence = PresenceGeneric | PresenceNone
+type Presence = PresenceGeneric | PresenceNone
 
-export type PresenceData = PresenceSphere | PresenceLocation
+type PresenceData = PresenceSphere | PresenceLocation
 
-export interface PresenceSphere {
+interface PresenceSphere {
     type: "SPHERE"
 }
 
-export interface PresenceLocation {
+interface PresenceLocation {
     type: "LOCATION",
     locationIds: number[]
 }
 
-export interface TimeAlways {
+interface TimeAlways {
     type: "ALL_DAY"
 }
 
-export interface TimeRange {
+interface TimeRange {
     type: "RANGE",
     from: TimeData,
     to: TimeData
 }
 
-export type Time = TimeAlways | TimeRange
+type Time = TimeAlways | TimeRange
 
-export interface TimeDataSun {
+interface TimeDataSun {
     type: SunTimes,
     offsetMinutes: number
 }
 
-export interface TimeDataClock {
+interface TimeDataClock {
     type: "CLOCK",
     data: timeHoursMinutes
 }
 
-export type TimeData = TimeDataSun |TimeDataClock
+type TimeData = TimeDataSun |TimeDataClock
 
-export interface EndCondition {
+interface EndCondition {
     type: "PRESENCE_AFTER",
     presence: PresenceSomebody,
 }
 
-export interface timeHoursMinutes {
+interface timeHoursMinutes {
     minutes: number,
     hours: number,
 }
 
 
-export interface ActiveDays {
+interface ActiveDays {
     Mon: boolean,
     Tue: boolean,
     Wed: boolean,
@@ -77,7 +77,7 @@ export interface ActiveDays {
 
 
 // TYPE: behaviour
-export interface HueBehaviour {
+interface HueBehaviour {
     action: {
         type: "BE_ON",
         data: number, // 0 .. 1
@@ -88,7 +88,7 @@ export interface HueBehaviour {
 }
 
 // TYPE: TWILIGHT
-export interface HueTwilight {
+interface HueTwilight {
     action: {
         type: "DIM_WHEN_TURNED_ON",
         data: number,
@@ -96,24 +96,34 @@ export interface HueTwilight {
     time: Time,
 }
 
-export type HueBehaviourWrapper = HueBehaviourWrapperTwilight | HueBehaviourWrapperBehaviour
+type HueBehaviourWrapper = HueBehaviourWrapperTwilight | HueBehaviourWrapperBehaviour
 
-export interface HueBehaviourWrapperBehaviour {
+interface HueBehaviourWrapperBehaviour {
     type: "BEHAVIOUR"
     data: HueBehaviour
     activeDays: ActiveDays,
     lightId: string,
-    cloudId: string,
-    updatedAt: string
+    cloudId: string
 }
 
 
-export interface HueBehaviourWrapperTwilight {
+interface HueBehaviourWrapperTwilight {
     type: "TWILIGHT"
     data: HueTwilight
     activeDays: ActiveDays,
     lightId: string,
-    cloudId: string,
-    updatedAt: string
+    cloudId: string
 }
 
+interface BehaviourBaseInterface{
+    behaviour: HueBehaviourWrapper;
+    isActive: boolean;
+    timestamp: number | null;
+    sphereLocation: SphereLocation
+}
+
+interface SwitchBehaviourInterface extends BehaviourBaseInterface{
+    presenceLocations: PresenceProfile[];
+    lastPresenceUpdate: number;
+    unsubscribe: EventUnsubscriber;
+}

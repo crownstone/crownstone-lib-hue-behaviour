@@ -1,9 +1,8 @@
-import {HueLightState} from "../../src/declarations/declarations";
 
 /** Helper class for simulation purposes.
  * Simulates an Api class and more;
  */
-export class Api {
+export class mockApi {
   lights;  //Fakes reals Api's api.lights method.
   light; // Same as lights, context purpose.
   user; // Extra for testing purpose.
@@ -19,7 +18,7 @@ export class Api {
  *
  */
 export class ApiLight {
-  state: HueLightState = {on: false, bri: 100};
+  state: {  } = {on: false, bri: 100};
 
   getLightState(id?) {
     return {...this.state};

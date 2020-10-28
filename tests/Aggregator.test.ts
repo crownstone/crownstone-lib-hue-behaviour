@@ -9,10 +9,9 @@ import {
   twilightDim50AllDay
 } from "./constants/mockBehaviours";
 
-import {HueBehaviourWrapperBehaviour, HueBehaviourWrapperTwilight} from "../src/declarations/behaviourTypes"
 
-import {Api} from "./helpers/Api";
-import {Light} from "./helpers/Light";
+import {mockApi} from "./helpers/Api";
+import {mockLight} from "./helpers/Light";
 import {SPHERE_LOCATION} from "./constants/testConstants";
 import {eventBus} from "../src/util/EventBus";
 import {ON_DUMB_HOUSE_MODE_SWITCH} from "../src/constants/EventConstants";
@@ -23,8 +22,8 @@ import exp = require("constants");
 
 describe("Function checks", () =>{
   test("Add behaviours", ()=>{
-    const api = new Api();
-    const light = new Light(api);
+    const api = new mockApi();
+    const light = new mockLight(api);
     const behaviourAggregator = light.behaviourAggregator;
     behaviourAggregator.addBehaviour(<HueBehaviourWrapperTwilight>twilightDim50AllDay,SPHERE_LOCATION);
     behaviourAggregator.addBehaviour(<HueBehaviourWrapperBehaviour>switchOn10AllDay,SPHERE_LOCATION);
@@ -33,8 +32,8 @@ describe("Function checks", () =>{
   })
 
   test("Remove behaviour", ()=>{
-    const api = new Api();
-    const light = new Light(api);
+    const api = new mockApi();
+    const light = new mockLight(api);
     const behaviourAggregator = light.behaviourAggregator;
     behaviourAggregator.addBehaviour(<HueBehaviourWrapperTwilight>twilightDim50AllDay,SPHERE_LOCATION)
     behaviourAggregator.removeBehaviour("CLOUD-ID-123123");
@@ -42,8 +41,8 @@ describe("Function checks", () =>{
   })
 
   test("Update twilight", ()=>{
-    const api = new Api();
-    const light = new Light(api);
+    const api = new mockApi();
+    const light = new mockLight(api);
     const behaviourAggregator = light.behaviourAggregator;
     behaviourAggregator.addBehaviour(<HueBehaviourWrapperTwilight>twilightDim50AllDay,SPHERE_LOCATION)
     let updatedBehaviour = <HueBehaviourWrapperTwilight>{...twilightDim50AllDay};
@@ -54,8 +53,8 @@ describe("Function checks", () =>{
   })
 
   test("Dumb house mode",() =>{
-    const api = new Api();
-    const light = new Light(api);
+    const api = new mockApi();
+    const light = new mockLight(api);
     const behaviourAggregator = light.behaviourAggregator;
     behaviourAggregator.addBehaviour(<HueBehaviourWrapperBehaviour>switchOn50Range23500500,SPHERE_LOCATION)
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 13, 0).toString()));
@@ -72,8 +71,8 @@ describe("Function checks", () =>{
   test('Loop', () =>{
     jest.useFakeTimers();
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 13, 0).toString()));
-    const api = new Api();
-    const light = new Light(api);
+    const api = new mockApi();
+    const light = new mockLight(api);
     const behaviourAggregator = light.behaviourAggregator;
     behaviourAggregator.addBehaviour(<HueBehaviourWrapperBehaviour>switchOn10AllDay,SPHERE_LOCATION)
     behaviourAggregator.init();

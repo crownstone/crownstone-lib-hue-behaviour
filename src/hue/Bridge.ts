@@ -1,12 +1,9 @@
-import {CrownstoneHue} from "../CrownstoneHue";
 import {Light} from "./Light"
 import {v3} from "node-hue-api";
 import {CrownstoneHueError} from "../util/CrownstoneHueError";
 import {APP_NAME, DEVICE_NAME} from "../constants/HueConstants"  //Device naming.
 import {persistence} from "../util/Persistence";
-import {DiscoverResult} from "../declarations/declarations";
 import {Discovery} from "./Discovery";
-
 const hueApi = v3.api;
 
 
@@ -47,8 +44,6 @@ export class Bridge {
     this.clientKey = clientKey;
     this.macAddress = macAddress;
     this.bridgeId = bridgeId;
-
-
   }
 
   /**

@@ -21,10 +21,10 @@ afterEach(() => {
 
 describe("End Condition testing", () => {
   test('SwitchBehaviour should be active when user is still in sphere as End condition, activation time expired.', () => {
-    const behaviourSupport = new BehaviourSupport()
+    const behaviourSupport = new BehaviourSupport();
     behaviourSupport.setTimeFromClock(9, 10).setTimeToClock(16, 10).setDimPercentage(90).setPresenceIgnore().setEndConditionWhilePeopleInSphere();
     const behaviour = new Behaviour(behaviourSupport.rule, SPHERE_LOCATION);
-    const time = new Date()
+    const time = new Date();
     time.setHours(9);
     time.setMinutes(10);
     eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_SPHERE);

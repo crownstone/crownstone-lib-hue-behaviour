@@ -1,8 +1,7 @@
-import {SphereLocation} from "../declarations/declarations";
+
 import {BehaviourAggregatorUtil} from "./BehaviourAggregatorUtil";
 import {Twilight} from "./behaviour/Twilight";
 import {PrioritizerBase} from "./PrioritizerBase";
-import {HueBehaviourWrapperTwilight} from "../declarations/behaviourTypes";
 
 
 export class TwilightPrioritizer extends PrioritizerBase {

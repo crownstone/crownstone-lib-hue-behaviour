@@ -1,15 +1,10 @@
-import {Bridge} from "./Bridge";
 import {
-    minValueOfStates,
-    maxValueOfStates,
-    minMaxValueStates,
-    possibleStates,
     LIGHT_POLLING_RATE
 } from "../constants/HueConstants";
 import {BehaviourAggregator} from "../behaviour/BehaviourAggregator";
-import {HueFullState, StateUpdate} from "../declarations/declarations";
 import Timeout = NodeJS.Timeout;
-import * as Api from "node-hue-api/lib/api/Api"; 
+import {v3} from "node-hue-api";
+const hueApi = v3.api;
 import {lightUtil} from "../util/LightUtil";
 
 
@@ -41,12 +36,12 @@ export class Light {
     bridgeId: string;
     capabilities: object;
     supportedStates: object;
-    api: Api;
+    api: any;
     lastUpdate: number;
     intervalId : Timeout;
     behaviourAggregator: BehaviourAggregator;
 
-    constructor(name: string, uniqueId: string, state: HueFullState, id: number, bridgeId: string, capabilities: object, supportedStates: object, api: Api) {
+    constructor(name: string, uniqueId: string, state: HueFullState, id: number, bridgeId: string, capabilities: object, supportedStates: object, api: any) {
         this.name = name;
         this.uniqueId = uniqueId;
         this.state = state;

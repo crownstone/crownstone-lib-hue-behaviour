@@ -1,6 +1,5 @@
 import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
 import {BehaviourSupport} from "./behaviour/BehaviourSupport";
-import {PrioritizedList} from "../declarations/declarations";
 import {Twilight} from "./behaviour/Twilight";
 
 

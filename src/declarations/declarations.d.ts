@@ -1,5 +1,3 @@
-import {SwitchBehaviour} from "../behaviour/behaviour/SwitchBehaviour";
-
 interface DiscoverResult {
   id: string,
   internalipaddress: string
@@ -68,10 +66,10 @@ interface SphereLocation {
   longitude: number
 }
 interface PrioritizedList{
-  1: SwitchBehaviour[];
-  2: SwitchBehaviour[];
-  3: SwitchBehaviour[];
-  4: SwitchBehaviour[];
+  1: SwitchBehaviourInterface[];
+  2: SwitchBehaviourInterface[];
+  3: SwitchBehaviourInterface[];
+  4: SwitchBehaviourInterface[];
 }
 
 type EventUnsubscriber = () => void

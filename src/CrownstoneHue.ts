@@ -3,8 +3,6 @@ import {CrownstoneHueError} from "./util/CrownstoneHueError";
 import {persistence} from "./util/Persistence";
 import {eventBus} from "./util/EventBus";
 import {ON_DUMB_HOUSE_MODE_SWITCH, ON_PRESENCE_CHANGE} from "./constants/EventConstants";
-import {PresenceEvent, SphereLocation} from "./declarations/declarations";
-import {HueBehaviourWrapper} from "./declarations/behaviourTypes";
 import {Discovery} from "./hue/Discovery";
 
 /**
