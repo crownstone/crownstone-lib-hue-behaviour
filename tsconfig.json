@@ -7,11 +7,7 @@
     "sourceMap": true,
     "composite": true
   },
-  "exclude": [
-    "node_modules",
-    "tests"
-  ],
   "include": [
-    "src/**/*.ts"
+    "src/"
   ]
 }

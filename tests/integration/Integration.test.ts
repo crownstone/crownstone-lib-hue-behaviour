@@ -7,8 +7,6 @@ import {
   SPHERE_LOCATION
 } from "../constants/testConstants";
 import {switchOn80WhenAny1Home} from "./constants/Behaviours";
-import {HueBehaviourWrapper, Presence} from "../../src/declarations/behaviourTypes";
-import {PresenceEvent} from "../../src/declarations/declarations";
 import {BehaviourSupport} from "../../src/behaviour/behaviour/BehaviourSupport";
 //Make sure Bridge is up and running in the network.
 persistence.loadConfiguration = jest.fn(async () => {

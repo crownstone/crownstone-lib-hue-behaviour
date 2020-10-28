@@ -15,12 +15,6 @@
     "node-hue-api": "^4.0.9",
     "suncalc": "^1.8.0"
   },
-  "jest": {
-    "moduleDirectories": [
-      "tests",
-      "src"
-    ]
-  },
   "devDependencies": {
     "@types/jest": "^26.0.14",
     "@types/node": "^14.6.4",

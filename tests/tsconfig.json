@@ -1,14 +1,12 @@
 {
+  "$schema": "http://json.schemastore.org/tsconfig",
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es5",
-    "outDir": "./dist",
-    "resolveJsonModule": true,
-    "rootDir": "."
+    "noImplicitAny": false,
+    "strictNullChecks": false
   },
-  "references": [
-    {
-      "path": "../"
-    }
+  "include": [
+    "../src/**/*",
+    "../tests/**/*"
   ]
 }

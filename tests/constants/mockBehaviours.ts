@@ -1,5 +1,5 @@
 
-export const switchOnWhenAny1Home = {
+export const switchOnWhenAny1Home : HueBehaviourWrapper = {
     "type": "BEHAVIOUR",
     "data": {
         "action": {"type": "BE_ON", "data": 100},
@@ -22,7 +22,7 @@ export const switchOnWhenAny1Home = {
     "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
-export const switchOn80WhenAny1Home = {
+export const switchOn80WhenAny1Home : HueBehaviourWrapper = {
     "type": "BEHAVIOUR",
     "data": {
         "action": {"type": "BE_ON", "data": 80},
@@ -45,7 +45,7 @@ export const switchOn80WhenAny1Home = {
     "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
-export const switchOnOnlyAtWeekend = {
+export const switchOnOnlyAtWeekend : HueBehaviourWrapper = {
     "type": "BEHAVIOUR",
     "data": {
         "action": {"type": "BE_ON", "data": 100},
@@ -68,7 +68,7 @@ export const switchOnOnlyAtWeekend = {
     "lightId": "5f4e47660bc0da0004b4fe16"
 }
 
-export const switchOnBetweenRangeWithSpherePresence = {
+export const switchOnBetweenRangeWithSpherePresence : HueBehaviourWrapper = {
     "type": "BEHAVIOUR",
     "data": {
         "action": {"type": "BE_ON", "data": 100},
@@ -98,7 +98,7 @@ export const switchOnBetweenRangeWithSpherePresence = {
 
 
 
-export const switchOnAllDayIgnorePresence = {
+export const switchOnAllDayIgnorePresence : HueBehaviourWrapper = {
     "type": "BEHAVIOUR",
     "data": {
         "action": {"type": "BE_ON", "data": 100},
@@ -123,7 +123,7 @@ export const switchOnAllDayIgnorePresence = {
 
 
 
-export const twilightDim50AllDay : HueBehaviourWrapperTwilight = {
+export const twilightDim50AllDay : HueBehaviourWrapper = {
     "type": "TWILIGHT",
     "data": {
         "action": {"type": "DIM_WHEN_TURNED_ON", "data": 50},
@@ -144,7 +144,7 @@ export const twilightDim50AllDay : HueBehaviourWrapperTwilight = {
     "lightId": "5f4e47660bc0da0004b4fe16",
 }
 
-export const twilightDim50AllDayUpdated100 = {
+export const twilightDim50AllDayUpdated100 : HueBehaviourWrapper = {
     "type": "TWILIGHT",
     "data": {
         "action": {"type": "DIM_WHEN_TURNED_ON", "data": 100},
