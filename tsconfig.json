@@ -1,10 +1,17 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+<<<<<<< HEAD
     "target": "es2018",
     "outDir": "dist",
+=======
+    "esModuleInterop": true,
+    "target": "ES2018",
+    "moduleResolution": "node",
+>>>>>>> 79a4e1eb0be25a081a47cd9fbf840c6c61702217
     "sourceMap": true,
-    "composite": true
+    "outDir": "dist",
+    "declaration": true
   },
   "exclude": [
     "node_modules"
@@ -12,5 +19,9 @@
   "include": [
     "src/**/*.ts"
   ]
+<<<<<<< HEAD
 }
 
+=======
+}
+>>>>>>> 79a4e1eb0be25a081a47cd9fbf840c6c61702217
