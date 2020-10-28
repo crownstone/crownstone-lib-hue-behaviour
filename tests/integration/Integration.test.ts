@@ -6,7 +6,6 @@ import {
   EVENT_LEAVE_SPHERE,
   SPHERE_LOCATION
 } from "../constants/testConstants";
-import {switchOn80WhenAny1Home} from "./constants/Behaviours";
 import {BehaviourSupport} from "../../src/behaviour/behaviour/BehaviourSupport";
 //Make sure Bridge is up and running in the network.
 persistence.loadConfiguration = jest.fn(async () => {

@@ -1,12 +1,19 @@
+
+
 {
-  "$schema": "http://json.schemastore.org/tsconfig",
-  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "noImplicitAny": false,
-    "strictNullChecks": false
+    "module": "commonjs",
+    "target": "es2018",
+    "outDir": "./dist",
+    "resolveJsonModule": true,
   },
+  "references": [
+    {
+      "path": "../"
+    }
+  ],
   "include": [
     "../src/**/*",
-    "../tests/**/*"
+    "./**/*.ts"
   ]
-}
+} 

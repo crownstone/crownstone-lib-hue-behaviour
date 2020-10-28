@@ -2,13 +2,17 @@ interface DiscoverResult {
   id: string,
   internalipaddress: string
 }
-interface HueLightState {
-  on: boolean,
+
+interface HueStateBase{
+  on?: boolean,
   bri?: number,
   hue?: number,
   sat?: number,
   xy?: [number, number],
   ct?: number,
+}
+interface HueLightState extends HueStateBase{
+  on: boolean
 }
 
 interface HueFullState extends HueLightState{
@@ -19,7 +23,7 @@ interface HueFullState extends HueLightState{
   reachable: boolean
 }
 
-interface StateUpdate extends HueLightState{
+interface StateUpdate extends HueStateBase{
   effect?: string,
   alert?: string,
   bri_inc?: number;

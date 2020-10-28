@@ -28,7 +28,7 @@ export class mockLight {
     })
     this.state = this.api.lights.getLightState();
     if(oldState.on !== this.state.on || oldState.bri !== this.state.bri ){
-      await this.behaviourAggregator.lightStateChanged({...this.state});
+      await this.behaviourAggregator.lightStateChanged(<HueFullState>{...this.state});
     }
   }
 

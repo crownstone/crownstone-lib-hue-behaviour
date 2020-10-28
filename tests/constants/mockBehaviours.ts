@@ -79,7 +79,8 @@ export const switchOnBetweenRangeWithSpherePresence : HueBehaviourWrapper = {
         },
         "presence": {"type": "SOMEBODY",
                     "data":{
-                        "type":"SPHERE"}
+                        "type":"SPHERE"},
+                    "delay": 300
                     }
 
     },
