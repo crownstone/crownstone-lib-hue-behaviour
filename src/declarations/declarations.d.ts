@@ -77,3 +77,14 @@ interface PrioritizedList{
 }
 
 type EventUnsubscriber = () => void
+
+interface lightInfo {
+  name: string
+  uniqueId: string,
+  state: HueFullState,
+  bridgeId: string,
+  id: number,
+  supportedStates: {  },
+  capabilities: { },
+  lastUpdate: number
+}

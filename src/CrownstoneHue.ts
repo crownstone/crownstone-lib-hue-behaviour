@@ -4,6 +4,7 @@ import {persistence} from "./util/Persistence";
 import {eventBus} from "./util/EventBus";
 import {ON_DUMB_HOUSE_MODE_SWITCH, ON_PRESENCE_CHANGE} from "./constants/EventConstants";
 import {Discovery} from "./hue/Discovery";
+import {GenericUtil} from "./util/GenericUtil";
 
 /**
  * CrownstoneHue object
@@ -45,7 +46,7 @@ export class CrownstoneHue {
     let bridgeObject = this.createBridgeFromConfig(uniqueId);
     await bridgeObject.init();
     for (const lightId of Object.keys(bridge.lights)) {
-      const light = await bridgeObject.configureLight(bridge.lights[lightId].id);
+      const light = await bridgeObject.configureLightById(bridge.lights[lightId].id);
       if ("behaviours" in bridge.lights[lightId]) {
         for (const behaviour of bridge.lights[lightId].behaviours) {
           light.behaviourAggregator.addBehaviour(behaviour, this.sphereLocation);
@@ -64,7 +65,9 @@ export class CrownstoneHue {
     eventBus.emit(ON_DUMB_HOUSE_MODE_SWITCH, on);
   }
 
- async addBehaviour(behaviour: HueBehaviourWrapper):Promise<void> {
+ async addBehaviour(newBehaviour: HueBehaviourWrapper):Promise<void> {
+    const behaviour = GenericUtil.deepCopy(newBehaviour) as HueBehaviourWrapper;
+
     for (const bridge of this.bridges) {
       const light = bridge.lights[behaviour.lightId];
       if (light !== undefined) {
@@ -143,7 +146,8 @@ export class CrownstoneHue {
   async addLight(bridgeId:string, idOnBridge: number):Promise<void> {
     for(const bridge of this.bridges){
       if (bridge.bridgeId === bridgeId){
-        await bridge.configureLight(idOnBridge);
+        const light = await bridge.configureLightById(idOnBridge);
+        light.init();
         break;
       }
     }
@@ -163,7 +167,8 @@ export class CrownstoneHue {
 
 
   getConnectedBridges(): Bridge[] {
-    return this.bridges;
+
+    return [...this.bridges];
   }
 
   createBridgeFromConfig(bridgeId: string): Bridge {
@@ -177,5 +182,11 @@ export class CrownstoneHue {
       }
       return new Bridge(bridgeConfig.name, bridgeConfig.username, bridgeConfig.clientKey, bridgeConfig.macAddress, bridgeConfig.ipAddress, bridgeId);
     }
+  }
+
+  async stop():Promise<void>{
+    this.bridges.forEach(async bridge => {
+      await persistence.saveFullBridgeInformation(bridge);
+      bridge.cleanup()});
   }
 }

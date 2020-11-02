@@ -6,6 +6,7 @@ import Timeout = NodeJS.Timeout;
 import {v3} from "node-hue-api";
 const hueApi = v3.api;
 import {lightUtil} from "../util/LightUtil";
+import {GenericUtil} from "../util/GenericUtil";
 
 
 
@@ -56,10 +57,10 @@ export class Light {
 
     init():void{
         this.behaviourAggregator.init();
-        this.intervalId = setInterval(() => this.renewState(), LIGHT_POLLING_RATE);
+        this.intervalId = setInterval(async () => await this.renewState(), LIGHT_POLLING_RATE);
     }
 
-    private _setLastUpdate(): void {
+    _setLastUpdate(): void {
         this.lastUpdate = Date.now();
     }
 
@@ -74,18 +75,19 @@ export class Light {
     async renewState(): Promise<void> {
         const newState = await this.api.lights.getLightState(this.id) as HueFullState;
         if (!lightUtil.stateEqual(this.state,newState)) {
-            this.state = newState;
+            this.state = <HueFullState>GenericUtil.deepCopy(newState);
             this._setLastUpdate();
             await this.behaviourAggregator.lightStateChanged({...this.state});
         }
     }
 
+
     getState(): HueFullState {
-        return {...this.state};
+        return <HueFullState>GenericUtil.deepCopy(this.state);
     }
 
 
-    private _updateState(state: StateUpdate): void {
+     _updateState(state: StateUpdate): void {
         Object.keys(state).forEach(key => {
             if (lightUtil.isAllowedStateType(key)) {
                 this.state[key] = state[key];
@@ -109,7 +111,7 @@ export class Light {
         return this.state["reachable"] || false;
     }
 
-    getInfo(): object {
+    getInfo(): lightInfo {
         return {
             name: this.name,
             uniqueId: this.uniqueId,

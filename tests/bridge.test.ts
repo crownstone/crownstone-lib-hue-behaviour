@@ -4,7 +4,8 @@
 import {CrownstoneHueError} from "../src/util/CrownstoneHueError";
 import {persistence} from "../src/util/Persistence";
 import {Discovery} from "../src/hue/Discovery";
-import {api} from "node-hue-api/lib/v3";
+import {v3} from "node-hue-api"
+
 
 import {SPHERE_LOCATION} from "./constants/testConstants";
 import exp = require("constants");
@@ -30,7 +31,7 @@ afterEach(() =>{
   jest.clearAllMocks()
 })
 beforeEach(()=>{
-  api.createLocal = jest.fn().mockImplementation(ignore => {
+  v3.api.createLocal = jest.fn().mockImplementation(ignore => {
     return {
       connect: ((ignore?) => {
         return {
@@ -132,7 +133,7 @@ describe("Bridge", () => {
   test('Configure light by Id', async () => {
     const bridge = new Bridge("", "", "", "", "192.168.178.26", "")
     await bridge.init();
-    await bridge.configureLight(0).then(light => {
+    await bridge.configureLightById(0).then(light => {
       expect(light.uniqueId).toBe("ABCD123")
     })
   })
@@ -145,7 +146,7 @@ describe("Bridge", () => {
   })
 
   test('Rediscovery', async () => {
-    api.createLocal = jest.fn().mockImplementation((ipaddress) => {
+    v3.api.createLocal = jest.fn().mockImplementation((ipaddress) => {
       if(ipaddress === "192.168.178.26") {
         return {connect: (() => Promise.reject({code: "ETIMEDOUT"}))};
       } else if(ipaddress === "192.168.178.10"){
@@ -162,13 +163,13 @@ describe("Bridge", () => {
   test('Get light by Id',async ()=>{
     const bridge = new Bridge("Philips Hue", "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo", "F713C35839453184BA3B148E5504C74B", "00:17:88:29:2a:f4", "192.168.178.26", "001788FFFE292AF4")
     await bridge.init();
-    await bridge.configureLight(0)
+    await bridge.configureLightById(0)
     return expect(bridge.getLightById("ABCD123").name).toBe("Light 1")
   })
   test('Remove light by Id',async ()=>{
     const bridge = new Bridge("Philips Hue", "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo", "F713C35839453184BA3B148E5504C74B", "00:17:88:29:2a:f4", "192.168.178.26", "001788FFFE292AF4")
     await bridge.init();
-    await bridge.configureLight(0)
+    await bridge.configureLightById(0)
     expect(bridge.getLightById("ABCD123").name).toBe("Light 1")
     await bridge.removeLight("ABCD123");
     expect(bridge.getConnectedLights().length).toBe(0);

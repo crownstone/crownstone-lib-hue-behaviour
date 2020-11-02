@@ -29,6 +29,7 @@ export class SwitchBehaviourPrioritizer extends PrioritizerBase {
   }
 
   _prioritizeBehaviour() {
+
     if (this.behaviours === []) {
       this.prioritizedBehaviour = undefined;
     }

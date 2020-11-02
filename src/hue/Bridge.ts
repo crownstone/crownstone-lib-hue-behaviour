@@ -112,11 +112,10 @@ export class Bridge {
    *
    * @Returns uninitialized light object. (Call .init())
    */
-  async configureLight(id: number): Promise<Light> {
+  async configureLightById(id: number): Promise<Light> {
     if (this.authenticated) {
       try {
         const lightInfo = await this.api.lights.getLight(id);
-        this.lights[lightInfo.uniqueid] = {};
         const light = new Light(lightInfo.name, lightInfo.uniqueid, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this.api)
         this.lights[lightInfo.uniqueid] = light;
         persistence.saveLight(this.bridgeId, light)
@@ -139,12 +138,17 @@ export class Bridge {
     }
   }
 
+
   async removeLight(uniqueLightId: string): Promise<void> {
     await persistence.removeLightFromConfig(this, uniqueLightId);
     this.lights[uniqueLightId].cleanup();
     delete this.lights[uniqueLightId];
   }
 
+
+  /** Retrieves all the lights that are connected through the module.
+   *
+   */
   getConnectedLights(): Light[] {
     return Object.values(this.lights);
   }
@@ -160,6 +164,9 @@ export class Bridge {
   }
 
 
+  /** Retrieves all lights from the bridge.
+   *
+   */
   async getAllLightsFromBridge(): Promise<Light[]> {
     if (this.authenticated) {
       const lights = await this.api.lights.getAll();

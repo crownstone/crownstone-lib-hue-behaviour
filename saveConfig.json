@@ -9,50 +9,81 @@
       "lights": {
         "00:17:88:01:10:25:5d:16-0b": {
           "name": "Hue color lamp 1",
-          "id": 4
+          "id": 4,
+          "behaviours": [
+            {
+              "type": "BEHAVIOUR",
+              "activeDays": {
+                "Fri": true,
+                "Mon": true,
+                "Sat": true,
+                "Sun": true,
+                "Thu": true,
+                "Tue": true,
+                "Wed": true
+              },
+              "data": {
+                "action": {
+                  "type": "BE_ON",
+                  "data": 50
+                },
+                "time": {
+                  "type": "ALL_DAY"
+                },
+                "presence": {
+                  "type": "SOMEBODY",
+                  "data": {
+                    "type": "LOCATION",
+                    "locationIds": [
+                      1
+                    ]
+                  },
+                  "delay": 0
+                }
+              },
+              "cloudId": "cifunction now() { [native code] }",
+              "lightId": "00:17:88:01:10:25:5d:16-0b"
+            }
+          ]
         },
         "00:17:88:01:10:4a:cd:c8-0b": {
           "name": "Hue color lamp 2",
-          "id": 5
-        }
-      }
-    },
-    "ECB5FAFFFE068F8B": {
-      "name": "Philips hue",
-      "ipAddress": "10.27.8.188",
-      "macAddress": "ec:b5:fa:06:8f:8b",
-      "username": "iA2t2aVH2ik-X74buEgBQq5xMrfiiGb8L0l0Jw1D",
-      "clientKey": "8669BECD317E3D73033EF138044FE109",
-      "lights": {
-        "00:17:88:01:04:71:04:39-0b": {
-          "name": "Hue color lamp 3",
-          "id": 3,
-          "behaviours": []
-        },
-        "00:17:88:01:04:71:09:99-0b": {
-          "name": "Hue color lamp 1",
-          "id": 1,
-          "behaviours": []
-        },
-        "00:17:88:01:04:71:09:9c-0b": {
-          "name": "Hue color lamp 2",
-          "id": 2,
-          "behaviours": []
-        }
-      }
-    },
-    "FFAAGGFFFECCDDEE": {
-      "name": "Bridge 1",
-      "username": "12351241",
-      "clientKey": "3456346",
-      "macAddress": "FF:AA:GG:CC:DD:EE",
-      "ipAddress": "192.168.172.15",
-      "bridgeId": "FFAAGGFFFECCDDEE",
-      "lights": {
-        "AS:TE:ST:f4:FA:DA": {
-          "name": "TEST",
-          "id": "4",
-          "behaviours": []
+          "id": 5,
+          "behaviours": [
+            {
+              "type": "BEHAVIOUR",
+              "activeDays": {
+                "Fri": true,
+                "Mon": true,
+                "Sat": true,
+                "Sun": true,
+                "Thu": true,
+                "Tue": true,
+                "Wed": true
+              },
+              "data": {
+                "action": {
+                  "type": "BE_ON",
+                  "data": 50
+                },
+                "time": {
+                  "type": "ALL_DAY"
+                },
+                "presence": {
+                  "type": "SOMEBODY",
+                  "data": {
+                    "type": "LOCATION",
+                    "locationIds": [
+                      1
+                    ]
+                  },
+                  "delay": 0
+                }
+              },
+              "cloudId": "cifunction now() { [native code] }",
+              "lightId": "00:17:88:01:10:4a:cd:c8-0b"
+            }
+          ]
         }
       }
     }

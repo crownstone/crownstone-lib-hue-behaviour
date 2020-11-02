@@ -1,7 +1,3 @@
-// TODO: add a few util functions here which persist your config.
-// TODO: inject these into the constructor of your main class, so we can use the database ones later on.
-
-
 import {promises as fs} from "fs";
 import {Bridge, CrownstoneHueError, Light} from ".."; 
 
@@ -47,6 +43,7 @@ class Persistence {
     let bridgeId = config["bridgeId"];
     delete config["reachable"];
     delete config["bridgeId"];
+    config["lights"] = {};
     this.configuration[CONF_BRIDGE_LOCATION][bridgeId] = config;
     if (bridge.lights != {}) {
       bridge.getConnectedLights().forEach(light => {
@@ -65,10 +62,12 @@ class Persistence {
    */
   saveLight(bridgeId: string, light: Light): void {
     if (this.configuration != undefined) {
-      this.configuration[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]] = {};
-      this.configuration[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["name"] = light["name"];
-      this.configuration[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["id"] = light["id"];
-      this.configuration[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light["uniqueId"]]["behaviours"] = [];
+      const lightInfo = light.getInfo()
+      const uniqueId = lightInfo.uniqueId;
+      this.configuration[CONF_BRIDGE_LOCATION][bridgeId]["lights"][uniqueId] = {};
+      this.configuration[CONF_BRIDGE_LOCATION][bridgeId]["lights"][uniqueId]["name"] = lightInfo.name;
+      this.configuration[CONF_BRIDGE_LOCATION][bridgeId]["lights"][uniqueId]["id"] = lightInfo.id;
+      this.configuration[CONF_BRIDGE_LOCATION][bridgeId]["lights"][uniqueId]["behaviours"] = [];
 
     } else {
       throw new CrownstoneHueError(410)

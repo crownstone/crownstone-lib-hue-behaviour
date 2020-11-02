@@ -78,9 +78,27 @@ describe("Function checks", () =>{
     behaviourAggregator.init();
     jest.advanceTimersByTime(500);
     expect(setInterval).toBeCalledTimes(1);
+
     return expect(behaviourAggregator.switchBehaviourPrioritizer.prioritizedBehaviour).toBeDefined();
   })
 
+  test('Light should stay off', () =>{
+    jest.useFakeTimers();
+    Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 13, 0).toString()));
+    const api = new mockApi();
+    const light = new mockLight(api);
+    const behaviourAggregator = light.behaviourAggregator;
+    behaviourAggregator.addBehaviour(<HueBehaviourWrapperBehaviour>switchOn10AllDay,SPHERE_LOCATION)
+    behaviourAggregator.init();
+    jest.advanceTimersByTime(500);
+    expect(light.state.bri).toBe(10*2.54);
+    jest.advanceTimersByTime(500);
+    api.user.turnLightOff();
+    light.renewState();
+    jest.advanceTimersByTime(500);
+    jest.advanceTimersByTime(500);
+    return expect(light.state.on).toBeFalsy()
+  })
 
 })
 
