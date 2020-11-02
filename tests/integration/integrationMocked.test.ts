@@ -9,6 +9,10 @@ import {persistence} from "../../src/util/Persistence";
 import {BehaviourSupport} from "../../src/behaviour/behaviour/BehaviourSupport";
 import {eventBus} from "../../src/util/EventBus";
 
+function timeout(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 describe('Integration Test with mocks', () => {
   let fakeSaveFile = {};
 
@@ -119,8 +123,7 @@ describe('Integration Test with mocks', () => {
       }
       persistence.configuration = config;
       return config;
-    });
-    jest.useFakeTimers();
+    })
     const crownstoneHue = new CrownstoneHue();
     let bridges = await crownstoneHue.init(SPHERE_LOCATION);
 
@@ -132,7 +135,7 @@ describe('Integration Test with mocks', () => {
     await crownstoneHue.addBehaviour(behaviourC.rule);
     const behaviourD = new BehaviourSupport().setCloudId("id3").setLightId(fakeLightsOnBridge[1].uniqueid).setTimeAllDay().setDimPercentage(80).setPresenceSomebodyInSphere().setPresenceDelay(0)
     await crownstoneHue.addBehaviour(behaviourD.rule);
-    await jest.advanceTimersToNextTimer(1);
+    await timeout(500);
     const lights = bridges[0].getConnectedLights();
     //Init, lights should be at 20%.
     expect(lights[0].getState()).toMatchObject({on: true, bri: 20 * 2.54})
@@ -141,21 +144,21 @@ describe('Integration Test with mocks', () => {
 
     //User enters house, light should be 80%
     crownstoneHue.presenceChange(<PresenceEvent>EVENT_ENTER_SPHERE);
-    await jest.advanceTimersToNextTimer(1);
+    await timeout(500);
     expect(lights[0].getState()).toMatchObject({on: true, bri: 80 * 2.54})
     expect(fakeLightsOnBridge[0].state).toMatchObject({on: true, bri: 80 * 2.54})
     expect(lights[0].behaviourAggregator.currentLightState).toMatchObject({on: true, bri: 80 * 2.54})
 
     //User has a a visitor and sets dumb House mode on.
     crownstoneHue.setDumbHouseMode(true);
-    await jest.advanceTimersToNextTimer(1);
+    await timeout(500);
     expect(lights[0].getState()).toMatchObject({on: true, bri: 80 * 2.54})
     expect(fakeLightsOnBridge[0].state).toMatchObject({on: true, bri: 80 * 2.54})
     expect(lights[0].behaviourAggregator.currentLightState).toMatchObject({on: true, bri: 80 * 2.54})
     console.log("NEXT")
     //Everyone leaves the house, lights should stay 80%, forgot to turn off dumb house mode.
     crownstoneHue.presenceChange(<PresenceEvent>EVENT_LEAVE_SPHERE);
-    jest.advanceTimersToNextTimer(1);
+    await timeout(500);
     console.log(lights[0].behaviourAggregator.override)
     expect(lights[0].getState()).toMatchObject({on: true, bri: 80 * 2.54})
     expect(fakeLightsOnBridge[0].state).toMatchObject({on: true, bri: 80 * 2.54})
@@ -164,7 +167,7 @@ describe('Integration Test with mocks', () => {
 
     //User turns off dumbhouse mode, lights should stay the same.
     crownstoneHue.setDumbHouseMode(false);
-    await jest.advanceTimersToNextTimer(1);
+    await timeout(500);
     console.log(lights[0].behaviourAggregator.override)
     expect(lights[0].getState()).toMatchObject({on: true, bri: 80 * 2.54})
     expect(fakeLightsOnBridge[0].state).toMatchObject({on: true, bri: 80 * 2.54})
@@ -172,8 +175,9 @@ describe('Integration Test with mocks', () => {
 
     //User enters house again
     crownstoneHue.presenceChange(<PresenceEvent>EVENT_ENTER_SPHERE);
-    await jest.advanceTimersToNextTimer(1);
+    await timeout(500);
     expect(lights[0].behaviourAggregator.override).toBe("NO_OVERRIDE")
+    await crownstoneHue.stop();
   })
 
 })

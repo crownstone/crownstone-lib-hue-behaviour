@@ -62,7 +62,6 @@ export class BehaviourAggregator {
     this.timestamp = Date.now();
     this.switchBehaviourPrioritizer.tick(this.timestamp);
     this.twilightPrioritizer.tick(this.timestamp);
-    console.log("PRIORITIZED!")
     await this._handleBehaviours();
 
     if (this.dumbHouseModeActive) {
@@ -115,6 +114,7 @@ export class BehaviourAggregator {
     this.aggregatedBehaviour = newBehaviour;
 
     this.checkIfAllBehavioursAreInactive();
+    this._checkIfStateMatchesWithNewBehaviour();
 
     if (typeof (newBehaviour) !== "undefined") {
       if (newBehaviour.behaviour.type === "TWILIGHT") {
@@ -160,15 +160,11 @@ export class BehaviourAggregator {
    * @param behaviour
    */
   async onBehaviourDeactivation(): Promise<void> {
-    if (this.override === DIM_STATE_OVERRIDE) {
-      await this._activateNewBehaviour();
-      this.override = NO_OVERRIDE; //STATE MATCH
-    } else if (this.override === SWITCH_STATE_OVERRIDE) {
+    if (this.override !== NO_OVERRIDE) {
       this.override = NO_OVERRIDE;
-      await this._activateNewBehaviour();
-    } else {
-      await this._activateNewBehaviour();
     }
+    await this._activateNewBehaviour();
+
   }
 
   async _activateNewBehaviour() {
@@ -178,7 +174,6 @@ export class BehaviourAggregator {
   }
 
   async _setLightState() {
-    console.log("HELLO!")
     const state = this.getComposedState()
     this.currentLightState = GenericUtil.deepCopy(state);
     await this.updateCallBack(state);
@@ -209,19 +204,14 @@ export class BehaviourAggregator {
    */
   _setOverrideOnLightStateChange(state): void {
     const composedState = this.getComposedState();
-    console.log(composedState);
     if (composedState.on !== state.on && typeof (this.switchBehaviourPrioritizer.prioritizedBehaviour) !== "undefined") {
-      this.override = SWITCH_STATE_OVERRIDE
-      console.log("switch")
+      this.override = SWITCH_STATE_OVERRIDE;
 
     } else if (composedState.on === state.on && composedState.bri !== state.bri && typeof (this.switchBehaviourPrioritizer.prioritizedBehaviour) !== "undefined") {
       this.override = DIM_STATE_OVERRIDE;
-      console.log("DIM")
     } else {
       this.override = NO_OVERRIDE;
-      console.log("NO")
     }
-    console.log(this.override)
   }
 
   /** If a light turns manually on while behaviour is active, behaviour's state will be used as light's state.
@@ -240,6 +230,17 @@ export class BehaviourAggregator {
     return false;
   }
 
+  _checkIfStateMatchesWithNewBehaviour() {
+    if (typeof (this.aggregatedBehaviour) === "undefined") {
+      if (!this.currentLightState.on) {
+        this.override = NO_OVERRIDE
+      }
+    } else {
+      if (lightUtil.stateEqual(this.currentLightState, this.aggregatedBehaviour.getComposedState())) {
+        this.override = NO_OVERRIDE
+      }
+    }
+  }
 }
 
 function debugPrintStateDifference(oldS, newS) {
