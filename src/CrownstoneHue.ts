@@ -207,8 +207,10 @@ export class CrownstoneHue {
 
   async stop():Promise<void>{
     for(const bridge of this.bridges){
-      await persistence.saveFullBridgeInformation(bridge);
       bridge.cleanup()
     }
+    Object.values(this.lights).forEach(wrappedLight => {
+      wrappedLight.cleanup();
+  });
   }
 }
