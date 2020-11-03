@@ -3,6 +3,7 @@ export const ERROR_CODES = {
     404: "Bridge is unreachable and probably offline.",
     405: "Bridge is not authenticated.",
     406: "Link button on Bridge is not pressed.",
+    407: "Bridge is not initialized.",
     410: "Configuration settings are undefined.",
     422: "Light is not found on the bridge.",
     999: "Unknown Error, see description."

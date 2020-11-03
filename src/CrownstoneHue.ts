@@ -5,6 +5,8 @@ import {eventBus} from "./util/EventBus";
 import {ON_DUMB_HOUSE_MODE_SWITCH, ON_PRESENCE_CHANGE} from "./constants/EventConstants";
 import {Discovery} from "./hue/Discovery";
 import {GenericUtil} from "./util/GenericUtil";
+import {LightAggregatorWrapper} from "./wrapper/LightAggregatorWrapper";
+import {Light} from "./hue/Light";
 
 /**
  * CrownstoneHue object
@@ -14,10 +16,12 @@ import {GenericUtil} from "./util/GenericUtil";
  *
  * @param sphereLocation - Longitude and Latitude of the location of where the Sphere is.
  * @param bridges - List of connected bridges
+ * @param lights - List of a wrapped light and aggregator
  *
  */
 export class CrownstoneHue {
   bridges: Bridge[] = [];
+  lights: {  [uniqueId: string]: LightAggregatorWrapper } = {};
   sphereLocation: SphereLocation;
 
   /**
@@ -47,12 +51,14 @@ export class CrownstoneHue {
     await bridgeObject.init();
     for (const lightId of Object.keys(bridge.lights)) {
       const light = await bridgeObject.configureLightById(bridge.lights[lightId].id);
+      const lightAggregatorWrapper = new LightAggregatorWrapper(light)
       if ("behaviours" in bridge.lights[lightId]) {
         for (const behaviour of bridge.lights[lightId].behaviours) {
-          light.behaviourAggregator.addBehaviour(behaviour, this.sphereLocation);
+          lightAggregatorWrapper.behaviourAggregator.addBehaviour(behaviour, this.sphereLocation);
         }
       }
-      light.init();
+      lightAggregatorWrapper.init();
+      this.lights[lightId]  = lightAggregatorWrapper;
     }
     this.bridges.push(bridgeObject);
   }
@@ -71,7 +77,7 @@ export class CrownstoneHue {
     for (const bridge of this.bridges) {
       const light = bridge.lights[behaviour.lightId];
       if (light !== undefined) {
-        light.behaviourAggregator.addBehaviour(behaviour, this.sphereLocation);
+        this.lights[behaviour.lightId].behaviourAggregator.addBehaviour(behaviour, this.sphereLocation);
         await persistence.saveBehaviour(bridge.bridgeId,behaviour.lightId,behaviour);
         break;
       }
@@ -82,7 +88,7 @@ export class CrownstoneHue {
     for (const bridge of this.bridges) {
       const light = bridge.lights[behaviour.lightId];
       if (light !== undefined) {
-        light.behaviourAggregator.updateBehaviour(behaviour);
+        this.lights[behaviour.lightId].behaviourAggregator.updateBehaviour(behaviour);
         await persistence.updateBehaviour(bridge.bridgeId,behaviour.lightId,behaviour)
         break;
       }
@@ -93,7 +99,7 @@ export class CrownstoneHue {
     for (const bridge of this.bridges) {
       const light = bridge.lights[behaviour.lightId];
       if (light !== undefined) {
-        light.behaviourAggregator.removeBehaviour(behaviour.cloudId);
+        this.lights[behaviour.lightId].behaviourAggregator.removeBehaviour(behaviour.cloudId);
         await persistence.removeBehaviour(bridge.bridgeId,behaviour.lightId,behaviour.cloudId);
         break;
       }
@@ -147,7 +153,11 @@ export class CrownstoneHue {
     for(const bridge of this.bridges){
       if (bridge.bridgeId === bridgeId){
         const light = await bridge.configureLightById(idOnBridge);
-        light.init();
+        const lightAggregatorWrapper = new LightAggregatorWrapper(light);
+        this.lights[light.getUniqueId()]  = lightAggregatorWrapper;
+        lightAggregatorWrapper.init();
+        persistence.saveLight(bridge.bridgeId, light)
+        await persistence.saveConfiguration();
         break;
       }
     }
@@ -158,14 +168,27 @@ export class CrownstoneHue {
       const light = bridge.lights[lightId];
       if (light !== undefined) {
         await bridge.removeLight(lightId);
+        this.lights[lightId].cleanup();
+        delete this.lights[lightId];
+        await persistence.removeLightFromConfig(bridge, lightId);
         break;
       }
     }
   }
 
+  getAllWrappedLights(): LightAggregatorWrapper[]{
+    return Object.values(this.lights);
+  }
+
+  getAllConnectedLights():Light[]{
+    let lights = []
+    for(const wrappedLight of  Object.values(this.lights)){
+      lights.push(wrappedLight.light);
+    }
+    return lights;
+}
 
   getConnectedBridges(): Bridge[] {
-
     return this.bridges;
   }
 

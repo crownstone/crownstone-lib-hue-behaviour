@@ -26,7 +26,7 @@ import {GenericUtil} from "../util/GenericUtil";
  * @param api  - Link to the api object it is connected to.
  * @param lastUpdate - Timestamp of when the state was last changed.
  * @param intervalId - Timeout object for the interval.
- * @param behaviourAggregator - Handles the behaviours.
+ * @param stateChangeCallback - Callback for when state is changed.
  *
  */
 export class Light {
@@ -37,10 +37,10 @@ export class Light {
     bridgeId: string;
     capabilities: object;
     supportedStates: object;
-    api: any;
+    api: ((action,extra?) => {});
     lastUpdate: number;
     intervalId : Timeout;
-    callback: (value) => {};
+    stateChangeCallback = ((value) => {});
 
     constructor(name: string, uniqueId: string, state: HueFullState, id: number, bridgeId: string, capabilities: object, supportedStates: object, api: any) {
         this.name = name;
@@ -59,7 +59,7 @@ export class Light {
     }
 
     setCallback(callback){
-        this.callback = callback;
+        this.stateChangeCallback = callback;
     }
 
     _setLastUpdate(): void {
@@ -74,11 +74,11 @@ export class Light {
      * Obtains the state from the light on the bridge and updates the state object if different.
      */
     async renewState(): Promise<void> {
-        const newState = await this.api.lights.getLightState(this.id) as HueFullState;
-        if (!lightUtil.stateEqual(this.state,newState)) {
+        const newState = await this.api("getLightState",this.id) as HueFullState;
+        if ( typeof(newState) !== "undefined" && !lightUtil.stateEqual(this.state,newState)) {
             this.state = <HueFullState>GenericUtil.deepCopy(newState);
             this._setLastUpdate();
-            this.callback(this.state);
+            this.stateChangeCallback(this.state);
         }
     }
 
@@ -101,7 +101,7 @@ export class Light {
      */
     async setState(state: StateUpdate): Promise<boolean> {
         state = lightUtil.manipulateMinMaxValueStates(state);
-        const result = await this.api.lights.setLightState(this.id.toString(), state);
+        const result = await this.api("setLightState",[this.id.toString(), state]) as boolean;
         if (result) {
             this._updateState(state);
         }

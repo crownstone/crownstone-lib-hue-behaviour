@@ -1,4 +1,4 @@
-import {CrownstoneHue, Discovery} from "../../src";
+import {Bridge, CrownstoneHue, Discovery} from "../../src";
 import {persistence} from "../../src/util/Persistence";
 import {v3} from "node-hue-api"
 import {
@@ -55,7 +55,7 @@ describe('Test over network with actual bridges and lights', () => {
     behaviour2.setLightId("00:17:88:01:10:25:5d:16-0b").setPresenceSomebodyInLocations([1]).setActionState(50).setTimeAllDay().setPresenceDelay(0)
     const crownstoneHue = new CrownstoneHue();
     const bridges = await crownstoneHue.init(SPHERE_LOCATION);
-    const lights = bridges[0].getConnectedLights();
+    const lights = crownstoneHue.getAllConnectedLights();
     await crownstoneHue.addBehaviour(<HueBehaviourWrapper>behaviour.rule);
     await crownstoneHue.addBehaviour(<HueBehaviourWrapper>behaviour2.rule);
     await lights[1].setState({on: false, transitiontime: 0})
@@ -69,8 +69,27 @@ describe('Test over network with actual bridges and lights', () => {
     crownstoneHue.presenceChange(<PresenceEvent>EVENT_LEAVE_LOCATION);
     await timeout(2500);
     expect(lights[1].getState()["on"]).toBeFalsy();
-    bridges.forEach((bridge) => bridge.cleanup())
+    await crownstoneHue.stop();
     return;
   }, 60000)
+
+  //Testing.....
+  // test("Test",async ()=>{
+  //   const bridge = new Bridge( "Philips Hue", "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo", "F713C35839453184BA3B148E5504C74B", "00:17:88:29:2a:f4","192.168.178.26","001788FFFE292AF4");
+  //   await bridge.init();
+  //   // bridge.api._config = {remote : false,
+  //   //   baseUrl: "https://192.168.178.25:443/api",
+  //   //   clientkey: undefined,
+  //   //   username : "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo"}
+  //  await bridge.populateLights();
+  //   const lights = bridge.getConnectedLights()
+  //   console.log("DISCONNECT ME")
+  //   await timeout(10000)
+  //   console.log("RECONNECT ME")
+  //   await lights[0].renewState()
+  //   await lights[1].renewState()
+  //
+  //   console.log(await bridge._useApi("setLightState",[1,{on:true}]));
+  // },120000)
 });
 

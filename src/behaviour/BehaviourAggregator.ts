@@ -178,6 +178,7 @@ export class BehaviourAggregator {
   async _setLightState() {
     const state = this.getComposedState()
     this.currentLightState = GenericUtil.deepCopy(state);
+
     await this.updateCallBack(state);
   }
 

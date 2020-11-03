@@ -1,3 +1,4 @@
+
 interface DiscoverResult {
   id: string,
   internalipaddress: string
@@ -88,3 +89,20 @@ interface lightInfo {
   capabilities: { },
   lastUpdate: number
 }
+
+interface Api {
+  lights: {
+    getLightState: ((id) =>{}),
+    setLightState: ((id,state) =>{}),
+    getLight: ((id) =>{ }),
+    getAll: (() =>{})
+  },
+  users:{
+    createUser: ((appName,deviceName) => {});
+  },
+  configuration: {
+    getConfiguration: (() => {})
+  }
+}
+interface ApiUser {username:string,clientkey:string}
+interface ApiLight {name:string, uniqueid: string, state:HueFullState, id:number, capabilities:{control:{}}, getSupportedStates:(()=>{})}

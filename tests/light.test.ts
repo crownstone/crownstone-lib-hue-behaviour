@@ -9,16 +9,14 @@ afterEach(() =>{
   jest.clearAllMocks()
 })
 const fakeState = {"on": true, "bri": 190, "alert": "select", "mode": "homeautomation", "reachable": true}
-const mockApi = {
-  lights: {
-    setLightState: (() => {
+const mockApi = ((value,extra?) => {
+  switch(value){
+    case "setLightState":
       return Promise.resolve(true)
-    }),
-    getLightState: (() => {
-      return fakeState
-    })
-  }
+  case "getLightState":
+    return fakeState
 }
+})
 
 describe('Light', () => {
   test('Init', () => {
@@ -26,7 +24,7 @@ describe('Light', () => {
     const light = new Light("Fake light", "1234ABCD", {
       on: false,
       reachable: false
-    }, 0, "aaccdffee22f", {}, {}, <any>mockApi)
+    }, 0, "aaccdffee22f", {}, {}, mockApi)
     light.renewState = jest.fn();
     light.init();
     jest.advanceTimersByTime(500);
@@ -41,8 +39,7 @@ describe('Light', () => {
       "alert": "select",
       "mode": "homeautomation",
       "reachable": true
-    }, 0, "aaccdffee22f", {}, {}, <any>mockApi)
-    light.behaviourAggregator.lightStateChanged = jest.fn();
+    }, 0, "aaccdffee22f", {}, {},mockApi)
     await light.renewState();
     expect(light.getState()).toStrictEqual(fakeState)
   })
@@ -53,7 +50,7 @@ describe('Light', () => {
       "alert": "select",
       "mode": "homeautomation",
       "reachable": true
-    }, 0, "aaccdffee22f", {}, {}, <any>mockApi)
+    }, 0, "aaccdffee22f", {}, {}, mockApi)
     await light.renewState();
     expect(light.getState()).toStrictEqual(fakeState)
   })
@@ -65,7 +62,7 @@ describe('Light', () => {
       "alert": "select",
       "mode": "homeautomation",
       "reachable": true
-    }, 0, "aaccdffee22f", {}, {}, <any>mockApi)
+    }, 0, "aaccdffee22f", {}, {},mockApi)
     await light.setState({on: true, bri: 10000});
     expect(light.getState()).toStrictEqual({
       "on": true,
@@ -82,7 +79,7 @@ describe('Light', () => {
       "alert": "select",
       "mode": "homeautomation",
       "reachable": true
-    }, 0, "aaccdffee22f", {}, {}, <any>mockApi)
+    }, 0, "aaccdffee22f", {}, {}, mockApi)
     await light.setState({on: true, bri: -100});
     expect(light.getState()).toStrictEqual({
       "on": true,

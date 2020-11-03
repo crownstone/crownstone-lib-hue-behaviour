@@ -16,5 +16,15 @@ export const GenericUtil = {
       })
       return clonedObj;
     }
+  },
+  isConnectionError(err):boolean{
+    if((typeof(err.errorCode) !== "undefined" && err.errorCode === 404 )
+      || err.message.includes("ECONNRESET") || err.message.includes("ECONNREFUSED")
+      || err.message.includes("ETIMEDOUT") || err.message.includes("ENOTFOUND")
+      ||err.message.includes("EHOSTUNREACH")){
+      return true;
+    } else {
+      return false;
+    }
   }
 }
