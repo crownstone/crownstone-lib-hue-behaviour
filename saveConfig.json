@@ -10,12 +10,80 @@
         "00:17:88:01:10:25:5d:16-0b": {
           "name": "Hue color lamp 1",
           "id": 4,
-          "behaviours": []
+          "behaviours": [
+            {
+              "type": "BEHAVIOUR",
+              "activeDays": {
+                "Fri": true,
+                "Mon": true,
+                "Sat": true,
+                "Sun": true,
+                "Thu": true,
+                "Tue": true,
+                "Wed": true
+              },
+              "data": {
+                "action": {
+                  "type": "BE_ON",
+                  "data": 50
+                },
+                "time": {
+                  "type": "ALL_DAY"
+                },
+                "presence": {
+                  "type": "SOMEBODY",
+                  "data": {
+                    "type": "LOCATION",
+                    "locationIds": [
+                      1
+                    ]
+                  },
+                  "delay": 0
+                }
+              },
+              "cloudId": "cifunction now() { [native code] }",
+              "lightId": "00:17:88:01:10:25:5d:16-0b"
+            }
+          ]
         },
         "00:17:88:01:10:4a:cd:c8-0b": {
           "name": "Hue color lamp 2",
           "id": 5,
-          "behaviours": []
+          "behaviours": [
+            {
+              "type": "BEHAVIOUR",
+              "activeDays": {
+                "Fri": true,
+                "Mon": true,
+                "Sat": true,
+                "Sun": true,
+                "Thu": true,
+                "Tue": true,
+                "Wed": true
+              },
+              "data": {
+                "action": {
+                  "type": "BE_ON",
+                  "data": 50
+                },
+                "time": {
+                  "type": "ALL_DAY"
+                },
+                "presence": {
+                  "type": "SOMEBODY",
+                  "data": {
+                    "type": "LOCATION",
+                    "locationIds": [
+                      1
+                    ]
+                  },
+                  "delay": 0
+                }
+              },
+              "cloudId": "cifunction now() { [native code] }",
+              "lightId": "00:17:88:01:10:4a:cd:c8-0b"
+            }
+          ]
         }
       }
     }

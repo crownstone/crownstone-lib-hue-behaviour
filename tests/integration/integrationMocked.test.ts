@@ -8,6 +8,7 @@ import {
 import {persistence} from "../../src/util/Persistence";
 import {BehaviourSupport} from "../../src/behaviour/behaviour/BehaviourSupport";
 import {eventBus} from "../../src/util/EventBus";
+import exp = require("constants");
 
 function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -178,6 +179,63 @@ describe('Integration Test with mocks', () => {
     await timeout(500);
     expect(lights[0].behaviourAggregator.override).toBe("NO_OVERRIDE")
     await crownstoneHue.stop();
+    return;
   })
+
+
+  test('Removing', async () => {
+    persistence.loadConfiguration = jest.fn().mockImplementation(() => {
+      const config = {
+        "Bridges":
+          {
+            "ABDCFFFEAKE91": {
+              "name": "Philips Hue Fake Bridge",
+              "ipAddress": "192.168.178.26", // Should change itself to the right one
+              "macAddress": "AB:DC:FA:KE:91",
+              "username": "FakeUsername",
+              "clientKey": "FakeKey",
+              "lights": {
+                "ABCD123": {
+                  "name": "Light 1",
+                  "id": 0,
+                  "behaviours": []
+                },
+                "XYZ0987": {
+                  "name": "Light 2",
+                  "id": 1,
+                  "behaviours": []
+                }
+              }
+            }
+          }
+      }
+      persistence.configuration = config;
+      return config;
+    })
+    const crownstoneHue = new CrownstoneHue();
+    let bridges = await crownstoneHue.init(SPHERE_LOCATION);
+
+    const behaviourA = new BehaviourSupport().setCloudId("id0").setLightId(fakeLightsOnBridge[0].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()
+    await crownstoneHue.addBehaviour(behaviourA.rule);
+    const behaviourB = new BehaviourSupport().setCloudId("id1").setLightId(fakeLightsOnBridge[1].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()
+    await crownstoneHue.addBehaviour(behaviourB.rule);
+    const behaviourC = new BehaviourSupport().setCloudId("id2").setLightId(fakeLightsOnBridge[0].uniqueid).setTimeAllDay().setDimPercentage(80).setPresenceSomebodyInSphere().setPresenceDelay(0)
+    await crownstoneHue.addBehaviour(behaviourC.rule);
+    crownstoneHue.presenceChange(<PresenceEvent>EVENT_ENTER_SPHERE);
+    await timeout(500);
+    const lights = bridges[0].getConnectedLights();
+    await crownstoneHue.removeBehaviour(behaviourC.rule);
+    await timeout(500);
+    expect(lights[0].getState()).toMatchObject({on:true,bri:20*2.54})
+    expect(lights[0].behaviourAggregator.override).toBe("NO_OVERRIDE")
+    await crownstoneHue.removeLight("XYZ0987");
+    const behaviourD = new BehaviourSupport().setCloudId("id0").setLightId(fakeLightsOnBridge[0].uniqueid).setTimeAllDay().setDimPercentage(80).setPresenceIgnore();
+    await crownstoneHue.updateBehaviour(behaviourD.rule)
+    await timeout(500);
+    expect(crownstoneHue.bridges.length).toBe(1);
+    expect(lights[0].getState()).toMatchObject({on:true,bri:80*2.54})
+    await crownstoneHue.stop();
+  })
+
 
 })

@@ -61,13 +61,13 @@ describe('Test over network with actual bridges and lights', () => {
     await lights[1].setState({on: false, transitiontime: 0})
     crownstoneHue.presenceChange(<PresenceEvent>EVENT_ENTER_SPHERE);
     crownstoneHue.presenceChange(<PresenceEvent>EVENT_ENTER_LOCATION);
-    await timeout(2000);
+    await timeout(2500);
 
     expect(lights[1].getState()["bri"]).toBe(50 * 2.54);
     expect(lights[0].getState()["bri"]).toBe(50 * 2.54);
     crownstoneHue.presenceChange(<PresenceEvent>EVENT_LEAVE_SPHERE);
     crownstoneHue.presenceChange(<PresenceEvent>EVENT_LEAVE_LOCATION);
-    await timeout(2000);
+    await timeout(2500);
     expect(lights[1].getState()["on"]).toBeFalsy();
     bridges.forEach((bridge) => bridge.cleanup())
     return;

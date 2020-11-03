@@ -138,7 +138,7 @@ export class CrownstoneHue {
    * @remarks
    * id refers to the id of the light on the bridge and NOT the uniqueId of a light.
    * Gets info of the light from Bridge and creates a Light object and pushes it to the list.
-   * Throws error on invalid Id.
+   *
    *
    * @param bridgeId - The id of the bridge of which the light have to be added to.
    * @param idOnBridge - The id of the light on the bridge.
@@ -157,9 +157,7 @@ export class CrownstoneHue {
     for (const bridge of this.bridges) {
       const light = bridge.lights[lightId];
       if (light !== undefined) {
-        light.cleanup();
-        delete bridge.lights[lightId];
-        await persistence.removeLightFromConfig(bridge,lightId);
+        await bridge.removeLight(lightId);
         break;
       }
     }
@@ -168,7 +166,7 @@ export class CrownstoneHue {
 
   getConnectedBridges(): Bridge[] {
 
-    return [...this.bridges];
+    return this.bridges;
   }
 
   createBridgeFromConfig(bridgeId: string): Bridge {
@@ -185,8 +183,9 @@ export class CrownstoneHue {
   }
 
   async stop():Promise<void>{
-    this.bridges.forEach(async bridge => {
+    for(const bridge of this.bridges){
       await persistence.saveFullBridgeInformation(bridge);
-      bridge.cleanup()});
+      bridge.cleanup()
+    }
   }
 }

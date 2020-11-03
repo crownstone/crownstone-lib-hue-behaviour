@@ -40,7 +40,7 @@ export class Light {
     api: any;
     lastUpdate: number;
     intervalId : Timeout;
-    behaviourAggregator: BehaviourAggregator;
+    callback: (value) => {};
 
     constructor(name: string, uniqueId: string, state: HueFullState, id: number, bridgeId: string, capabilities: object, supportedStates: object, api: any) {
         this.name = name;
@@ -52,12 +52,14 @@ export class Light {
         this.supportedStates = supportedStates;
         this.api = api;
         this.lastUpdate = Date.now();
-        this.behaviourAggregator = new BehaviourAggregator(async (value:StateUpdate)=>{ await this.setState(value)},state);
     }
 
     init():void{
-        this.behaviourAggregator.init();
         this.intervalId = setInterval(async () => await this.renewState(), LIGHT_POLLING_RATE);
+    }
+
+    setCallback(callback){
+        this.callback = callback;
     }
 
     _setLastUpdate(): void {
@@ -66,7 +68,6 @@ export class Light {
 
     cleanup(){
         clearInterval(this.intervalId);
-        this.behaviourAggregator.cleanup();
     }
 
     /**
@@ -77,7 +78,7 @@ export class Light {
         if (!lightUtil.stateEqual(this.state,newState)) {
             this.state = <HueFullState>GenericUtil.deepCopy(newState);
             this._setLastUpdate();
-            await this.behaviourAggregator.lightStateChanged({...this.state});
+            this.callback(this.state);
         }
     }
 

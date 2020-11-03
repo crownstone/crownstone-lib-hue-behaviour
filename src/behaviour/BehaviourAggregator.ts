@@ -85,6 +85,7 @@ export class BehaviourAggregator {
   }
 
   updateBehaviour(behaviour: HueBehaviourWrapper): void {
+    this._checkIfBehaviourIsActive(behaviour);
     if (behaviour.type === "BEHAVIOUR") {
       this.switchBehaviourPrioritizer.updateBehaviour(behaviour);
     } else if (behaviour.type === "TWILIGHT") {
@@ -115,11 +116,11 @@ export class BehaviourAggregator {
 
     this.checkIfAllBehavioursAreInactive();
     this._checkIfStateMatchesWithNewBehaviour();
-
     if (typeof (newBehaviour) !== "undefined") {
       if (newBehaviour.behaviour.type === "TWILIGHT") {
         await this._twilightHandling(newBehaviour);
-      } else if (newBehaviour.behaviour.type === "BEHAVIOUR" && this.override === NO_OVERRIDE && typeof (oldBehaviour) !== "undefined" && oldBehaviour.behaviour.cloudId != newBehaviour.behaviour.cloudId) {
+      } else if (newBehaviour.behaviour.type === "BEHAVIOUR" && this.override === NO_OVERRIDE
+        && typeof (oldBehaviour) !== "undefined" && oldBehaviour.behaviour.cloudId != newBehaviour.behaviour.cloudId) {
         await this._activateNewBehaviour();
       }
     }
@@ -134,6 +135,7 @@ export class BehaviourAggregator {
       this.override = NO_OVERRIDE; //oldBehaviour can't be undefined with an override set.
 
     }
+
   }
 
   /** Separate case for twilights.
@@ -238,6 +240,16 @@ export class BehaviourAggregator {
     } else {
       if (lightUtil.stateEqual(this.currentLightState, this.aggregatedBehaviour.getComposedState())) {
         this.override = NO_OVERRIDE
+      }
+    }
+  }
+
+  _checkIfBehaviourIsActive(newBehaviour) {
+    if(this.override === NO_OVERRIDE){
+      if(typeof(this.aggregatedBehaviour) !== "undefined" && typeof(newBehaviour) !== "undefined"
+        && this.aggregatedBehaviour.behaviour.cloudId === newBehaviour.cloudId
+        && this.aggregatedBehaviour.behaviour.data.action.data != newBehaviour.data.action.data){
+        this.aggregatedBehaviour = undefined; //Reset so it's getting changed in next loop iteration.
       }
     }
   }
