@@ -2,7 +2,7 @@ import {Bridge} from "./hue/Bridge";
 import {CrownstoneHueError} from "./util/CrownstoneHueError";
 import {persistence} from "./util/Persistence";
 import {eventBus} from "./util/EventBus";
-import {ON_DUMB_HOUSE_MODE_SWITCH, ON_PRESENCE_CHANGE} from "./constants/EventConstants";
+import {ON_BRIDGE_PERSISTENCE_UPDATE, ON_DUMB_HOUSE_MODE_SWITCH, ON_PRESENCE_CHANGE} from "./constants/EventConstants";
 import {Discovery} from "./hue/Discovery";
 import {GenericUtil} from "./util/GenericUtil";
 import {LightAggregatorWrapper} from "./wrapper/LightAggregatorWrapper";
@@ -23,7 +23,7 @@ export class CrownstoneHue {
   bridges: Bridge[] = [];
   lights: {  [uniqueId: string]: LightAggregatorWrapper } = {};
   sphereLocation: SphereLocation;
-
+  unsubscribe: EventUnsubscriber
   /**
    * To be called for initialization of the CrownstoneHue.
    *
@@ -32,6 +32,7 @@ export class CrownstoneHue {
    */
   async init(sphereLocation: SphereLocation): Promise<Bridge[]> {
     this.sphereLocation = sphereLocation
+    this.unsubscribe = eventBus.subscribe(ON_BRIDGE_PERSISTENCE_UPDATE, this._handleUpdateEvent.bind(this));
     await persistence.loadConfiguration();
     await this._setupModule();
     return this.bridges;
@@ -78,7 +79,7 @@ export class CrownstoneHue {
       const light = bridge.lights[behaviour.lightId];
       if (light !== undefined) {
         this.lights[behaviour.lightId].behaviourAggregator.addBehaviour(behaviour, this.sphereLocation);
-        await persistence.saveBehaviour(bridge.bridgeId,behaviour.lightId,behaviour);
+        await persistence.appendBehaviour(bridge.bridgeId,behaviour.lightId,behaviour);
         break;
       }
     }
@@ -89,19 +90,28 @@ export class CrownstoneHue {
       const light = bridge.lights[behaviour.lightId];
       if (light !== undefined) {
         this.lights[behaviour.lightId].behaviourAggregator.updateBehaviour(behaviour);
-        await persistence.updateBehaviour(bridge.bridgeId,behaviour.lightId,behaviour)
+        persistence.updateBehaviour(bridge.bridgeId,behaviour.lightId,behaviour)
+        await persistence.saveConfiguration();
+
         break;
       }
     }
   }
 
+  async _handleUpdateEvent(info){
+    const bridgeInfo = JSON.parse(info);
+    persistence.appendBridge(bridgeInfo);
+    await persistence.saveConfiguration()
+
+  }
 
   async removeBehaviour(behaviour: HueBehaviourWrapper):Promise<void> {
     for (const bridge of this.bridges) {
       const light = bridge.lights[behaviour.lightId];
       if (light !== undefined) {
         this.lights[behaviour.lightId].behaviourAggregator.removeBehaviour(behaviour.cloudId);
-        await persistence.removeBehaviour(bridge.bridgeId,behaviour.lightId,behaviour.cloudId);
+        persistence.removeBehaviour(bridge.bridgeId,behaviour.lightId,behaviour.cloudId);
+        await persistence.saveConfiguration();
         break;
       }
     }
@@ -133,7 +143,8 @@ export class CrownstoneHue {
       if(this.bridges[i].bridgeId === bridgeId){
         this.bridges[i].cleanup();
         this.bridges.splice(i,1);
-        await persistence.removeBridge(bridgeId);
+        persistence.removeBridge(bridgeId);
+        await persistence.saveConfiguration();
         break;
       }
     }
@@ -157,7 +168,7 @@ export class CrownstoneHue {
         const lightAggregatorWrapper = new LightAggregatorWrapper(light);
         this.lights[light.getUniqueId()]  = lightAggregatorWrapper;
         lightAggregatorWrapper.init();
-        persistence.saveLight(bridge.bridgeId, light)
+        persistence.appendLight(bridge.bridgeId, light)
         await persistence.saveConfiguration();//
         break;
       }
@@ -171,7 +182,8 @@ export class CrownstoneHue {
         await bridge.removeLight(lightId);
         this.lights[lightId].cleanup();
         delete this.lights[lightId];
-        await persistence.removeLightFromConfig(bridge, lightId); //
+        persistence.removeLightFromConfig(bridge, lightId); //
+        await persistence.saveConfiguration();
         break;
       }
     }
@@ -207,6 +219,7 @@ export class CrownstoneHue {
   }
 
   async stop():Promise<void>{
+    this.unsubscribe();
     for(const bridge of this.bridges){
       bridge.cleanup()
     }

@@ -1,4 +1,3 @@
-
 interface ConfigurationObject {
   "Bridges": ConfBridges;
 }
@@ -24,4 +23,10 @@ interface ConfBridgeObject {
   username: string;
   clientKey: string;
   lights: ConfLights;
+}
+
+interface LightInfoObject {
+  name: string,
+  id: number,
+  uniqueId: string
 }

@@ -9,11 +9,9 @@ import {persistence} from "../../src/util/Persistence";
 import {BehaviourSupport} from "../../src/behaviour/behaviour/BehaviourSupport";
 import {eventBus} from "../../src/util/EventBus";
 import exp = require("constants");
-
-function timeout(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
+/**
+ * Makes the test wait until all async operations are executed.
+ */
 const flushPromises = () => new Promise(setImmediate);
 
 describe('Integration Test with mocks', () => {
@@ -194,7 +192,7 @@ describe('Integration Test with mocks', () => {
   })
 
 
-  test('Removing', async () => {
+  test('Removing and updating', async () => {
     jest.useFakeTimers()
     persistence.loadConfiguration = jest.fn().mockImplementation(() => {
       const config = {
@@ -249,6 +247,9 @@ describe('Integration Test with mocks', () => {
     await flushPromises();
     expect(crownstoneHue.bridges.length).toBe(1);
     expect(wrappedLights[0].light.getState()).toMatchObject({on: true, bri: 80 * 2.54})
+    expect(Object.keys(persistence.configuration.Bridges).length).toBe(1);
+    expect(Object.keys(persistence.configuration.Bridges[fakeBridge.bridgeid].lights).length).toBe(1);
+    expect(persistence.configuration.Bridges[fakeBridge.bridgeid].lights[fakeLightsOnBridge[0].uniqueid].behaviours.length).toBe(1);
     await crownstoneHue.stop();
   })
 

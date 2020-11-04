@@ -92,9 +92,9 @@ beforeEach(()=>{
     persistence.configuration = config;
     return config;
   });
-  persistence.saveFullBridgeInformation = jest.fn(async (ignore) => {
+  persistence.appendBridge = jest.fn(async (ignore) => {
   });
-  persistence.saveLight = jest.fn(async (ignore) => {
+  persistence.appendBridge = jest.fn(async (ignore) => {
   });
 })
 describe("Bridge", () => {
@@ -153,7 +153,7 @@ describe("Bridge", () => {
         return {connect: (() => Promise.resolve(""))};
       }
     });
-    persistence.updateBridgeIpAddress = jest.fn();
+    persistence.appendBridge = jest.fn();
     Discovery.discoverBridgeById = jest.fn().mockImplementation((id) =>{return {bridgeId:"001788FFFE292AF4",internalipaddress:"192.168.178.10"}})
     const bridge = new Bridge("Philips Hue", "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo", "F713C35839453184BA3B148E5504C74B", "00:17:88:29:2a:f4", "192.168.178.26", "001788FFFE292AF4")
     await bridge.init();

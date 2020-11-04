@@ -34,7 +34,6 @@ export class BehaviourAggregator {
   constructor(callback, state) {
     this.updateCallBack = callback;
     this.currentLightState = GenericUtil.deepCopy(state);
-
     this.unsubscribe = eventBus.subscribe(ON_DUMB_HOUSE_MODE_SWITCH, this._onDumbHouseModeSwitch.bind(this));
   }
 

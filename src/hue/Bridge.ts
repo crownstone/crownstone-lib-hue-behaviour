@@ -2,10 +2,11 @@ import {Light} from "./Light"
 import {v3} from "node-hue-api";
 import {CrownstoneHueError} from "..";
 import {APP_NAME, DEVICE_NAME} from "../constants/HueConstants"  //Device naming for on the Hue Bridge.
-import {persistence} from "../util/Persistence";
 import {Discovery} from "./Discovery";
 import {GenericUtil} from "../util/GenericUtil";
-import Api from "node-hue-api/lib/api/Api";  // Only used for types.
+import Api from "node-hue-api/lib/api/Api"; // library import only used for types
+import {eventBus} from "../util/EventBus";
+import {ON_BRIDGE_PERSISTENCE_UPDATE} from "../constants/EventConstants";
 const hueApi = v3.api;
 
 function timeout(ms) {
@@ -89,7 +90,7 @@ export class Bridge {
     await this.createNewUser()
     await this.connect();
     await this.updateBridgeInfo();
-    await persistence.saveFullBridgeInformation(this);
+    this.save();
   }
 
   /**
@@ -111,7 +112,6 @@ export class Bridge {
       }
     }
   }
- //Todo remove save
   /**
    * Adds a light to the lights list of this bridge.
    *
@@ -129,8 +129,6 @@ export class Bridge {
         const lightInfo = await this._useApi("getLightById",id);
         const light = new Light(lightInfo.name, lightInfo.uniqueid, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this._useApi.bind(this))
         this.lights[lightInfo.uniqueid] = light;
-        persistence.saveLight(this.bridgeId, light)
-        await persistence.saveConfiguration();
         return light;
       } catch (err) {
         if (typeof (err.getHueErrorType) === "function") {
@@ -149,9 +147,7 @@ export class Bridge {
     }
   }
 
-  //Todo remove save
   async removeLight(uniqueLightId: string): Promise<void> {
-    await persistence.removeLightFromConfig(this, uniqueLightId);
     this.lights[uniqueLightId].cleanup();
     delete this.lights[uniqueLightId];
   }
@@ -189,7 +185,7 @@ export class Bridge {
     })
   }
 
-  isReachable(){
+  isReachable():boolean{
     return this.reachable;
   }
 
@@ -256,7 +252,6 @@ export class Bridge {
       }
     }
   }
-  //Queue voor reconnect
   //Extra layer for error handling, in case bridge fails or is turned off.
   async _useApi(call,extra?){
     try{
@@ -322,7 +317,7 @@ export class Bridge {
     } else{
     this.ipAddress = result.internalipaddress;
     await this.init()
-    await persistence.updateBridgeIpAddress(this.bridgeId, this.ipAddress);
+    this.update({ipAddress:this.ipAddress});
     }
   }
 
@@ -337,28 +332,51 @@ export class Bridge {
   }
 
   update(values: object) {
+  let updateValues = {};
     if (values["name"] !== undefined) {
       this.name = values["name"]
+      updateValues["name"] = values["name"]
     }
     if (values["ipAddress"] !== undefined) {
       this.ipAddress = values["ipAddress"]
+      updateValues["ipAddress"] = values["ipAddress"]
     }
     if (values["username"] !== undefined) {
       this.username = values["username"]
+      updateValues["username"] = values["username"]
     }
     if (values["clientKey"] !== undefined) {
       this.clientKey = values["clientKey"]
+      updateValues["clientKey"] = values["clientKey"]
     }
     if (values["macAddress"] !== undefined) {
       this.macAddress = values["macAddress"]
+      updateValues["macAddress"] = values["macAddress"]
     }
     if (values["bridgeId"] !== undefined) {
       this.bridgeId = values["bridgeId"]
+      updateValues["bridgeId"] = values["bridgeId"]
     }
     if (values["reachable"] !== undefined) {
       this.reachable = values["reachable"]
     }
+   this.save();
   }
+
+  save(){
+    const saveState =
+      {
+      name: this.name,
+      ipAddress: this.ipAddress,
+      macAddress: this.macAddress,
+      username: this.username,
+      clientKey: this.clientKey,
+      bridgeId: this.bridgeId,
+      lights: Object.values(this.lights).map((light) => {return {name:light.name, id:light.id,uniqueId:light.uniqueId} as LightInfoObject})
+    }
+    eventBus.emit(ON_BRIDGE_PERSISTENCE_UPDATE,JSON.stringify(saveState))
+  }
+
 
   getInfo(): object {
     return {
