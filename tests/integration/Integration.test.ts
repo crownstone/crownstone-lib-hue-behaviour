@@ -84,9 +84,11 @@ describe('Test over network with actual bridges and lights', () => {
     // }
 
     console.log("NOW")
-    await timeout(10000)
     await bridge.populateLights();
     const lights = bridge.getConnectedLights()
+    await bridge.configureLightById(10);
+    await bridge._useApi("",10);
+    await bridge.configureLightById(10);
 
   }, 120000)
 

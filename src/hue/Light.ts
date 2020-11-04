@@ -20,7 +20,7 @@ import {GenericUtil} from "../util/GenericUtil";
  * @param bridgeId - The id of the Bridge the Light is connected to.
  * @param capabilities - Capabilities what the light is capable off,  For each light type it's different. Info added on creation from Bridge.
  * @param supportedStates - supported states of the light. For each light type it's different. Info added on creation from Bridge.
- * @param api  - Link to the api object it is connected to.
+ * @param api  - callBack to Api function
  * @param lastUpdate - Timestamp of when the state was last changed.
  * @param intervalId - Timeout object for the interval.
  * @param stateChangeCallback - Callback for when state is changed.
@@ -71,7 +71,10 @@ export class Light {
      * Obtains the state from the light on the bridge and updates the state object if different.
      */
     async renewState(): Promise<void> {
-        const newState = await this.api("getLightState",this.id) as HueFullState;
+        const newState = await this.api("getLightState",this.id) as {hadConnectionFailure:boolean,HueFullState};
+        if(newState.hadConnectionFailure){
+            return;
+        }
         if ( typeof(newState) !== "undefined" && !lightUtil.stateEqual(this.state,newState)) {
             this.state = <HueFullState>GenericUtil.deepCopy(newState);
             this._setLastUpdate();

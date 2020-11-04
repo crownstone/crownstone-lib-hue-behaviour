@@ -6,6 +6,7 @@ export const ERROR_CODES = {
     407: "Bridge is not initialized.",
     410: "Configuration settings are undefined.",
     422: "Light is not found on the bridge.",
+    888: "Unknown call to Hue Api.",
     999: "Unknown Error, see description."
 }
 

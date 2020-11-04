@@ -39,3 +39,5 @@ export const hueStateVariables = {
 export const DISCOVERY_URL = "https://discovery.meethue.com/";
 
 export const LIGHT_POLLING_RATE = 500;
+
+export const RECONNECTION_TIMEOUT_TIME = 10000;
