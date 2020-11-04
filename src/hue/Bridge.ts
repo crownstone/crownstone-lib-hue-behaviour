@@ -232,12 +232,12 @@ export class Bridge {
   //todo alle commands voor lampen niet queuen
   /** Extra layer for error handling, in case bridge fails or is turned off.
    */
-  async _useApi(call, extra?) {
-    if(!exemptOfAuthentication[call]){
+  async _useApi(action, extra?) {
+    if(!exemptOfAuthentication[action]){
       this._isAuthenticated()
     }
     try {
-      switch (call) {
+      switch (action) {
         case "getAllLights":
           return await this.api.lights.getAll();
         case "createUser":
