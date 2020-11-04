@@ -73,23 +73,21 @@ describe('Test over network with actual bridges and lights', () => {
     return;
   }, 60000)
 
-  //Testing.....
-  // test("Test",async ()=>{
-  //   const bridge = new Bridge( "Philips Hue", "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo", "F713C35839453184BA3B148E5504C74B", "00:17:88:29:2a:f4","192.168.178.26","001788FFFE292AF4");
-  //   await bridge.init();
-  //   // bridge.api._config = {remote : false,
-  //   //   baseUrl: "https://192.168.178.25:443/api",
-  //   //   clientkey: undefined,
-  //   //   username : "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo"}
-  //  await bridge.populateLights();
-  //   const lights = bridge.getConnectedLights()
-  //   console.log("DISCONNECT ME")
-  //   await timeout(10000)
-  //   console.log("RECONNECT ME")
-  //   await lights[0].renewState()
-  //   await lights[1].renewState()
-  //
-  //   console.log(await bridge._useApi("setLightState",[1,{on:true}]));
-  // },120000)
-});
+  test("Test", async () => {
+    const bridge = new Bridge("Philips Hue", "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo", "F713C35839453184BA3B148E5504C74B", "00:17:88:29:2a:f4", "192.168.178.26", "001788FFFE292AF4");
+    await bridge.init();
+    // bridge.api._config = {
+    //   remote: false,
+    //   baseUrl: "https://192.168.178.25:443/api",
+    //   clientkey: undefined,
+    //   username: "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo"
+    // }
 
+    console.log("NOW")
+    await timeout(10000)
+    await bridge.populateLights();
+    const lights = bridge.getConnectedLights()
+
+  }, 120000)
+
+})

@@ -13,6 +13,7 @@
     "node_modules"
   ],
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "node_modules/node-hue-api/**/*.d.ts"
   ]
 }

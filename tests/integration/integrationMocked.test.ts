@@ -56,7 +56,7 @@ describe('Integration Test with mocks', () => {
     await crownstoneHue.addLight(fakeBridge.bridgeid, 0);
     await crownstoneHue.addBehaviour(behaviourA.rule);
     await crownstoneHue.addBehaviour(behaviourB.rule);
-    await jest.advanceTimersToNextTimer(1);
+    jest.advanceTimersToNextTimer(1);
     await flushPromises();
     const wrappedLights = crownstoneHue.getAllWrappedLights();
     expect(wrappedLights[0].light.getState()).toMatchObject({on: true, bri: 20 * 2.54})
@@ -99,7 +99,7 @@ describe('Integration Test with mocks', () => {
     await crownstoneHue.addBehaviour(behaviourA.rule);
     await crownstoneHue.addBehaviour(behaviourB.rule);
     const wrappedLights = crownstoneHue.getAllWrappedLights();
-    await jest.advanceTimersToNextTimer(1);
+    jest.advanceTimersToNextTimer(1);
     await flushPromises();
     expect(wrappedLights[0].light.getState()).toMatchObject({on: true, bri: 20 * 2.54})
     return expect(fakeLightsOnBridge[0].state).toMatchObject({on: true, bri: 20 * 2.54})
@@ -152,7 +152,7 @@ describe('Integration Test with mocks', () => {
 
     //User enters house, light should be 80%
     crownstoneHue.presenceChange(<PresenceEvent>EVENT_ENTER_SPHERE);
-    jest.advanceTimersToNextTimer()
+    jest.advanceTimersToNextTimer();
     await flushPromises();
 
     expect(wrappedLights[0].light.getState()).toMatchObject({on: true, bri: 80 * 2.54})
@@ -169,7 +169,7 @@ describe('Integration Test with mocks', () => {
 
     //Everyone leaves the house, lights should stay 80%, forgot to turn off dumb house mode.
     crownstoneHue.presenceChange(<PresenceEvent>EVENT_LEAVE_SPHERE);
-    jest.advanceTimersToNextTimer()
+    jest.advanceTimersToNextTimer();
     await flushPromises();
     expect(wrappedLights[0].light.getState()).toMatchObject({on: true, bri: 80 * 2.54})
     expect(fakeLightsOnBridge[0].state).toMatchObject({on: true, bri: 80 * 2.54})

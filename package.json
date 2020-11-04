@@ -11,9 +11,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/node-hue-api": "^2.3.1",
     "node-fetch": "^2.6.1",
-    "node-hue-api": "^4.0.9",
-    "set-interval-async": "1.0.33",
+    "node-hue-api": "^4.0.9", 
     "suncalc": "^1.8.0"
   },
   "devDependencies": {

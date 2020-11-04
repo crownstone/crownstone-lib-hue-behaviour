@@ -1,10 +1,7 @@
 import {
     LIGHT_POLLING_RATE
 } from "../constants/HueConstants";
-import {BehaviourAggregator} from "../behaviour/BehaviourAggregator";
 import Timeout = NodeJS.Timeout;
-import {v3} from "node-hue-api";
-const hueApi = v3.api;
 import {lightUtil} from "../util/LightUtil";
 import {GenericUtil} from "../util/GenericUtil";
 

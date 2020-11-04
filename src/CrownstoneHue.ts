@@ -95,6 +95,7 @@ export class CrownstoneHue {
     }
   }
 
+
   async removeBehaviour(behaviour: HueBehaviourWrapper):Promise<void> {
     for (const bridge of this.bridges) {
       const light = bridge.lights[behaviour.lightId];
@@ -157,7 +158,7 @@ export class CrownstoneHue {
         this.lights[light.getUniqueId()]  = lightAggregatorWrapper;
         lightAggregatorWrapper.init();
         persistence.saveLight(bridge.bridgeId, light)
-        await persistence.saveConfiguration();
+        await persistence.saveConfiguration();//
         break;
       }
     }
@@ -170,7 +171,7 @@ export class CrownstoneHue {
         await bridge.removeLight(lightId);
         this.lights[lightId].cleanup();
         delete this.lights[lightId];
-        await persistence.removeLightFromConfig(bridge, lightId);
+        await persistence.removeLightFromConfig(bridge, lightId); //
         break;
       }
     }

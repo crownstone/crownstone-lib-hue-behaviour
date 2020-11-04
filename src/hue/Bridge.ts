@@ -1,10 +1,11 @@
 import {Light} from "./Light"
 import {v3} from "node-hue-api";
-import {CrownstoneHueError} from "../util/CrownstoneHueError";
-import {APP_NAME, DEVICE_NAME} from "../constants/HueConstants"  //Device naming.
+import {CrownstoneHueError} from "..";
+import {APP_NAME, DEVICE_NAME} from "../constants/HueConstants"  //Device naming for on the Hue Bridge.
 import {persistence} from "../util/Persistence";
 import {Discovery} from "./Discovery";
 import {GenericUtil} from "../util/GenericUtil";
+import Api from "node-hue-api/lib/api/Api";  // Only used for types.
 const hueApi = v3.api;
 
 function timeout(ms) {
@@ -125,7 +126,7 @@ export class Bridge {
   async configureLightById(id: number): Promise<Light> {
     if (this.authenticated) {
       try {
-        const lightInfo = await this._useApi("getLightById",id) as ApiLight;
+        const lightInfo = await this._useApi("getLightById",id);
         const light = new Light(lightInfo.name, lightInfo.uniqueid, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this._useApi.bind(this))
         this.lights[lightInfo.uniqueid] = light;
         persistence.saveLight(this.bridgeId, light)
@@ -155,6 +156,9 @@ export class Bridge {
     delete this.lights[uniqueLightId];
   }
 
+  //todo if all reconnecting? return: Continue;
+  //todo while loop, niet recursief.
+  //todo alle commands voor lampen niet queuen
   async _attemptReconnection(){
     try{
       this.reachable = false;
@@ -166,7 +170,6 @@ export class Bridge {
         await this._attemptReconnection();
       }
     }
-
   }
 
   /** Retrieves all the lights that are connected through the module.
@@ -196,7 +199,7 @@ export class Bridge {
    */
   async getAllLightsFromBridge(): Promise<Light[]> {
     if (this.authenticated) {
-      const lights = await this._useApi("getAllLights") as [ApiLight];
+      const lights = await this._useApi("getAllLights");
       if(typeof(lights) === "undefined"){
         return []
       }
@@ -242,7 +245,7 @@ export class Bridge {
   async createNewUser(): Promise<void> {
     await this._createUnAuthenticatedApi();
     try {
-      let createdUser = await this._useApi("createUser") as ApiUser;
+      let createdUser = await this._useApi("createUser");
       this.update({"username": createdUser.username, "clientKey": createdUser.clientkey})
 
     } catch (err) {
@@ -253,7 +256,7 @@ export class Bridge {
       }
     }
   }
-
+  //Queue voor reconnect
   //Extra layer for error handling, in case bridge fails or is turned off.
   async _useApi(call,extra?){
     try{
@@ -267,16 +270,15 @@ export class Bridge {
         case "getLightById":
           return await this.api.lights.getLight(extra);
         case "setLightState":
-          return await this.api.lights.setLightState(extra[0], extra[1]);
+          return await this.api.lights.setLightState(extra[0], extra[1]);  // Niet uitvoeren na reconnect.
         case "getLightState":
           return await this.api.lights.getLightState(extra);
         default:
           return false;
       }
-
     } catch(err){
       if(GenericUtil.isConnectionError(err)){
-        await this._attemptReconnection()
+        await this._attemptReconnection();
       }
       else {
         throw err;
@@ -293,7 +295,7 @@ export class Bridge {
    */
   async populateLights(): Promise<void> {
     if (this.authenticated) {
-      let lights = await this._useApi("getAllLights") as [ApiLight];
+      let lights = await this._useApi("getAllLights");
       lights.forEach(light => {
         this.lights[light.uniqueid] = new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this._useApi.bind(this))
       });
@@ -328,7 +330,7 @@ export class Bridge {
     return this.lights[uniqueId];
   }
 
-  cleanup() {
+  cleanup():void {
     Object.values(this.lights).forEach(light =>{
       light.cleanup();
     })
