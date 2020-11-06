@@ -21,6 +21,8 @@ export const GenericUtil = {
   },
   isConnectionError(err): boolean {
     if ((typeof (err.errorCode) !== "undefined" && err.errorCode === 404)
+      ||((typeof(err.code) !== "undefined") && (err.code == "ENOTFOUND"
+      || err.code == "ECONNREFUSED" || err.code == "ETIMEDOUT" || err.code == "ECONNRESET"))
       || err.message.includes("ECONNRESET") || err.message.includes("ECONNREFUSED")
       || err.message.includes("ETIMEDOUT") || err.message.includes("ENOTFOUND")
       || err.message.includes("EHOSTUNREACH")) {

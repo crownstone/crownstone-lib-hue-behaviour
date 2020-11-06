@@ -89,3 +89,7 @@ interface lightInfo {
   capabilities: { },
   lastUpdate: number
 }
+
+interface failedConnection{
+  hadConnectionFailure:true;
+}

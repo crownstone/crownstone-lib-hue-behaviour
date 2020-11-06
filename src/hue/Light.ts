@@ -71,8 +71,8 @@ export class Light {
      * Obtains the state from the light on the bridge and updates the state object if different.
      */
     async renewState(): Promise<void> {
-        const newState = await this.api("getLightState",this.id) as {hadConnectionFailure:boolean,HueFullState};
-        if(newState.hadConnectionFailure){
+        const newState = await this.api("getLightState",this.id) as failedConnection | HueFullState;
+        if("hadConnectionFailure" in newState && newState.hadConnectionFailure){
             return;
         }
         if ( typeof(newState) !== "undefined" && !lightUtil.stateEqual(this.state,newState)) {
@@ -101,11 +101,14 @@ export class Light {
      */
     async setState(state: StateUpdate): Promise<boolean> {
         state = lightUtil.manipulateMinMaxValueStates(state);
-        const result = await this.api("setLightState",[this.id.toString(), state]) as boolean;
+        const result = await this.api("setLightState",[this.id.toString(), state]) as failedConnection | boolean;
+        if((typeof result !== "boolean" && result.hadConnectionFailure)){
+            return false;
+        }
         if (result) {
             this._updateState(state);
         }
-        return result;
+        return <boolean>result;
     }
 
     isReachable(): boolean {

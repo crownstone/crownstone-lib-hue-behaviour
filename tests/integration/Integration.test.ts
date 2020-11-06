@@ -1,4 +1,4 @@
-import {Bridge, CrownstoneHue, Discovery} from "../../src";
+import {Bridge, CrownstoneHue, CrownstoneHueError, Discovery} from "../../src";
 import {persistence} from "../../src/util/Persistence";
 import {v3} from "node-hue-api"
 import {
@@ -72,23 +72,6 @@ describe('Test over network with actual bridges and lights', () => {
     await crownstoneHue.stop();
     return;
   }, 60000)
-
-  test("Test", async () => {
-    const bridge = new Bridge("Philips Hue", "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo", "F713C35839453184BA3B148E5504C74B", "00:17:88:29:2a:f4", "192.168.178.26", "001788FFFE292AF4");
-    await bridge.init();
-    // bridge.api._config = {
-    //   remote: false,
-    //   baseUrl: "https://192.168.178.25:443/api",
-    //   clientkey: undefined,
-    //   username: "vaHAgs9ElCehbdZctr71J1Xi3B6FIWIBoYN4yawo"
-    // }
-
-    console.log("NOW")
-    await bridge.populateLights();
-    const lights = bridge.getConnectedLights()
-    await bridge._useApi("",10);
-    await bridge.configureLightById(10);
-
-  }, 120000)
+ 
 
 })
