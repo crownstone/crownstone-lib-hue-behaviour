@@ -9,8 +9,8 @@ export class TwilightPrioritizer extends PrioritizerBase {
   prioritizedBehaviour: Twilight = undefined;
 
 
-  addBehaviour(behaviour: HueBehaviourWrapperTwilight, sphereLocation: SphereLocation): void {
-    this.behaviours.push(new Twilight(behaviour, sphereLocation));
+  addBehaviour(behaviour: HueBehaviourWrapperTwilight, sphereLocation: SphereLocation): number {
+    return this.behaviours.push(new Twilight(behaviour, sphereLocation));
   }
 
   removeBehaviour(cloudId: string): void {

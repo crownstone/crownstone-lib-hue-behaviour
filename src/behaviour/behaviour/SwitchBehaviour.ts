@@ -12,7 +12,7 @@ export class SwitchBehaviour extends BehaviourBase implements SwitchBehaviourInt
 
   constructor(behaviour: HueBehaviourWrapperBehaviour, sphereLocation: SphereLocation) {
     super(behaviour,sphereLocation);
-    this.unsubscribe = eventBus.subscribe(ON_PRESENCE_CHANGE, this._onPresenceDetect.bind(this));
+    this.unsubscribe = eventBus.subscribe(ON_PRESENCE_CHANGE, this.onPresenceDetect.bind(this));
   }
 
   cleanup() {
@@ -25,7 +25,7 @@ export class SwitchBehaviour extends BehaviourBase implements SwitchBehaviourInt
    * Calls _handlePresenceEvent() with the appropriate Presence object.
    * @param presenceEvent - PresenceEvent object of type ENTER or LEAVE, containing information of who enters/leaves which room or the house.
    */
-  _onPresenceDetect(presenceEvent: PresenceEvent): void {
+  onPresenceDetect(presenceEvent: PresenceEvent): void {
     if (this.behaviour.type === "BEHAVIOUR") {
       if (this.behaviour.data.presence.type !== "IGNORE") {
         this._handlePresenceEvent(presenceEvent, this.behaviour.data.presence)

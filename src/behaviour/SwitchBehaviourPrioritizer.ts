@@ -14,8 +14,8 @@ export class SwitchBehaviourPrioritizer extends PrioritizerBase {
   }
 
 
-  addBehaviour(behaviour: HueBehaviourWrapperBehaviour, sphereLocation: SphereLocation): void {
-    this.behaviours.push(new SwitchBehaviour(behaviour, sphereLocation));
+  addBehaviour(behaviour: HueBehaviourWrapperBehaviour, sphereLocation: SphereLocation): number {
+   return this.behaviours.push(new SwitchBehaviour(behaviour, sphereLocation));
   }
 
   removeBehaviour(cloudId: string): void {

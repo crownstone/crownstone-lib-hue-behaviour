@@ -328,6 +328,9 @@ export class Bridge {
    *
    */
   private async _rediscoverMyself(): Promise<void> {
+    if(this.bridgeId == undefined){
+      throw new CrownstoneHueError(408);
+    }
     const result = await Discovery.discoverBridgeById(this.bridgeId);
     if (result.internalipaddress === "-1") {
       throw new CrownstoneHueError(404, "Bridge with id " + this.bridgeId + " not found.");

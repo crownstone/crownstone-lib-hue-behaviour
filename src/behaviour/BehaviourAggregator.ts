@@ -34,7 +34,7 @@ export class BehaviourAggregator {
   constructor(callback, state) {
     this.updateCallBack = callback;
     this.currentLightState = GenericUtil.deepCopy(state);
-    this.unsubscribe = eventBus.subscribe(ON_DUMB_HOUSE_MODE_SWITCH, this._onDumbHouseModeSwitch.bind(this));
+    this.unsubscribe = eventBus.subscribe(ON_DUMB_HOUSE_MODE_SWITCH, this.onDumbHouseModeSwitch.bind(this));
   }
 
   /** Starts the aggregator's loop.
@@ -70,11 +70,11 @@ export class BehaviourAggregator {
   }
 
 
-  addBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): void {
+  addBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): number {
     if (behaviour.type === "BEHAVIOUR") {
-      this.switchBehaviourPrioritizer.addBehaviour(behaviour, sphereLocation);
+      return this.switchBehaviourPrioritizer.addBehaviour(behaviour, sphereLocation);
     } else if (behaviour.type === "TWILIGHT") {
-      this.twilightPrioritizer.addBehaviour(behaviour, sphereLocation);
+      return this.twilightPrioritizer.addBehaviour(behaviour, sphereLocation);
     }
   }
 
@@ -92,7 +92,7 @@ export class BehaviourAggregator {
     }
   }
 
-  _onDumbHouseModeSwitch(data: boolean): void {
+  onDumbHouseModeSwitch(data: boolean): void {
     this.dumbHouseModeActive = data;
   }
 
