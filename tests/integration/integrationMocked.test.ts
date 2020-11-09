@@ -235,7 +235,7 @@ describe('Integration Test with mocks', () => {
     jest.advanceTimersToNextTimer()
     await flushPromises();
     const wrappedLights = crownstoneHue.getAllWrappedLights();
-    await crownstoneHue.removeBehaviour(behaviourC.rule);
+    await crownstoneHue.removeBehaviour(behaviourC.rule.lightId,behaviourC.rule.cloudId);
     jest.advanceTimersToNextTimer()
     await flushPromises();
     expect(wrappedLights[0].light.getState()).toMatchObject({on: true, bri: 20 * 2.54})

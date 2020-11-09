@@ -41,7 +41,7 @@ beforeEach(() => {
 afterEach(()=>jest.clearAllMocks())
 test('Init returns bridges', async () => {
   const crownstoneHue = new CrownstoneHue();
-  crownstoneHue._setupBridgeById = jest.fn((id) =>{  crownstoneHue.bridges.push(crownstoneHue.createBridgeFromConfig(id))});
+  crownstoneHue._setupBridgeById = jest.fn((id) =>{  crownstoneHue.bridges.push(crownstoneHue._createBridgeFromConfig(id))});
   const bridges = await crownstoneHue.init(SPHERE_LOCATION);
   expect(crownstoneHue._setupBridgeById).toBeCalledTimes(1)
   return expect(bridges.length).toBe(1)
