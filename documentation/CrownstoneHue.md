@@ -3,7 +3,19 @@
 ## Overview
 
 - **Crownstone Hue**  
-   - Initialization - Adding a Philips Hue Bridge - Removing a Philips Hue Bridge - Adding/Removing Philips Hue Lights - Adding a light - Removing a light - Adding/Updating/Removing Behaviours - Adding a Behaviour - Updating a Behaviour - Removing a Behaviour - Updating user presence - Switching Dumb house mode - Obtaining Lights and Bridges
+   - Initialization 
+   - Adding a Philips Hue Bridge 
+   - Removing a Philips Hue Bridge 
+   - Adding/Removing Philips Hue Lights 
+   		- Adding a light 
+   		- Removing a light 
+   - Adding/Updating/Removing Behaviours 
+   		- Adding a Behaviour 
+   		- Updating a Behaviour 
+   		- Removing a Behaviour 
+   - Updating user presence 
+   - Switching Dumb house mode 
+   - Obtaining Lights and Bridges
 - Discovery
 - Bridge
 - Light
