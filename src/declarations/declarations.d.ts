@@ -93,3 +93,7 @@ interface lightInfo {
 interface failedConnection{
   hadConnectionFailure:true;
 }
+
+interface BridgeInfo extends BridgeFormat{
+  lights: [];
+}

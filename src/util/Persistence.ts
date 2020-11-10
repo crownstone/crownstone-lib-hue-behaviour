@@ -47,7 +47,7 @@ class Persistence {
     }
   }
 
-  removeLightFromConfig(bridge: Bridge, uniqueLightId) {
+  removeLightFromConfig(bridge: Bridge, uniqueLightId): void {
     this.isConfiguredCheck();
     delete this.configuration[CONF_BRIDGE_LOCATION][bridge.bridgeId]["lights"][uniqueLightId];
   }
@@ -84,7 +84,7 @@ class Persistence {
     }
   }
 
-  appendBridge(bridgeInfo) {
+  appendBridge(bridgeInfo:BridgeInfo): void {
     this.isConfiguredCheck();
     if (bridgeInfo["bridgeId"] != undefined) {
       if (this.configuration[CONF_BRIDGE_LOCATION][bridgeInfo["bridgeId"]] == undefined) {
@@ -95,16 +95,22 @@ class Persistence {
         this.configuration[CONF_BRIDGE_LOCATION][bridgeInfo["bridgeId"]]["macAddress"] = bridgeInfo.macAddress || ""
         this.configuration[CONF_BRIDGE_LOCATION][bridgeInfo["bridgeId"]]["clientKey"] = bridgeInfo.clientKey || ""
         this.configuration[CONF_BRIDGE_LOCATION][bridgeInfo["bridgeId"]]["username"] = bridgeInfo.username || ""
+        if (bridgeInfo.lights != []) {
+          for (const light of bridgeInfo.lights) {
+            this.appendLight(bridgeInfo.bridgeId, light);
+          }
+        }
       }
     }
   }
+
   removeBridge(bridgeId: string): void {
     this.isConfiguredCheck();
     delete this.configuration[CONF_BRIDGE_LOCATION][bridgeId];
   }
 
 
-  _appendFullBridge(bridgeInfo) {
+  _appendFullBridge(bridgeInfo): void {
     this.configuration[CONF_BRIDGE_LOCATION][bridgeInfo.bridgeId] = {
       name: bridgeInfo.name,
       username: bridgeInfo.username,
@@ -120,7 +126,7 @@ class Persistence {
     }
   }
 
-  _appendNewLight(bridgeId, light) {
+  _appendNewLight(bridgeId:string, light:LightInfoObject): void {
     this.configuration[CONF_BRIDGE_LOCATION][bridgeId]["lights"][light.uniqueId] = {
       name: light.name,
       id: light.id,
@@ -128,12 +134,12 @@ class Persistence {
     }
   }
 
-  appendBehaviour(bridgeId, lightId, behaviour) {
+  appendBehaviour(bridgeId:string, lightId:string, behaviour:HueBehaviourWrapper): void {
     this.isConfiguredCheck();
-    this.configuration[CONF_BRIDGE_LOCATION][bridgeId].lights[lightId].behaviours.push(GenericUtil.deepCopy(behaviour));
+    this.configuration[CONF_BRIDGE_LOCATION][bridgeId].lights[behaviour].behaviours.push(GenericUtil.deepCopy(behaviour));
   }
 
-  updateBehaviour(bridgeId, lightId, updatedBehaviour) {
+  updateBehaviour(bridgeId:string, lightId:string, updatedBehaviour:HueBehaviourWrapper): void {
     this.isConfiguredCheck();
     for (let i = 0; i < this.configuration[CONF_BRIDGE_LOCATION][bridgeId].lights[lightId].behaviours.length; i++) {
       const behaviour = this.configuration[CONF_BRIDGE_LOCATION][bridgeId].lights[lightId].behaviours[i];
@@ -144,12 +150,12 @@ class Persistence {
     }
   }
 
-  removeBehaviour(bridgeId, lightId, cloudId) {
+  removeBehaviour(bridgeId:string, lightId:string, cloudId:string): void {
     this.isConfiguredCheck();
     for (let i = 0; i < this.configuration[CONF_BRIDGE_LOCATION][bridgeId].lights[lightId].behaviours.length; i++) {
       const behaviour = this.configuration[CONF_BRIDGE_LOCATION][bridgeId].lights[lightId].behaviours[i];
       if (behaviour.cloudId === cloudId) {
-        this.configuration[CONF_BRIDGE_LOCATION][bridgeId].lights[lightId].behaviours.splice([i],1);
+        this.configuration[CONF_BRIDGE_LOCATION][bridgeId].lights[lightId].behaviours.splice([i], 1);
         break;
       }
     }
@@ -159,7 +165,7 @@ class Persistence {
    * appends all lights from the connected bridges into the config file.
    *
    */
-  appendAllLightsFromConnectedBridges(bridges): void {
+  appendAllLightsFromConnectedBridges(bridges:Bridge[]): void {
     this.isConfiguredCheck();
     bridges.forEach(bridge => {
       Object.keys(bridge.lights).forEach(light => {
@@ -168,7 +174,7 @@ class Persistence {
     });
   }
 
-  isConfiguredCheck() {
+  isConfiguredCheck(): void {
     if (persistence.configuration == undefined) {
       throw new CrownstoneHueError(410);
     }
