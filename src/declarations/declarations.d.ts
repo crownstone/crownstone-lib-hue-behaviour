@@ -86,7 +86,7 @@ interface lightInfo {
   bridgeId: string,
   id: number,
   supportedStates: {  },
-  capabilities: { },
+  capabilities: [],
   lastUpdate: number
 }
 

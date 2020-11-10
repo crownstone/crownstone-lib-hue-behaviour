@@ -1,4 +1,4 @@
-# Documentation  - Discovery
+# Documentation - Discovery
 ## Overview
  - Crownstone Hue  
  - **Discovery** 

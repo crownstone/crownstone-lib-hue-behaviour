@@ -33,13 +33,13 @@ export class Light {
     readonly id: number;
     bridgeId: string;
     capabilities: object;
-    supportedStates: object;
+    supportedStates: [];
     api: ((action,extra?) => {});
     lastUpdate: number;
     intervalId : Timeout;
     stateChangeCallback = ((value) => {});
 
-    constructor(name: string, uniqueId: string, state: HueFullState, id: number, bridgeId: string, capabilities: object, supportedStates: object, api: any) {
+    constructor(name: string, uniqueId: string, state: HueFullState, id: number, bridgeId: string, capabilities: object, supportedStates: [], api: any) {
         this.name = name;
         this.uniqueId = uniqueId;
         this.state = state;
@@ -71,14 +71,19 @@ export class Light {
      * Obtains the state from the light on the bridge and updates the state object if different.
      */
     async renewState(): Promise<void> {
-        const newState = await this.api("getLightState",this.id) as failedConnection | HueFullState;
+        let newState = await this.api("getLightState",this.id) as failedConnection | HueFullState;
         if("hadConnectionFailure" in newState && newState.hadConnectionFailure){
             return;
         }
+        newState = newState as HueFullState;
         if ( typeof(newState) !== "undefined" && !lightUtil.stateEqual(this.state,newState)) {
             this.state = <HueFullState>GenericUtil.deepCopy(newState);
             this._setLastUpdate();
             this.stateChangeCallback(this.state);
+        }
+        else if( typeof(newState) !== "undefined" && this.state.reachable !== newState.reachable){
+            this.state.reachable = newState.reachable
+            this._setLastUpdate();
         }
     }
 
@@ -116,7 +121,7 @@ export class Light {
     }
 
     getInfo(): lightInfo {
-        return {
+        return GenericUtil.deepCopy({
             name: this.name,
             uniqueId: this.uniqueId,
             state: this.state,
@@ -125,13 +130,13 @@ export class Light {
             supportedStates: this.supportedStates,
             capabilities: this.capabilities,
             lastUpdate: this.lastUpdate
-        };
+        });
     }
 
     getUniqueId(): string {
         return this.uniqueId;
     }
-    getSupportedStates(): object {
+    getSupportedStates(): [] {
         return this.supportedStates;
     }
 }

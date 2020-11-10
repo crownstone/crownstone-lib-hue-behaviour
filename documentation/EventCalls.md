@@ -1,5 +1,4 @@
-
-# Documentation  - Event calls
+# Documentation - Event calls
 ## Overview
 
  - Crownstone Hue  
