@@ -154,7 +154,6 @@ export class Bridge {
    *
    */
   async getAllLightsFromBridge(): Promise<Light[]> {
-    if (this.authenticated) {
       const lights = await this._useApi("getAllLights");
       if (typeof (lights) === "undefined" || lights.hadConnectionFailure) {
         return []
@@ -162,10 +161,7 @@ export class Bridge {
       return lights.map(light => {
         return new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this._useApi.bind(this))
       });
-    } else {
-      throw new CrownstoneHueError(405);
     }
-  }
 
   /**
    * Connects to the bridge and creates an API that has full access to the bridge.
@@ -351,36 +347,46 @@ export class Bridge {
     })
   }
 
-  update(values: object) {
-    let updateValues = {};
+  update(values: object,onlyUpdate:boolean = false) {
+    let saveValue = false;
     if (values["name"] !== undefined) {
       this.name = values["name"]
-      updateValues["name"] = values["name"]
+      saveValue = true;
     }
     if (values["ipAddress"] !== undefined) {
       this.ipAddress = values["ipAddress"]
-      updateValues["ipAddress"] = values["ipAddress"]
+      saveValue = true;
     }
     if (values["username"] !== undefined) {
       this.username = values["username"]
-      updateValues["username"] = values["username"]
+      saveValue = true;
     }
     if (values["clientKey"] !== undefined) {
       this.clientKey = values["clientKey"]
-      updateValues["clientKey"] = values["clientKey"]
+      saveValue = true;
     }
     if (values["macAddress"] !== undefined) {
       this.macAddress = values["macAddress"]
-      updateValues["macAddress"] = values["macAddress"]
+      saveValue = true;
     }
     if (values["bridgeId"] !== undefined) {
       this.bridgeId = values["bridgeId"]
-      updateValues["bridgeId"] = values["bridgeId"]
+      saveValue = true;
     }
+
+
     if (values["reachable"] !== undefined) {
       this.reachable = values["reachable"]
     }
-    this.save();
+    if (values["authenticated"] !== undefined) {
+      this.authenticated = values["authenticated"]
+    }
+    if (values["reconnecting"] !== undefined) {
+      this.reconnecting = values["reconnecting"]
+    }
+    if(saveValue && !onlyUpdate){
+      this.save();
+    }
   }
 
   save() {
@@ -408,7 +414,10 @@ export class Bridge {
       username: this.username,
       clientKey: this.clientKey,
       bridgeId: this.bridgeId,
-      reachable: this.reachable
+      reachable: this.reachable,
+      authenticated: this.authenticated,
+      reconnecting: this.reconnecting,
+      lights: Object.values(this.lights)
     };
   }
 }

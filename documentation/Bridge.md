@@ -1,0 +1,128 @@
+
+# Documentation  - Bridge
+## Overview
+ - Crownstone Hue  
+ - Discovery
+ - **Bridge**
+ - Light 
+ - LightBehaviourAggregator
+ - Behaviour Aggregator 
+ - Behaviour & Twilight Prioritizer 
+ - Behavior/Twilight 
+ - Persistence 
+ - Event calls
+ - Errors
+
+## Introduction
+The Bridge is a object that represents the Philips Hue Bridge. This object is used to communicate to the actual Philips Hue bridge it represents and it's lights.
+
+## Usage
+### Import
+```import {Bridge} from {.}```
+### Constructing
+``` const bridge = new Bridge("name","username", "clientKey", "macAddress", "ipAddress","bridgeId"); ```
+Several fields may be left empty on constructing, it will try to gather it itself on initialization.  
+Note that either ```ip address``` or ```bridge id``` have to be set and if the ```username``` is empty while initializing, the link button should be pressed on the physicial bridge.
+
+### Initialization
+Before using, the bridge should be initialized else it will throws errors on usage of the Api related parts.
+```
+await bridge.init();
+```
+#### Linking
+Upon initialization with an empty username , ``` await this.link()``` will be called.
+This will create an unauthenticated api for user creation.  
+On success ```bridge.reachable``` is set to  ```true ``` and its ready for user creation.
+##### User creation
+After an unauthenticated api is created, ```await this.createNewUser()``` is called. 
+This attempts to create a user on the physical Philips Hue Bridge with the identifiers set by ```APP_NAME``` and ```DEVICE_NAME``` in the HueConstants.ts[ToDo: Link to consts]. If the link button on the physical bridge is not pressed during this, it will throw an error.
+
+On success, a user is created on the Philips Hue Bridge and the bridge will update itself with the new ```username``` and ```clientkey```.
+
+#### Connecting
+If the username is set after linking or upon initialization, the bridge calls ```this.connect()```, this attempts to create an authenticated Api.
+On success ```bridge.authenticated ``` and ```bridge.reachable``` are set to  ```true ``` and the bridge object is ready to use.
+When the username is wrong or denied by the Philips Hue bridge, it will throw an error.
+
+### Light configuration
+To configure a light that is connected to the Philips Bridge, call:
+```await bridge.configureLightById(id)```
+``Id`` is of type `number` and represents the id of the light on the bridge, not the uniqueId.
+On succes, it will return an uninitialized Light object.
+In case of a wrong id used, it throws an error.
+ 
+### Removing a light
+ To remove the light from the Bridge object, call:
+ `await bridge.removeLight(uniqueLightId)`
+ This only removes the light from the object's light list, not from the actual Philips Hue Bridge.
+
+
+### Update
+To update the values of the bridge, call:
+`bridge.update(values,onlyUpdate?)`
+`values` is an object that supports a single or a combination of the following fields:
+```
+{
+"name": string,
+"ipAddress": string,
+"username": string,
+"clientKey": string,
+"macAddress": string,
+"bridgeId": string,
+"reachable": string,
+"authenticated": string,
+"reconnecting": string
+}
+``` 
+`onlyUpdate` is an boolean that is per default false. Meaning that `this.save()` will be called after the fields are updated, with the only exception of when only fields are updated that does not need to be saved (reachable, authenticated and reconnecting). 
+
+**Example:**
+`bridge.update({"ipAddress": "192.168.178.123"})`
+
+### Save
+To save the Bridge's current state, call:
+`bridge.save()`
+This will emit an event with topic `"onBridgeUpdate"` and a data object formated as:
+```
+{
+name: string,
+ipAddress: string, 
+macAddress: string, 
+username: string, 
+clientKey: string, 
+bridgeId: string, 
+lights: {name: string, id: number, uniqueId: string}[]
+}
+``` 
+
+
+### On connection failure
+If the Philips Hue bridge has connection issues, such as it is not reachable or the ip address is set wrong, the bridge object attempts to rediscover the bridge. Note that if the bridge id is not set, the rediscovery will not work and an error is thrown.
+
+During the period of rediscovering, ```bridge.reachable``` is set to ```false```, ```bridge.reconnecting``` is set to ```true``` and all api calls will be ignored and returned with ```{"hadConnectionFailure":true} ``` . The bridge will attempt to rediscover indefintely.
+
+After a successfull discovery it updates the ipaddress to the new ipaddress, ```bridge.reachable``` is set to ```true```,   ```bridge.reconnecting``` is set to ```false``` and it will return one more time  ```{"hadConnectionFailure":true} ```.
+
+### Remaining functions
+```cleanup():void``` Calls the cleanup function of every configured light.
+```getLightById(uniqueId):Light``` Returns a Light object that matches the given uniqueId in the bridge's light list.
+`getConnectedLights(): Light[]` Returns an array with all lights from the bridge's configured light list.
+```getAllLightsFromBridge():Promise<Light[]>``` Returns an array with all Light objects that is retrieved from the actual Philips Hue Bridge, corrosponding all Hue Lights connected to the Philips Hue Bridge. These Light objects aren't initialized.
+`populateLights():Promise<void>` Add all Philips Hue Lights from the Philips Hue Bridge to the bridge's light list. These Light objects aren't initialized.
+```isReachable():boolean``` returns a boolean representing if the bridge is reachable or not.
+```isReconnecting():boolean``` returns a boolean representing if the bridge is reconnecting or not. 
+`getInfo(): object` Returns all fields as an object:
+```
+{
+name: string,  
+ipAddress: string,  
+macAddress: string,  
+username: string,  
+clientKey: string,  
+bridgeId: string,  
+reachable: boolean,  
+authenticated: boolean,  
+reconnecting: boolean,  
+lights: Light[]
+} 
+```

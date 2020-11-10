@@ -1,15 +1,35 @@
+# Documentation  - Discovery
 ## Overview
+ - Crownstone Hue  
+ - **Discovery** 
+	 - Discover all bridges in the network
+	 - Discovering a bridge by Id
+ - Bridge
+ - Light 
+ - LightBehaviourAggregator
+ - Behaviour Aggregator 
+ - Behaviour & Twilight Prioritizer 
+ - Behavior/Twilight 
+ - Persistence 
+ - Event calls
+ - Errors
 
-- **Crownstone Hue**
-- Discovery
-- Bridge
-- Light
-- LightBehaviourAggregator
-- Behaviour Aggregator
-- Behaviour & Twilight Prioritizer
-- Behavior/Twilight
-- Persistence
-- Event calls
-- Errors
+## Introduction
+The Discovery is a set of utility functions for discovering Philips Hue Bridges in the user's local network. Note that the Bridge has to be connected and reachable from outside the network, as all the discovery functions use (indirectly) the Discovery API that is provided by Philips Hue. 
 
-## Crownstone Hue
+## Usage
+### Import
+```import {Discovery} from {.}```
+### Discovering all bridges in the network
+The Discovery utility provides the following:
+```await Discovery.discoverBridges()```
+On success it returns an array of uninitialized Bridges with it's name and IP Address set.
+If no Bridges are found or the Discovery API is unreachable, it returns an empty array. 
+
+```await Discovery.getBridgesFromDiscoveryUrl()``` 
+Returns an array of objects formated as ```{id:string,internalipaddress:string}``` 
+### Discovering a bridge by Id.
+To discovery a bridge by Id, call:
+```await Discovery.discoverBridgeById(bridgeId)``` 
+On succes it returns the bridge id and a (new) ip address in an object formated as ```{id:string,internalipaddress:string}```.
+ If the bridge cannot be found, it returns it's bridge id along with an internalipaddress set as ```"-1"```.
