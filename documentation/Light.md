@@ -4,14 +4,14 @@
  - Discovery
  - Bridge
  - **Light** 
-		 - Constructing
-		 - Initialization
-		 - Polling/Renew state
-		 - Setting the callback for a lightstate change
-		 - Setting a new light state
-		 - Retrieving the current known state
-		 - Cleanup
-		 - Remaining functions
+ 	- Constructing
+	- Initialization
+	- Polling/Renew state
+	- Setting the callback for a lightstate change
+	- Setting a new light state
+	- Retrieving the current known state
+	- Cleanup
+	- Remaining functions
  - LightBehaviourAggregator
  - Behaviour Aggregator 
  - Behaviour & Twilight Prioritizer 
@@ -99,5 +99,7 @@ Which will stop the polling.
 
 ### Remaining functions
 `isReachable():boolean` - Returns if the light is reachable or not. (Might have a slight delay as it depends on actual Bridge providing this data after a poll) 
+
 `getInfo():lightInfo` - Returns all information fields of the light.
+
 `getSupportedStates():[]` - Returns an array of supported states
