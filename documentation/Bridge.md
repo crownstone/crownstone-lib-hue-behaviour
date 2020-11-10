@@ -4,6 +4,17 @@
  - Crownstone Hue  
  - Discovery
  - **Bridge**
+   - Constructing
+   - Initialization
+     - Linking
+       - User creation
+     - Connecting 
+   - Light configuration
+   - Removing a light
+   - Update
+   - Save
+   - On connection failure
+   - Remaining functions
  - Light 
  - LightBehaviourAggregator
  - Behaviour Aggregator 
@@ -105,12 +116,19 @@ After a successfull discovery it updates the ipaddress to the new ipaddress, ```
 
 ### Remaining functions
 ```cleanup():void``` Calls the cleanup function of every configured light.
+
 ```getLightById(uniqueId):Light``` Returns a Light object that matches the given uniqueId in the bridge's light list.
+
 `getConnectedLights(): Light[]` Returns an array with all lights from the bridge's configured light list.
+
 ```getAllLightsFromBridge():Promise<Light[]>``` Returns an array with all Light objects that is retrieved from the actual Philips Hue Bridge, corrosponding all Hue Lights connected to the Philips Hue Bridge. These Light objects aren't initialized.
+
 `populateLights():Promise<void>` Add all Philips Hue Lights from the Philips Hue Bridge to the bridge's light list. These Light objects aren't initialized.
+
 ```isReachable():boolean``` returns a boolean representing if the bridge is reachable or not.
-```isReconnecting():boolean``` returns a boolean representing if the bridge is reconnecting or not. 
+
+```isReconnecting():boolean``` returns a boolean representing if the bridge is reconnecting or not.
+
 `getInfo(): object` Returns all fields as an object:
 ```
 {
