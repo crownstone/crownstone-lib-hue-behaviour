@@ -4,17 +4,17 @@ Module is still a W.I.P., thus imports aren't correctly specified yet and some p
 
 ## Documentation
 ### Overview 
- - Crownstone Hue
- - Discovery 
- - Bridge
- - Light 
- - Errors
- - Event calls
- - Persistence 
- - LightAggregatorWrapper
- - Behaviour Aggregator 
- - SwitchBehaviour- & Twilight Prioritizer 
- - Behaviours
+ - [Crownstone Hue](/documentation/CrownstoneHue.md)
+ - [Discovery](/documentation/Discovery.md)
+ - [Bridge](/documentation/Bridge.md)
+ - [Light](/documentation/Light.md)
+ - [Errors](/documentation/Errors.md)
+ - [Event calls](/documentation/EventCalls.md)
+ - [Persistence](/documentation/Persistence.md)
+ - [LightAggregatorWrapper](/documentation/LightAggregatorWrapper.md)
+ - [Behaviour Aggregator](/documentation/BehaviourAggregator.md)
+ - [SwitchBehaviour- & Twilight Prioritizer](/documentation/Prioritizer.md)
+ - [Behaviours](/documentation/Behaviours.md)
 
 ### Installation
 
@@ -22,8 +22,8 @@ Module is still a W.I.P., thus imports aren't correctly specified yet and some p
 ```import {CrownstoneHue} from {.}```
 
 ### Usage
-The CrownstoneHue class is the front of the module, this should be used for every operation needed on the module. (See CrownstoneHue for all it's functions)
-With the only exceptions as of retrieving information of certain Bridges/Lights, this is done by calling their respective get functions.
+The CrownstoneHue class is the front of the module, this should be used for every operation needed on the module. (See [CrownstoneHue](/documentation/CrownstoneHue.md) for all it's functions)
+With the only exceptions as of retrieving information of certain Bridges/Lights, this can done by calling their respective get functions.
 
 #### Examples
 In the following piece of code we give some broad examples of how the module can be used.  
