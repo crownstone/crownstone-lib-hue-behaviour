@@ -25,7 +25,11 @@ The usage of the utility is a builder like approach and you'll have to save afte
 
 In short: to use the persistence utility, call `await Persistence.loadConfiguration()`
 Then use one of the functions to build up the configuration.
-Example: `Persistence.appendLight("bridgeId", Light)`
+
+Example: 
+
+```Persistence.appendLight("bridgeId", Light)```
+
 Then when ready, save the current configuration by calling  `await Persistence.saveConfiguration()`.
 
 ### Importing
