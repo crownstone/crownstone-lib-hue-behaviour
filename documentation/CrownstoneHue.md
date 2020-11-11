@@ -1,19 +1,20 @@
 # Documentation - Crownstone Hue 
 ## Overview
  - **Crownstone Hue**
-	- Initialization
-	- Adding a Philips Hue Bridge
-	- Removing a Philips Hue Bridge
-	- Adding/Removing Philips Hue Lights
-		- Adding a light
-		- Removing a light
-	- Adding/Updating/Removing Behaviours
-		- Adding a Behaviour
-		- Updating a Behaviour
-		- Removing a Behaviour
-	-  Updating user presence
-	-  Switching Dumb house mode
-	-  Obtaining Lights and Bridges
+	- [Initialization](#initialization)
+	- [Adding a Philips Hue Bridge](#adding-a-philips-hue-bridge)
+	- [Removing a Philips Hue Bridge](#removing-a-philips-hue-bridge)
+	- [Adding/Removing Philips Hue Lights](#addingremoving-philips-hue-lights)
+		- [Adding a light](#adding-a-light)
+		- [Removing a light](#removing-a-light)
+	- [Adding/Updating/Removing Behaviours](#addingupdatingremoving-behaviours)
+		- [Adding a Behaviour](#adding-a-behaviour)
+		- [Updating a Behaviour](#updating-a-behaviour)
+		- [Removing a Behaviour](#removing-a-behaviour)
+	-  [Updating user presence](#updating-user-presence)
+	-  [Switching Dumb house mode](#switching-dumb-house-mode)
+	-  [Stopping the module](#stopping-the-module)
+	-  [Obtaining Lights and Bridges](#obtaining-lights-and-bridges)
  - Discovery 
  - Bridge
  - Light 
@@ -26,7 +27,7 @@
  - Errors
 
 ## About
-The Crownstone Hue class is the entry point into the module.  It will handle all passed data from outside through it's defined functions and calls the persistence functions when needed.
+The Crownstone Hue class is the front of the module. To use the module, call one of its functions as this will handle all passed data from outside and calls the persistence functions when needed.
 ## Usage 
 ### Import
 ```import {CrownstoneHue} from {.}```
@@ -46,11 +47,11 @@ interface SphereLocation {
 ```
 This information will be used for the time of sunrise and sunset.
 
-Upon initialization the module will load the configuration settings from the configuration file.
+Upon initialization, the module will load the configuration settings from the configuration file.
 After the configuration file is loaded, it will attempt to create Bridges with the given information from the configuration file.
 When the Bridges are reachable and successfully configured, the lights will be configured and initialized.
-Afterwards  it will a light and a behaviour aggregator together and add the light's behaviours to the aggregator.
-After everything is done succesfull, it will return a list of connected Bridges and the module is ready to use. 
+Afterwards, it wraps a light and a behaviour aggregator together and adds the light's behaviours to the aggregator.
+After everything is done successfully, it will return a list of configured Bridges and the module is ready to use. 
 
 
 ### Adding a Philips Hue Bridge
@@ -60,7 +61,7 @@ To add a bridge to the module there are three ways.
  - By Bridge Id
  
 #### By a config format
-In case you already have certain information of the bridge you can create a bridge with that information, in order to do this, call:
+In case you already have certain information about the bridge you can create a bridge with that information, to do this, call:
 ```
 await crownstoneHue.addBridge(configFormat);
 ```
@@ -81,30 +82,30 @@ interface BridgeFormat {
 }
 ```
 Based on the information passed with the format, it will create a bridge.
-If any of the keys are missing or undefined, it will pass an empty string on creation of the object.
+If any of the keys are missing or undefined, it will pass an empty string on the creation of the object.
 
-The most important parts of the format is the username, bridgeId and ip address as the bridge object relies on these and will attempt to find them itself if any or a combination of those are missing.
+The most important parts of the format are the username, bridgeId and ip address as the bridge object relies on these and will attempt to find them itself if any or a combination of those are missing.
 When there is/are...
  - No username: The bridge's linking procedure will be started and the physical
    link button has to be pressed or it will throw an error. 
   - No ip address: The bridge's (re)discovery procedure will be started and it tries to find an ip address linked to the bridge id.
   - No bridge id: The bridge has 1 attempt to find the bridge id with the given ip address, in case of failure it throws an error.
-  - No bridge id and no ip address: The function will returns an uninitialized bridge object because the object cannot function without those.
+  - No bridge id and no ip address: The function will return an uninitialized bridge object because the object cannot function without those.
 
-On a successfull initialization, it then adds the lights and wraps them with their behaviours if they are defined.
-Afterwards it will return the Bridge object.
+On a successful initialization, it then adds the lights and wraps them with their behaviours if they are defined.
+Afterwards, it will return the Bridge object.
 
 #### By Ip address
-In order to add a Bridge to the module by Ip address, call:
+To add a Bridge to the module by Ip address, call:
 ```
 await crownstoneHue.addBridgeByIpAddress(ipAddress);
 ```
 The given ip address should be of type string and only IPv4 is supported.
 
-After calling the function, it will create a Bridge object with only an IP address defined and initiliazes it. This will make the bridge object try to connect to the Philips Hue Bridge and attempt to create an user. Note that the link button on the physical bridge has to be pressed to make this work.
+After calling the function, it will create a Bridge object with only an IP address defined and initializes it. This will make the bridge object try to connect to the Philips Hue Bridge and attempt to create a user. Note that the link button on the physical bridge has to be pressed to make this work.
 
-On success, it will fill update itself with all needed information and return the bridge object.
-On failure, it throws an error when link button isn't pressed or when IP Address is wrong as it cannot discover itself without a BridgeId. 
+On success, it will fill update itself with all the needed information and return the bridge object.
+On failure, it throws an error when the link button isn't pressed or when IP Address is wrong as it cannot discover itself without a bridge Id. 
 
 #### By Bridge Id
 In order to add a Bridge to the module by Bridge Id, call:
@@ -112,15 +113,15 @@ In order to add a Bridge to the module by Bridge Id, call:
 await crownstoneHue.addBridgeByBridgeId(bridgeId);
 ``` 
 This will attempt to find the Philips Hue Bridge in the network through a discovery call. 
-Upon a successfull discovery call it will create a bridge object with a IP address and bridge id filled in and initiliazes it.
-The bridge object then tries to connect to the Philips Hue Bridge and attempts to create an user. Note that the link button on the physical bridge has to be pressed to make this work.
+Upon a successful discovery call, it will create a bridge object with an IP address and bridge id filled in and initializes it.
+The bridge object then tries to connect to the Philips Hue Bridge and attempts to create a user. Note that the link button on the physical bridge has to be pressed to make this work.
 
-On success, it will fill update itself with all needed information and return the bridge object.
+On success, it will fill update itself with all the needed information and return the bridge object.
 On failure, It will throw an error when no Bridge is found in the network or when the link button isn't pressed.
 
 
 ### Removing a Philips Hue Bridge
-In order to remove a bridge from the module, call:
+To remove a bridge from the module, call:
 ```
 await crownstoneHue.removeBridge(bridgeId);
 ``` 
@@ -146,33 +147,33 @@ After the light is removed, the configuration file will be updated.
 
 ### Adding/Updating/Removing Behaviours
 #### Adding a Behaviour
-In order to add a behaviour to the module, call:
+To add a behaviour to the module, call:
 ```
 await crownstoneHue.addBehaviour(behaviour:HueBehaviourWrapper);
 ``` 
 See HueBehaviourWrapper for the format.
 
 This function will add the behaviour to the light that is defined in the  ```lightId``` variable inside the given object.
-Afterwards it saves the configuration file.
+Afterwards, it saves the configuration file.
 
 #### Updating a Behaviour 
-In order to update a behaviour to the module, call:
+To update a behaviour to the module, call:
 ```
 await crownstoneHue.addBehaviour(behaviour:HueBehaviourWrapper);
 ``` 
 See HueBehaviourWrapper for the format.
 
 This function will update the behaviour based on the ```cloudId``` and ```lightId ``` variable inside the object.
-Afterwards it saves the configuration file.
+Afterwards, it saves the configuration file.
 
 #### Removing a Behaviour 
-In order to remove a behaviour from the module, call:
+To remove a behaviour from the module, call:
 ```
 await crownstoneHue.removeBehaviour(lightId,cloudId);
 ``` 
 This will search for the light on the bridges and then if found, it will try to remove the behaviour from the light based on the ```cloudId```.
 
-Afterwards it updates the configuration file.
+Afterwards, it updates the configuration file.
 
 ### Updating user presence
 If a user enters or leaves a room or a sphere, call:
@@ -180,7 +181,7 @@ If a user enters or leaves a room or a sphere, call:
 crownstoneHue.presenceChange(data:PresenceEvent);
 ``` 
 This will send an event call with the presence event data to all the behaviours
-The format for the PresenceEvent is build with the following interfaces:
+The format for the PresenceEvent can be build with the following interfaces:
 ```
 interface PresenceEvent{  
   type: PresenceEventType  
@@ -203,7 +204,7 @@ interface PresenceProfileSphere {
 }  
 ```
 #### Example:
-An event for user with id 0 entering a sphere is as follows:
+An event for a user with id 0 entering a sphere is as follows:
 ```
 {
 	type:"ENTER",
@@ -213,7 +214,7 @@ An event for user with id 0 entering a sphere is as follows:
 		}
 }
 ```
-An event for user with id 1 leaving location with id 4 is as follows:
+An event for a user with id 1 leaving a location with id 4 is as follows:
 ```
 {
 	type:"LEAVE",
@@ -230,10 +231,10 @@ To switch dumb house mode on or off, call:
 crownstoneHue.setDumbHouseMode(on:boolean);
 ```
 On function call, it emits an event call to all BehaviourAggregators with the given value.
-When value is true, behaviours do not manipulate the light's state.
+When the value is true, behaviours do not manipulate the light's state.
 
 ### Stopping the module.
-In order to stop the module, call:
+To stop the module, call:
 ```
 await crownstoneHue.stop();
 ```
@@ -242,6 +243,9 @@ This will stop all timers and cleanup the eventbus.
 
 ### Obtaining Lights and Bridges
 There are some extra functions to obtain lights and bridges.
+
 ```getAllWrappedLights()```  will return a list of LightAggregatorWrapper objects.
+
 ```getAllConnectedLights()```  will return only all Lights as Light objects.
+
 ```getConfiguredBridges()()```  will return all bridges that are configured. 
