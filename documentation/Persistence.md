@@ -12,8 +12,8 @@
  - Event calls
  - Errors
 
-## Introduction
-This is a persistence utility for the Crownstone Hue module, it has a few basic functions for preserving and loading the configuration of the objects used. 
+## About
+This is a persistence utility for the Crownstone Hue module, it has a few basic functions for preserving and loading the data of the objects used. 
  
 ## Usage
 The Persistence utility is a singelton class created at runtime, to use it you simply import it and then call it's functions.

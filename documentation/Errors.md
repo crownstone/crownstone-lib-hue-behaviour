@@ -12,7 +12,7 @@
  - Event calls
  - **Errors**
 
-## Introduction
+## About
 In case of something happened the module can throw an error, these errors are defined in CrownstoneHueError.ts[Todo link] as well as a copy below.
  
 ## Errors 

@@ -14,6 +14,7 @@
    - Update
    - Save
    - On connection failure
+   - Getters
    - Remaining functions
  - Light 
  - LightBehaviourAggregator
@@ -24,10 +25,11 @@
  - Event calls
  - Errors
 
-## Introduction
-The Bridge is a object that represents the Philips Hue Bridge. This object is used to communicate to the actual Philips Hue bridge it represents and it's lights.
+## About
+The Bridge is a object that represents the Philips Hue Bridge. This object is used to communicate to the actual Philips Hue bridge it represents and it's lights.  
 
-## Usage
+
+## Usage  
 ### Import
 ```import {Bridge} from {.}```
 ### Constructing
@@ -40,6 +42,7 @@ Before using, the bridge should be initialized else it will throws errors on usa
 ```
 await bridge.init();
 ```
+
 #### Linking
 Upon initialization with an empty username , ``` await this.link()``` will be called.
 This will create an unauthenticated api for user creation.  
@@ -114,18 +117,12 @@ During the period of rediscovering, ```bridge.reachable``` is set to ```false```
 
 After a successfull discovery it updates the ipaddress to the new ipaddress, ```bridge.reachable``` is set to ```true```,   ```bridge.reconnecting``` is set to ```false``` and it will return one more time  ```{"hadConnectionFailure":true} ```.
 
-### Remaining functions
-```cleanup():void``` Calls the cleanup function of every configured light.
-
+### Getters
 ```getLightById(uniqueId):Light``` Returns a Light object that matches the given uniqueId in the bridge's light list.
 
-`getConnectedLights(): Light[]` Returns an array with all lights from the bridge's configured light list.
-
-```getAllLightsFromBridge():Promise<Light[]>``` Returns an array with all Light objects that is retrieved from the actual Philips Hue Bridge, corrosponding all Hue Lights connected to the Philips Hue Bridge. These Light objects aren't initialized.
-
-`populateLights():Promise<void>` Add all Philips Hue Lights from the Philips Hue Bridge to the bridge's light list. These Light objects aren't initialized.
-
 ```isReachable():boolean``` returns a boolean representing if the bridge is reachable or not.
+
+`getConnectedLights(): Light[]` Returns an array with all lights from the bridge's configured light list.
 
 ```isReconnecting():boolean``` returns a boolean representing if the bridge is reconnecting or not.
 
@@ -144,3 +141,10 @@ reconnecting: boolean,
 lights: Light[]
 } 
 ```
+
+### Remaining functions
+```cleanup():void``` Calls the cleanup function of every configured light.
+
+```getAllLightsFromBridge():Promise<Light[]>``` Returns an array with all Light objects that is retrieved from the actual Philips Hue Bridge, corrosponding all Hue Lights connected to the Philips Hue Bridge. These Light objects aren't initialized.
+
+`populateLights():Promise<void>` Add all Philips Hue Lights from the Philips Hue Bridge to the bridge's light list. These Light objects aren't initialized.

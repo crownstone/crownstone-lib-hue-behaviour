@@ -1,11 +1,12 @@
-# Documentation - Event calls
+
+# Documentation  - Event calls
 ## Overview
 
  - Crownstone Hue  
  - Discovery
  - Bridge
  - Light 
- - LightBehaviourAggregator
+ - LightAggregatorWrapper
  - Behaviour Aggregator 
  - Behaviour & Twilight Prioritizer 
  - Behavior/Twilight 
@@ -13,7 +14,7 @@
  - **Event calls**
  - Errors
 
-## Introduction
+## About
 The Crownstone Hue module uses some event calls for data transfering.
 Meaning you can subscribe to these topics in case you need to catch something.
 These topic constants are exported from EventConstants.ts [ToDo link to event constants ]

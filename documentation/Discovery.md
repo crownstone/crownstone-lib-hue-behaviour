@@ -1,4 +1,5 @@
-# Documentation - Discovery
+
+# Documentation  - Discovery
 ## Overview
  - Crownstone Hue  
  - **Discovery** 
@@ -6,7 +7,7 @@
 	 - Discovering a bridge by Id
  - Bridge
  - Light 
- - LightBehaviourAggregator
+ - LightAggregatorWrapper
  - Behaviour Aggregator 
  - Behaviour & Twilight Prioritizer 
  - Behavior/Twilight 
@@ -14,7 +15,7 @@
  - Event calls
  - Errors
 
-## Introduction
+## About
 The Discovery is a set of utility functions for discovering Philips Hue Bridges in the user's local network. Note that the Bridge has to be connected and reachable from outside the network, as all the discovery functions use (indirectly) the Discovery API that is provided by Philips Hue. 
 
 ## Usage

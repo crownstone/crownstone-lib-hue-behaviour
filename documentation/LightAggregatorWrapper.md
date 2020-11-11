@@ -1,3 +1,4 @@
+
 # Documentation - LightAggregatorWrapper
 ## Overview
  - Crownstone Hue  
@@ -15,14 +16,14 @@
  - Event calls
  - Errors
 
-## Introduction
+## About
 This is just a wrapper used to connect a Behaviour Aggregator with a Light object.
 
 ## Usage
 ### Import
 ```import {Discovery} from {.}```
 ### Constructing
-`const lightAggregatorWrapper = new LightAggregatorWrapper(light:Light)`
+`new LightAggregatorWrapper(light:Light)`
 On constructing it creates a BehaviourAggregator with a callback for the light's setState function.
 
 ### Initialization

@@ -113,7 +113,7 @@ export class BehaviourAggregator {
     const newBehaviour = this._getAggregatedBehaviour();
     this.aggregatedBehaviour = newBehaviour;
 
-    this.checkIfAllBehavioursAreInactive();
+    this._checkIfAllBehavioursAreInactive();
     this._checkIfStateMatchesWithNewBehaviour();
     if (typeof (newBehaviour) !== "undefined") {
       if (newBehaviour.behaviour.type === "TWILIGHT") {
@@ -126,7 +126,7 @@ export class BehaviourAggregator {
 
     //Light is on, but dimmed, user leaves room/behaviour deactivates  >  light should still turn off.
     if (typeof (oldBehaviour) !== "undefined" && typeof (newBehaviour) === "undefined") {
-      await this.onBehaviourDeactivation();
+      await this._onBehaviourDeactivation();
     }
 
     if (typeof (oldBehaviour) === "undefined" && typeof (newBehaviour) !== "undefined") {
@@ -150,7 +150,7 @@ export class BehaviourAggregator {
   /** Checks if all behaviours are inactive and then removes override.
    * prioritizedBehaviour will be undefined when all are inactive.
    */
-  checkIfAllBehavioursAreInactive() {
+  _checkIfAllBehavioursAreInactive() {
     if (typeof (this.switchBehaviourPrioritizer.prioritizedBehaviour) === "undefined") {
       this.override = NO_OVERRIDE;
     }
@@ -160,7 +160,7 @@ export class BehaviourAggregator {
    *  Could be user leaving a room or just deactivation.
    * @param behaviour
    */
-  async onBehaviourDeactivation(): Promise<void> {
+  async _onBehaviourDeactivation(): Promise<void> {
     if (this.override !== NO_OVERRIDE) {
       this.override = NO_OVERRIDE;
     }
@@ -253,16 +253,5 @@ export class BehaviourAggregator {
       }
     }
   }
-}
-
-function debugPrintStateDifference(oldS, newS) {
-  let printableState = {};
-
-  Object.keys(oldS).forEach(key => {
-    if (JSON.stringify(oldS[key]) !== JSON.stringify(newS[key])) {
-      printableState[key] = {old: oldS[key], new: newS[key]};
-    }
-  });
-  console.log(printableState);
 }
 

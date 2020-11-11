@@ -51,7 +51,6 @@ export class PrioritizerBase {
    *
    */
   getComposedState(): HueLightState {
-    console.log("getComposedState"  + Date.now());
     return this.composedState;
   }
 }

@@ -1,18 +1,18 @@
-# Documentation - Light
+# Documentation  - Light
 ## Overview
  - Crownstone Hue  
  - Discovery
  - Bridge
  - **Light** 
- 	- Constructing
-	- Initialization
-	- Polling/Renew state
-	- Setting the callback for a lightstate change
-	- Setting a new light state
-	- Retrieving the current known state
-	- Cleanup
-	- Remaining functions
- - LightBehaviourAggregator
+		 - Constructing
+		 - Initialization
+		 - Polling/Renew state
+		 - Setting the callback for a lightstate change
+		 - Setting a new light state
+		 - Retrieving the current known state
+		 - Cleanup
+		 - Getters
+ - LightAggregatorWrapper
  - Behaviour Aggregator 
  - Behaviour & Twilight Prioritizer 
  - Behavior/Twilight 
@@ -20,7 +20,7 @@
  - Event calls
  - Errors
 
-## Introduction
+## About
 The Light object represents a single Philips Hue Light and is dependend on a Bridge object for the usage of it's api.
 
 ## Usage
@@ -69,6 +69,10 @@ The `state` variable is an object supporting the following fields:
 Note when on is false, it can't change any other states, when done so it throws an error. 
 When exceeding the maximum or minimum values of a field, the maximum or minimum will be used instead.
  
+**Example:**
+Turning the light on with a brigthness of 254 and a hue of 12555.
+`await light.setState({on:true,bri:254, hue:12555})`
+ 
 ### Retrieving the current known state
 To retrieve the current known state, call:
 `light.getState()`
@@ -97,9 +101,7 @@ To stop the interval, call:
 Which will stop the polling.
 
 
-### Remaining functions
+### Getters
 `isReachable():boolean` - Returns if the light is reachable or not. (Might have a slight delay as it depends on actual Bridge providing this data after a poll) 
-
 `getInfo():lightInfo` - Returns all information fields of the light.
-
 `getSupportedStates():[]` - Returns an array of supported states
