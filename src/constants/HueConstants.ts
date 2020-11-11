@@ -1,12 +1,16 @@
-export const maxValueOfStates: StateUpdate = {
+
+export const APP_NAME: string = 'Hub';
+export const DEVICE_NAME: string = 'Hub1';
+
+export const maxValueOfStates = {
   'hue': 65535,
   'bri': 254,
   'sat': 254,
-  'xy': [0.5, 0.5],
+  'xy': [1.0, 1.0],
   'ct': 500
 }
 
-export const minValueOfStates: StateUpdate = {
+export const minValueOfStates = {
   'hue': 0,
   'bri': 1,
   'sat': 0,
@@ -27,3 +31,13 @@ export const possibleStates = {
   'effect': true,
   'alert': true
 }
+
+export const hueStateVariables = {
+  'on':true,
+  ...minMaxValueStates}
+
+export const DISCOVERY_URL = "https://discovery.meethue.com/";
+
+export const LIGHT_POLLING_RATE = 500;
+
+export const RECONNECTION_TIMEOUT_TIME = 10000;

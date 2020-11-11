@@ -1,7 +1,7 @@
-//TODO: stop hier alle functies in die niet perse in je behaviour class hoeven staan zodat deze makkelijker te lezen is
-import {SunCalc} from "SunCalc";
+import {hueStateVariables} from "../../constants/HueConstants";
 
-// TODO: globals in all caps maakt het duidelijk dat ze niet een locale variabele zijn
+const SunCalc = require('suncalc');
+
 const WEEKDAY_MAP = {0: "Sun", 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat"}
 
 export const BehaviourUtil = {
@@ -12,12 +12,31 @@ export const BehaviourUtil = {
   },
 
   isSomeonePresent(presenceLocations): boolean {
-    return (this.presenceLocations.length > 0);
+    return (presenceLocations.length > 0);
   },
 
   mapBehaviourActionToHue: function(value: number) {
     return value * 2.54
   },
+
+  /** Maps State A to State B
+   *
+   * @param stateA
+   * @param stateB
+   *
+   * Returns stateB with stateB objects.
+   */
+  mapStateObjectToTheOther(stateA,stateB){
+    for(const key of Object.keys(stateA)){
+      if((hueStateVariables[key])){
+        stateB[key] = stateA[key];
+      }
+    }
+    return {...stateB};
+  },
+
+
+
 
   /** returns the sunset time in minutes, given the timestamp and sphereLocation
    * @param sphereLocation

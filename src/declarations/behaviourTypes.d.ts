@@ -2,6 +2,7 @@ type PresenceTypeSomeone = "SOMEBODY" | "NOBODY"
 type PresenceType = PresenceTypeSomeone | "IGNORE" | "SPECIFIC_USERS"
 type SunTimes = "SUNSET" | "SUNRISE"
 type TimeDataType = SunTimes | "CLOCK"
+type BehaviourType = "BEHAVIOUR" | "TWILIGHT";
 
 interface PresenceNone {
     type: "IGNORE"
@@ -95,11 +96,34 @@ interface HueTwilight {
     time: Time,
 }
 
+type HueBehaviourWrapper = HueBehaviourWrapperTwilight | HueBehaviourWrapperBehaviour
 
-interface HueBehaviourWrapper {
+interface HueBehaviourWrapperBehaviour {
     type: "BEHAVIOUR"
     data: HueBehaviour
     activeDays: ActiveDays,
     lightId: string,
-    updatedAt: number
+    cloudId: string
+}
+
+
+interface HueBehaviourWrapperTwilight {
+    type: "TWILIGHT"
+    data: HueTwilight
+    activeDays: ActiveDays,
+    lightId: string,
+    cloudId: string
+}
+
+interface BehaviourBaseInterface{
+    behaviour: HueBehaviourWrapper;
+    isActive: boolean;
+    timestamp: number | null;
+    sphereLocation: SphereLocation
+}
+
+interface SwitchBehaviourInterface extends BehaviourBaseInterface{
+    presenceLocations: PresenceProfile[];
+    lastPresenceUpdate: number;
+    unsubscribe: EventUnsubscriber;
 }

@@ -1,5 +1,9 @@
-import {Bridge} from "./Bridge";
-import {minValueOfStates,maxValueOfStates,minMaxValueStates,possibleStates} from "../constants/HueConstants";
+import {
+    LIGHT_POLLING_RATE
+} from "../constants/HueConstants";
+import Timeout = NodeJS.Timeout;
+import {lightUtil} from "../util/LightUtil";
+import {GenericUtil} from "../util/GenericUtil";
 
 
 
@@ -16,22 +20,26 @@ import {minValueOfStates,maxValueOfStates,minMaxValueStates,possibleStates} from
  * @param bridgeId - The id of the Bridge the Light is connected to.
  * @param capabilities - Capabilities what the light is capable off,  For each light type it's different. Info added on creation from Bridge.
  * @param supportedStates - supported states of the light. For each light type it's different. Info added on creation from Bridge.
- * @param connectedBridge - Link to the bridge object it is connected to.
+ * @param api  - callBack to Api function
  * @param lastUpdate - Timestamp of when the state was last changed.
+ * @param intervalId - Timeout object for the interval.
+ * @param stateChangeCallback - Callback for when state is changed.
  *
  */
 export class Light {
     name: string;
     readonly uniqueId: string;
-    private state: HueState;
+    private state: HueFullState;
     readonly id: number;
     bridgeId: string;
     capabilities: object;
-    supportedStates: object;
-    connectedBridge: Bridge;
+    supportedStates: [];
+    api: ((action,extra?) => {});
     lastUpdate: number;
+    intervalId : Timeout;
+    stateChangeCallback = ((value) => {});
 
-    constructor(name: string, uniqueId: string, state: HueState, id: number, bridgeId: string, capabilities: object, supportedStates: object, connectedBridge: any) {
+    constructor(name: string, uniqueId: string, state: HueFullState, id: number, bridgeId: string, capabilities: object, supportedStates: [], api: any) {
         this.name = name;
         this.uniqueId = uniqueId;
         this.state = state;
@@ -39,82 +47,81 @@ export class Light {
         this.bridgeId = bridgeId;
         this.capabilities = capabilities;
         this.supportedStates = supportedStates;
-        this.connectedBridge = connectedBridge;
+        this.api = api;
         this.lastUpdate = Date.now();
     }
 
-    private _setLastUpdate(): void {
-        this.lastUpdate = Date.now();
+    init():void{
+        this.intervalId = setInterval(async () => await this.renewState(), LIGHT_POLLING_RATE);
+    }
 
+    setCallback(callback){
+        this.stateChangeCallback = callback;
+    }
+
+    _setLastUpdate(): void {
+        this.lastUpdate = Date.now();
+    }
+
+    cleanup(){
+        clearInterval(this.intervalId);
     }
 
     /**
      * Obtains the state from the light on the bridge and updates the state object if different.
      */
     async renewState(): Promise<void> {
-        const newState = await this.connectedBridge.api.lights.getLightState(this.id);
-        if (this.state != newState) {
-            this.state = newState
-            this._setLastUpdate()
+        let newState = await this.api("getLightState",this.id) as failedConnection | HueFullState;
+        if("hadConnectionFailure" in newState && newState.hadConnectionFailure){
+            return;
+        }
+        newState = newState as HueFullState;
+        if ( typeof(newState) !== "undefined" && !lightUtil.stateEqual(this.state,newState)) {
+            this.state = <HueFullState>GenericUtil.deepCopy(newState);
+            this._setLastUpdate();
+            this.stateChangeCallback(this.state);
+        }
+        else if( typeof(newState) !== "undefined" && this.state.reachable !== newState.reachable){
+            this.state.reachable = newState.reachable
+            this._setLastUpdate();
         }
     }
 
-    getState(): HueState {
-        return this.state;
+
+    getState(): HueFullState {
+        return <HueFullState>GenericUtil.deepCopy(this.state);
     }
 
-    private _isAllowedStateType(state): boolean {
-        return possibleStates[state] || false;
-    }
 
-    private _updateState(state: StateUpdate): void {
-
+     _updateState(state: StateUpdate): void {
         Object.keys(state).forEach(key => {
-            if (this._isAllowedStateType(key)) {
+            if (lightUtil.isAllowedStateType(key)) {
                 this.state[key] = state[key];
             }
         });
         this._setLastUpdate()
     }
-
-
-    /**
-     * Checks if state value is out of it's range and then return right value.
-     *
-     * @return State value between it's min and max.
-     */
-   private _manipulateMinMaxValueStates(state:StateUpdate): StateUpdate {
-        Object.keys(state).forEach(key => {
-            if ((minMaxValueStates[key] || false)) {
-                if (key === "xy") {
-                    state[key] = [Math.min(maxValueOfStates[key][0], Math.max(minValueOfStates[key][0], state[key][0])), Math.min(maxValueOfStates[key][1], Math.max(minValueOfStates[key][1], state[key][1]))];
-                } else {
-                    state[key] = Math.min(maxValueOfStates[key], Math.max(minValueOfStates[key], state[key]));
-                }
-            }
-        });
-
-        return state;
-    }
-
     /**
      * Sets the state of the light.
      */
     async setState(state: StateUpdate): Promise<boolean> {
-        state = this._manipulateMinMaxValueStates(state);
-        const result = await this.connectedBridge.api.lights.setLightState(this.id.toString(), state);
+        state = lightUtil.manipulateMinMaxValueStates(state);
+        const result = await this.api("setLightState",[this.id.toString(), state]) as failedConnection | boolean;
+        if((typeof result !== "boolean" && result.hadConnectionFailure)){
+            return false;
+        }
         if (result) {
             this._updateState(state);
         }
-        return result;
+        return <boolean>result;
     }
 
     isReachable(): boolean {
         return this.state["reachable"] || false;
     }
 
-    getInfo(): object {
-        return {
+    getInfo(): lightInfo {
+        return GenericUtil.deepCopy({
             name: this.name,
             uniqueId: this.uniqueId,
             state: this.state,
@@ -123,15 +130,13 @@ export class Light {
             supportedStates: this.supportedStates,
             capabilities: this.capabilities,
             lastUpdate: this.lastUpdate
-        };
+        });
     }
 
     getUniqueId(): string {
         return this.uniqueId;
     }
-
-
-    getSupportedStates(): object {
+    getSupportedStates(): [] {
         return this.supportedStates;
     }
 }

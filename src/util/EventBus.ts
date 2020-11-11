@@ -1,6 +1,5 @@
 
 
-
 class IdGenerator {
   currentId: number
 
