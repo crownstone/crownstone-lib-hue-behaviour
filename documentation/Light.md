@@ -5,13 +5,13 @@
  - [Bridge](/documentation/Bridge.md)
  - **Light** 
    - [Constructing](#constructing)
-	 - [Initialization](#initialization)
-	 - [Polling/Renew state](#pollingrenew-state)
-	 - [Setting the callback for a lightstate change](#settings-the-callback-for-a-lightstate-change)
-	 - [Setting a new light state](#setting-a-new-light-state)
-	 - [Retrieving the current known state](#retrieving-the-current-known-state)
-	 - [Cleanup](#cleanup)
-	 - [Getters](#getters) 
+   - [Initialization](#initialization)
+   - [Polling/Renew state](#pollingrenew-state)
+   - [Setting the callback for a lightstate change](#settings-the-callback-for-a-lightstate-change)
+   - [Setting a new light state](#setting-a-new-light-state)
+   - [Retrieving the current known state](#retrieving-the-current-known-state)
+   - [Cleanup](#cleanup)
+   - [Getters](#getters) 
  - [Errors](/documentation/Errors.md)
  - [Event calls](/documentation/EventCalls.md)
  - [Persistence](/documentation/Persistence.md)
@@ -70,14 +70,16 @@ Note when on is false, it can't change any other states, when done so it throws 
 When exceeding the maximum or minimum values of a field, the maximum or minimum will be used instead.
  
 **Example:**
+
 Turning the light on with a brigthness of 254 and a hue of 12555.
+
 `await light.setState({on:true,bri:254, hue:12555})`
  
 ### Retrieving the current known state
 To retrieve the current known state, call:
 `light.getState()`
 This will return the state as a HueFullLightState object as format:
-`
+```
 {
   on: boolean , 
   bri?: number,  
@@ -91,17 +93,20 @@ This will return the state as a HueFullLightState object as format:
   mode?: string,  
   reachable: boolean
   }
-  `
+  ```
 Depending the type of light, the fields can vary because a multiple color light has more options than a single color light.
 
 
 ### Cleanup
 To stop the interval, call:
+
 `light.cleanup()`
 Which will stop the polling.
 
 
 ### Getters
 `isReachable():boolean` - Returns if the light is reachable or not. (Might have a slight delay as it depends on actual Bridge providing this data after a poll) 
+
 `getInfo():lightInfo` - Returns all information fields of the light.
+
 `getSupportedStates():[]` - Returns an array of supported states
