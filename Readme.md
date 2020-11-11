@@ -1,13 +1,8 @@
 # Crownstone Hue module
-Philips Hue module... text here...
-
 # Work in Progress
 Module is still a W.I.P., thus imports aren't correctly specified yet and some parts are prone to change.
 
 ## Documentation
-The documentation is split up in several parts.
-
-Extra information regarding objects or the functionality of those can be read on their respective pages.  
 ### Overview 
  - Crownstone Hue
  - Discovery 
@@ -15,22 +10,22 @@ Extra information regarding objects or the functionality of those can be read on
  - Light 
  - Errors
  - Event calls
- - LightBehaviourAggregator
- - Behaviour Aggregator 
- - Behaviour & Twilight Prioritizer 
- - Behavior/Twilight 
  - Persistence 
+ - LightAggregatorWrapper
+ - Behaviour Aggregator 
+ - SwitchBehaviour- & Twilight Prioritizer 
+ - Behaviours
 
-## Installation
+### Installation
 
-## Import
+### Import
 ```import {CrownstoneHue} from {.}```
 
-## Usage
+### Usage
 The CrownstoneHue class is the front of the module, this should be used for every operation needed on the module. (See CrownstoneHue for all it's functions)
-With the only exceptions as of retrieving information of certain Bridges/Lights, such as if it is reachable or not. This is done by calling their respective get functions.
+With the only exceptions as of retrieving information of certain Bridges/Lights, this is done by calling their respective get functions.
 
-### Examples
+#### Examples
 In the following piece of code we give some broad examples of how the module can be used.  
 ```
 ... Init ...
@@ -54,24 +49,24 @@ const bridge = await crownstoneHue.addBridge({
                       {name: "Dimmable light" , 
                       id: 2, 
                       behaviours: [{
-								type: "BEHAVIOUR",
-								data:{...},
-								activeDays: {...},
-								lightId: "GD:F6:51....",
-								cloudId:"GNt03PZqyOVb7xkJCC5v"
-								}]
+				    type: "BEHAVIOUR",
+				    data:{...},
+				    activeDays: {...},
+				    lightId: "GD:F6:51....",
+				    cloudId:"GNt03PZqyOVb7xkJCC5v"
+				    }]
                       }
                     }
                   }
                 })              
 ... Some time passes and a new behaviour is made ... 
 await crownstoneHue.addBehaviour({
-								type: "BEHAVIOUR",
-								data:{...},
-								activeDays: {...},
-								lightId: "AS:FD:52....",
-								cloudId:"ygD9z3FyKWqyOVb7xkJCC5v"
-								})
+				  type: "BEHAVIOUR",
+				  data:{...},
+				  activeDays: {...},
+				  lightId: "AS:FD:52....",
+				  cloudId:"ygD9z3FyKWqyOVb7xkJCC5v"
+				  })
 
 ... User enters/leaves a room ...
 crownstoneHue.presenceChange(...)
