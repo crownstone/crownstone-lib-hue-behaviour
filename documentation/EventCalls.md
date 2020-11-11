@@ -1,23 +1,22 @@
 
-# Documentation  - Event calls
+# Documentation - Event calls
 ## Overview
-
- - Crownstone Hue  
- - Discovery
- - Bridge
- - Light 
- - LightAggregatorWrapper
- - Behaviour Aggregator 
- - Behaviour & Twilight Prioritizer 
- - Behavior/Twilight 
- - Persistence 
+ - [Crownstone Hue](/documentation/CrownstoneHue.md)
+ - [Discovery](/documentation/Discovery.md)
+ - [Bridge](/documentation/Bridge.md)
+ - [Light](/documentation/Light.md)
+ - [Errors](/documentation/Errors.md)
  - **Event calls**
- - Errors
+ - [Persistence](/documentation/Persistence.md)
+ - [LightAggregatorWrapper](/documentation/LightAggregatorWrapper.md)
+ - [Behaviour Aggregator](/documentation/BehaviourAggregator.md)
+ - [SwitchBehaviour- & Twilight Prioritizer](/documentation/Prioritizer.md)
+ - [Behaviours](/documentation/Behaviours.md)
 
 ## About
 The Crownstone Hue module uses some event calls for data transfering.
 Meaning you can subscribe to these topics in case you need to catch something.
-These topic constants are exported from EventConstants.ts [ToDo link to event constants ]
+These topic constants are exported from [EventConstants.ts](/src/constants/EventConstants.ts)
 
 ## Events
 ### ON_BRIDGE_PERSISTENCE_UPDATE

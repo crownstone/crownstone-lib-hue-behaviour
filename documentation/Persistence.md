@@ -1,16 +1,20 @@
 # Documentation - Persistence
 ## Overview
- - Crownstone Hue  
- - Discovery
- - Bridge
- - Light 
- - LightAggregatorWrapper
- - Behaviour Aggregator 
- - Behaviour & Twilight Prioritizer 
- - Behavior/Twilight 
- - **Persistence** 
- - Event calls
- - Errors
+ - [Crownstone Hue](/documentation/CrownstoneHue.md)
+ - [Discovery](/documentation/Discovery.md)
+ - [Bridge](/documentation/Bridge.md)
+ - [Light](/documentation/Light.md)
+ - [Errors](/documentation/Errors.md)
+ - [Event calls](/documentation/EventCalls.md)
+ - **Persistence**
+   - [Loading](#loading-call-before-using)
+   - [Save configuration](#save-configuration)
+   - [Building up the configuration](#building-up-the-configuration)
+   - [Getters](#getters)
+ - [LightAggregatorWrapper](/documentation/LightAggregatorWrapper.md)
+ - [Behaviour Aggregator](/documentation/BehaviourAggregator.md)
+ - [SwitchBehaviour- & Twilight Prioritizer](/documentation/Prioritizer.md)
+ - [Behaviours](/documentation/Behaviours.md)
 
 ## About
 This is a persistence utility for the Crownstone Hue module, it has a few basic functions for preserving and loading the data of the objects used. 
@@ -62,7 +66,7 @@ These do not save them automatically and the configuration should be loaded in b
 `removeBehaviour(bridgeId: string, lightId: string, cloudId: string): void`
 
 
-### Retrieving objects
+### Getters
 `getConfiguredBridges(): ConfBridgeObject[]`
 
 ` getAllBridges(): ConfBridges`

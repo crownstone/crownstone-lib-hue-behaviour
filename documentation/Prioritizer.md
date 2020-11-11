@@ -1,16 +1,22 @@
 # Documentation - Prioritizers
 ## Overview
- - Crownstone Hue  
- - Discovery
- - Bridge
- - Light 
- - LightAggregatorWrapper
- - Behaviour Aggregator
- - **Behaviour & Twilight Prioritizer** 
- - Behavior/Twilight 
- - Persistence 
- - Event calls
- - Errors
+ - [Crownstone Hue](/documentation/CrownstoneHue.md)
+ - [Discovery](/documentation/Discovery.md)
+ - [Bridge](/documentation/Bridge.md)
+ - [Light](/documentation/Light.md)
+ - [Errors](/documentation/Errors.md)
+ - [Event calls](/documentation/EventCalls.md)
+ - [Persistence](/documentation/Persistence.md)
+ - [LightAggregatorWrapper](/documentation/LightAggregatorWrapper.md)
+ - [Behaviour Aggregator](/documentation/BehaviourAggregator.md)
+ - **SwitchBehaviour- & Twilight Prioritizer**
+   - [Constructing](#constructing)
+   - [Adding/Updating/Removing behaviours](#addingupdatingremoving-behaviours)
+   - [Prioritizing](#prioritizing)
+   - [Cleanup](#cleanup)
+   - [Getting the prioritized behaviour](#getting-the-prioritized-behaviour)
+   - [Getting the composed state](#getting-the-composed-state)
+ - [Behaviours](/documentation/Behaviours.md)
 
 ## About
 The SwitchBehaviourPrioritizer and TwilightPrioritizer is the part of the module that prioritizes their respective behaviours according to a set of rules to determine which should be activated/prioritized and which not. It does this every time  `tick(timestamp: number)` is called.
@@ -21,7 +27,7 @@ Everything is handled by the module itself, though its public functionalities ar
 `const switchBehaviourPrioritizer = new SwitchBehaviourPrioritizer()`
 `const twilightPrioritizer = new TwilightPrioritizer()`
 
-### Adding/Updating/Removing behaviours.
+### Adding/Updating/Removing behaviours
 To add, update or remove a twilight or behaviour, use one of the following functions:
 `addBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): number` - This returns the behaviour's index position in the array.
 `removeBehaviour(cloudId: string): void`

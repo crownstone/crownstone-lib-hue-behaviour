@@ -1,20 +1,20 @@
 
 # Documentation - LightAggregatorWrapper
 ## Overview
- - Crownstone Hue  
- - Discovery
- - Bridge
- - Light 
+ - [Crownstone Hue](/documentation/CrownstoneHue.md)
+ - [Discovery](/documentation/Discovery.md)
+ - [Bridge](/documentation/Bridge.md)
+ - [Light](/documentation/Light.md)
+ - [Errors](/documentation/Errors.md)
+ - [Event calls](/documentation/EventCalls.md)
+ - [Persistence](/documentation/Persistence.md)
  - **LightAggregatorWrapper**
-	 - Constructing
-	 - Initialization
-	 - Cleanup
- - Behaviour Aggregator 
- - Behaviour & Twilight Prioritizer 
- - Behavior/Twilight 
- - Persistence 
- - Event calls
- - Errors
+	 - [Constructing](#constructing)
+	 - [Initialization](#initialization)
+	 - [Cleanup](#cleanup)
+ - [Behaviour Aggregator](/documentation/BehaviourAggregator.md)
+ - [SwitchBehaviour- & Twilight Prioritizer](/documentation/Prioritizer.md)
+ - [Behaviours](/documentation/Behaviours.md)
 
 ## About
 This is just a wrapper used to connect a Behaviour Aggregator with a Light object.

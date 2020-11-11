@@ -1,24 +1,24 @@
 # Documentation  - Light
 ## Overview
- - Crownstone Hue  
- - Discovery
- - Bridge
+ - [Crownstone Hue](/documentation/CrownstoneHue.md)
+ - [Discovery](/documentation/Discovery.md)
+ - [Bridge](/documentation/Bridge.md)
  - **Light** 
-		 - Constructing
-		 - Initialization
-		 - Polling/Renew state
-		 - Setting the callback for a lightstate change
-		 - Setting a new light state
-		 - Retrieving the current known state
-		 - Cleanup
-		 - Getters
- - LightAggregatorWrapper
- - Behaviour Aggregator 
- - Behaviour & Twilight Prioritizer 
- - Behavior/Twilight 
- - Persistence 
- - Event calls
- - Errors
+   - [Constructing](#constructing)
+	 - [Initialization](#initialization)
+	 - [Polling/Renew state](#pollingrenew-state)
+	 - [Setting the callback for a lightstate change](#settings-the-callback-for-a-lightstate-change)
+	 - [Setting a new light state](#setting-a-new-light-state)
+	 - [Retrieving the current known state](#retrieving-the-current-known-state)
+	 - [Cleanup](#cleanup)
+	 - [Getters](#getters) 
+ - [Errors](/documentation/Errors.md)
+ - [Event calls](/documentation/EventCalls.md)
+ - [Persistence](/documentation/Persistence.md)
+ - [LightAggregatorWrapper](/documentation/LightAggregatorWrapper.md)
+ - [Behaviour Aggregator](/documentation/BehaviourAggregator.md)
+ - [SwitchBehaviour- & Twilight Prioritizer](/documentation/Prioritizer.md)
+ - [Behaviours](/documentation/Behaviours.md)
 
 ## About
 The Light object represents a single Philips Hue Light and is dependend on a Bridge object for the usage of it's api.
@@ -37,7 +37,7 @@ In the module, this is done by the Bridge. This looks something like this:
 To initialize a light, call:
 `light.init()`
 This will start the polling of the light every 500ms, checking if the light's state has changed.
-The polling rate is defined in HueConstants.ts[Todo link] as `LIGHT_POLLING_RATE`
+The polling rate is defined in [HueConstants.ts](/src/constants/HueConstants.ts) as `LIGHT_POLLING_RATE`
 
 ### Polling/Renew state
 To renew the light's state, call:
