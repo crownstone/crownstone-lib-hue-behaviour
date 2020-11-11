@@ -14,13 +14,13 @@
  - [Behaviours](/documentation/Behaviours.md)
 
 ## About
-The Crownstone Hue module uses some event calls for data transfering.
+The Crownstone Hue module uses some event calls for data transferring.
 Meaning you can subscribe to these topics in case you need to catch something.
 These topic constants are exported from [EventConstants.ts](/src/constants/EventConstants.ts)
 
 ## Events
 ### ON_BRIDGE_PERSISTENCE_UPDATE
-When a bridge updates itself, it emits an event call with topic ```"onBridgeUpdate"``` and a data ```object``` with information about itself. Formatted as:
+When a bridge updates itself, it emits an event call with the topic ```"onBridgeUpdate"``` and a data ```object``` with information about itself. Formatted as:
 ```
 {
 name: string,
@@ -38,20 +38,20 @@ When a presence change call is made, it emits an event call with topic ```"onPre
 {
 type: "ENTER" | "LEAVE"
 data: {
-	type: "LOCATION"
-	profileIdx: number
-	locationId: number
-	}	
+    type: "LOCATION"
+    profileIdx: number
+    locationId: number
+    }   
 }
 ...
 {
 type: "ENTER" | "LEAVE"
 data: {
-	type: "SPHERE"
-	profileIdx: number 
-	}	
+    type: "SPHERE"
+    profileIdx: number 
+    }   
 }
 ```
 
 ### ON_DUMB_HOUSE_MODE_SWITCH
-When dumbhouse mode is set, it emits an event call with topic ```"onDumbHouseModeSwitch"``` and a data ```boolean```.
+When dumb house mode is set, it emits an event call with the topic ```"onDumbHouseModeSwitch"``` and a data ```boolean```.

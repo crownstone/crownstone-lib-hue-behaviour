@@ -47,10 +47,15 @@ interface SphereLocation {
 ```
 This information will be used for the time of sunrise and sunset.
 
+
 Upon initialization, the module will load the configuration settings from the configuration file.
+
 After the configuration file is loaded, it will attempt to create Bridges with the given information from the configuration file.
+
 When the Bridges are reachable and successfully configured, the lights will be configured and initialized.
+
 Afterwards, it wraps a light and a behaviour aggregator together and adds the light's behaviours to the aggregator.
+
 After everything is done successfully, it will return a list of configured Bridges and the module is ready to use. 
 
 
@@ -62,6 +67,7 @@ To add a bridge to the module there are three ways.
  
 #### By a config format
 In case you already have certain information about the bridge you can create a bridge with that information, to do this, call:
+
 ```
 await crownstoneHue.addBridge(configFormat);
 ```

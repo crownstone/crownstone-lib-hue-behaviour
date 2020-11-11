@@ -31,7 +31,7 @@ See below for the codes with some extra description for possible reasons.
 - 406: "Link button on Bridge is not pressed."
 - 407: "Bridge is not initialized." - An api call is done while the Bridge was not initialized yet.
 - 408: "Bridge has no Bridge Id and thus cannot be rediscovered." -
-- 410: "Configuration settings are undefined." - The persistence class hasn't being initialized before saving.
+- 410: "Configuration settings are undefined." - The persistence class hasn't been initialized before saving.
 - 422: "Light is not found on the bridge." - Probably a wrong id used, see the description for the light id.
 - 888: "Unknown action call to Hue Api." - Will be thrown if bridge use api method receives an unknown action string
 - 999: "Unknown Error, see description." - This one will most likely be thrown if an error from the external library is not specifically converted and/or something unexpected happened.

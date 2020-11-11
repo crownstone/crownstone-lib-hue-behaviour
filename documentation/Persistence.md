@@ -20,7 +20,7 @@
 This is a persistence utility for the Crownstone Hue module, it has a few basic functions for preserving and loading the data of the objects used. 
  
 ## Usage
-The Persistence utility is a singelton class created at runtime, to use it you simply import it and then call it's functions.
+The Persistence utility is a singleton class created at runtime, to use it you simply import it and then call its functions.
 The usage of the utility is a builder like approach and you'll have to save after you are done updating the configuration. 
 
 In short: to use the persistence utility, call `await Persistence.loadConfiguration()`
@@ -37,22 +37,27 @@ Then when ready, save the current configuration by calling  `await Persistence.s
 
 ### Loading (Call before using)
 To load the configuration, call:
+
 ` await Persistence.loadConfiguration()`
-This loads the configuration from the configuration file, location and name is defined as variable `CONF_NAME`.
+
+This loads the configuration from the configuration file, location and name are defined as variable `CONF_NAME`.
 If the configuration file does not exist yet, an empty configuration file will be created.
 
-If file is loaded or created, a configuration variable will be initialized with the last configuration and the current configuration is returned as `ConfigurationObject`.
+If the file is loaded or created, a configuration variable will be initialized with the last configuration and the current configuration is returned as `ConfigurationObject`.
 
-If this is not called first before using, it will throw a error while trying to update the configuration.
+If this is not called first before using, it will throw an error while trying to update the configuration.
 
 ### Save configuration
 To save the current configuration, call:
+
 `await Persistence.saveConfiguration()`
+
 This saves the configuration into the configuration file.
 
 ### Building up the configuration
 By calling one of these functions below, you'll build up the configuration variable.
 These do not save them automatically and the configuration should be loaded in before using them.
+
 `appendBridge(bridgeInfo:BridgeInfo): void`
 
 `removeBridge(bridgeId: string): void`
