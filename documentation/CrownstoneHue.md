@@ -15,16 +15,16 @@
 	-  [Switching Dumb house mode](#switching-dumb-house-mode)
 	-  [Stopping the module](#stopping-the-module)
 	-  [Obtaining Lights and Bridges](#obtaining-lights-and-bridges)
- - Discovery 
- - Bridge
- - Light 
- - LightAggregatorWrapper
- - Behaviour Aggregator 
- - Behaviour & Twilight Prioritizer 
- - Behavior/Twilight 
- - Persistence 
- - Event calls
- - Errors
+ - [Discovery](/Discovery.md)
+ - [Bridge](/Bridge.md)
+ - [Light](/Light.md)
+ - [Errors](/Errors.md)
+ - [Event calls](/EventCalls.md)
+ - [Persistence](/Persistence.md)
+ - [LightAggregatorWrapper](/LightAggregatorWrapper.md)
+ - [Behaviour Aggregator](/BehaviourAggregator.md)
+ - [SwitchBehaviour- & Twilight Prioritizer](/Prioritizer.md)
+ - [Behaviours](/Behaviours.md)
 
 ## About
 The Crownstone Hue class is the front of the module. To use the module, call one of its functions as this will handle all passed data from outside and calls the persistence functions when needed.
