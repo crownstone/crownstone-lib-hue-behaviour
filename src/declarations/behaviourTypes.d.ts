@@ -120,10 +120,11 @@ interface BehaviourBaseInterface{
     isActive: boolean;
     timestamp: number | null;
     sphereLocation: SphereLocation
+    unsubscribeSphereChange: EventUnsubscriber;
 }
 
 interface SwitchBehaviourInterface extends BehaviourBaseInterface{
     presenceLocations: PresenceProfile[];
     lastPresenceUpdate: number;
-    unsubscribe: EventUnsubscriber;
+    unsubscribePresenceChange: EventUnsubscriber;
 }

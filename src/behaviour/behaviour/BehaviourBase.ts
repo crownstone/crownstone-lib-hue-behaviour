@@ -1,5 +1,7 @@
 
 import {BehaviourUtil} from "./BehaviourUtil";
+import {eventBus} from "../../util/EventBus";
+import {ON_SPHERE_CHANGE} from "../../constants/EventConstants";
 
 
 export abstract class BehaviourBase{
@@ -7,10 +9,13 @@ export abstract class BehaviourBase{
   isActive: boolean;
   timestamp: number | null = null;
   sphereLocation: SphereLocation
+  unsubscribeSphereChange: EventUnsubscriber;
 
   protected constructor(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation) {
     this.behaviour = behaviour;
     this.sphereLocation = sphereLocation;
+    this.unsubscribeSphereChange = eventBus.subscribe(ON_SPHERE_CHANGE, this.setSphereLocation.bind(this));
+
   }
 
   setSphereLocation(sphereLocation: SphereLocation) {

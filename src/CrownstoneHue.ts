@@ -24,7 +24,7 @@ export class CrownstoneHue {
   lights: { [uniqueId: string]: LightAggregatorWrapper } = {};
   sphereLocation: SphereLocation;
   unsubscribe: EventUnsubscriber
-  dumbHouseModeActive:boolean = false;
+  dumbHouseModeActive: boolean = false;
   activePresenceEvents: PresenceEvent[] = [];
 
   /**
@@ -33,15 +33,16 @@ export class CrownstoneHue {
    * @returns a List of Bridge objects configured from the config file.
    *
    */
-  async init(sphereLocation: SphereLocation): Promise<Bridge[]> {
+  async init(sphereLocation: SphereLocation, data?): Promise<Bridge[]> {
     this.sphereLocation = sphereLocation
     this.unsubscribe = eventBus.subscribe(ON_BRIDGE_PERSISTENCE_UPDATE, this._handleUpdateEvent.bind(this));
-    await persistence.loadConfiguration();
-    await this._setupModule();
+    if(data != null){
+      await this._setupModule(data);
+    }
     return this.bridges;
   }
 
-  async _setupModule() {
+  async _setupModule(data) {
     if ("Bridges" in persistence.configuration) {
       for (const uniqueId of Object.keys(persistence.getAllBridges())) {
         await this._setupBridgeById(uniqueId);
@@ -67,6 +68,13 @@ export class CrownstoneHue {
     this.bridges.push(bridgeObject);
   }
 
+  /** Call to change/set new Sphere location
+  */
+  setSphereLocation(sphereLocation: SphereLocation) {
+    this.sphereLocation = sphereLocation;
+    eventBus.emit("",sphereLocation)
+  }
+
   /** Call to turn on/off Dumb house mode.
    *
    * @param on - Boolean whether Dumb house mode should be on or off.
@@ -87,8 +95,8 @@ export class CrownstoneHue {
       const light = bridge.lights[behaviour.lightId];
       if (light !== undefined) {
         const index = this.lights[behaviour.lightId].behaviourAggregator.addBehaviour(behaviour, this.sphereLocation);
-        if(newBehaviour.type === "BEHAVIOUR"){
-          for(const event of this.activePresenceEvents){
+        if (newBehaviour.type === "BEHAVIOUR") {
+          for (const event of this.activePresenceEvents) {
             this.lights[behaviour.lightId].behaviourAggregator.switchBehaviourPrioritizer.behaviours[index].onPresenceDetect(event);
           }
         }
@@ -118,7 +126,7 @@ export class CrownstoneHue {
 
   }
 
-  async removeBehaviour(lightId,cloudId): Promise<void> {
+  async removeBehaviour(lightId, cloudId): Promise<void> {
     for (const bridge of this.bridges) {
       const light = bridge.lights[lightId];
       if (light !== undefined) {
@@ -135,9 +143,9 @@ export class CrownstoneHue {
    * @param presenceEvent
    */
   presenceChange(presenceEvent: PresenceEvent): void {
-    if(presenceEvent.type === "ENTER"){
+    if (presenceEvent.type === "ENTER") {
       this.activePresenceEvents.push(presenceEvent);
-    } else if(presenceEvent.type === "LEAVE"){
+    } else if (presenceEvent.type === "LEAVE") {
       this._onPresenceLeave(presenceEvent);
     } else {
       return;
@@ -145,7 +153,7 @@ export class CrownstoneHue {
     eventBus.emit(ON_PRESENCE_CHANGE, presenceEvent);
   }
 
-  _onPresenceLeave(presenceEvent: PresenceEvent){
+  _onPresenceLeave(presenceEvent: PresenceEvent) {
     for (let i = 0; i < this.activePresenceEvents.length; i++) {
       let presenceProfile = this.activePresenceEvents[i].data;
       if (presenceProfile.profileIdx === presenceEvent.data.profileIdx) {
@@ -184,17 +192,17 @@ export class CrownstoneHue {
 
   async addBridge(config: BridgeFormat): Promise<Bridge> {
     const bridge = new Bridge(config.name || "", config.username || "", config.clientKey || "", config.macAddress || "", config.ipAddress || "1.1.1.1", config.bridgeId || "");
-    if(config.bridgeId == undefined && config.ipAddress == undefined){
+    if (config.bridgeId == undefined && config.ipAddress == undefined) {
       return bridge;
     }
     this.bridges.push(bridge);
     await bridge.init();
-    if(typeof(config.lights) !== "undefined"){
-      for(const light of Object.values(config.lights)){
-        const lightAggregatorWrapper = await this.addLight(config.bridgeId,light.id)
-        if(light.behaviours != []){
-          for(const behaviour of light.behaviours){
-            lightAggregatorWrapper.behaviourAggregator.addBehaviour(behaviour,this.sphereLocation);
+    if (typeof (config.lights) !== "undefined") {
+      for (const light of Object.values(config.lights)) {
+        const lightAggregatorWrapper = await this.addLight(config.bridgeId, light.id)
+        if (light.behaviours != []) {
+          for (const behaviour of light.behaviours) {
+            lightAggregatorWrapper.behaviourAggregator.addBehaviour(behaviour, this.sphereLocation);
           }
         }
       }
@@ -208,9 +216,9 @@ export class CrownstoneHue {
       if (this.bridges[i].bridgeId === bridgeId) {
         this.bridges[i].cleanup();
         this.bridges.splice(i, 1);
-        for(const light of Object.keys(this.lights)){
-          if(this.lights[light].light.bridgeId === bridgeId){
-           await this.removeLight(this.lights[light].light.uniqueId);
+        for (const light of Object.keys(this.lights)) {
+          if (this.lights[light].light.bridgeId === bridgeId) {
+            await this.removeLight(this.lights[light].light.uniqueId);
           }
         }
         persistence.removeBridge(bridgeId);

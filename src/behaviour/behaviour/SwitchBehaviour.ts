@@ -8,15 +8,15 @@ import {BehaviourBase} from "./BehaviourBase";
 export class SwitchBehaviour extends BehaviourBase implements SwitchBehaviourInterface{
   presenceLocations: PresenceProfile[] = []; // Empty when no one is present for this behaviour.
   lastPresenceUpdate: number = 0;
-  unsubscribe: EventUnsubscriber
+  unsubscribePresenceChange: EventUnsubscriber
 
   constructor(behaviour: HueBehaviourWrapperBehaviour, sphereLocation: SphereLocation) {
     super(behaviour,sphereLocation);
-    this.unsubscribe = eventBus.subscribe(ON_PRESENCE_CHANGE, this.onPresenceDetect.bind(this));
+    this.unsubscribePresenceChange = eventBus.subscribe(ON_PRESENCE_CHANGE, this.onPresenceDetect.bind(this));
   }
 
   cleanup() {
-    this.unsubscribe();
+    this.unsubscribePresenceChange();
   }
 
   /**
