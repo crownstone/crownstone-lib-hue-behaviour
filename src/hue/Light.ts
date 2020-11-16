@@ -23,7 +23,7 @@ import {GenericUtil} from "../util/GenericUtil";
  * @param api  - callBack to Api function
  * @param lastUpdate - Timestamp of when the state was last changed.
  * @param intervalId - Timeout object for the interval.
- * @param stateChangeCallback - Callback for when state is changed.
+ * @param stateChangeCallback - Callback for when state is change
  *
  */
 export class Light {
@@ -51,10 +51,15 @@ export class Light {
         this.lastUpdate = Date.now();
     }
 
+    // TODO: protect this init from being called more than once.
     init():void{
+        // if (this.initialized) { return; }
+        // this.initialize = true
         this.intervalId = setInterval(async () => await this.renewState(), LIGHT_POLLING_RATE);
     }
 
+    // TODO: rename this method so we know what this callback does
+    // Can setStateUpdateCallback or something.
     setCallback(callback){
         this.stateChangeCallback = callback;
     }

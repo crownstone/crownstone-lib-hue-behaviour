@@ -37,7 +37,7 @@ export class Bridge {
   lights: object = {};
   api: Api;
   authenticated: boolean = false;
-  name: string;
+  name: string; // TODO: if you make it type string | null, you might have type checks on this. Now you use empty string compares.
   username: string;
   clientKey: string;
   macAddress: string;
@@ -47,7 +47,8 @@ export class Bridge {
   reconnecting: boolean = false;
 
 
-  constructor(name: string, username: string, clientKey: string, macAddress: string, ipAddress: string, bridgeId: string) {
+  // TODO: Try to have null as defaults, NOT emptry strings.
+  constructor(name: string, username: string, clientKey: string, macAddress: string, ipAddress: string, bridgeId: string = "") { // TODO: <-- default arguments are used like this
     this.name = name;
     this.username = username;
     this.ipAddress = ipAddress;

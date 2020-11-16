@@ -1,6 +1,7 @@
 import {Light} from "..";
 import {BehaviourAggregator} from "../behaviour/BehaviourAggregator";
 
+// TODO: isn't this a LightBehaviourWrapper? It's not aggregating lights...
 export class LightAggregatorWrapper{
   light: Light
   behaviourAggregator: BehaviourAggregator

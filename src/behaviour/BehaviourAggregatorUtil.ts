@@ -62,7 +62,7 @@ export const BehaviourAggregatorUtil = {
     const timeA = behaviourSupportA.getSwitchingTime("from", behaviourA.timestamp, behaviourA.sphereLocation);
     const timeB = behaviourSupportB.getSwitchingTime("from", behaviourB.timestamp, behaviourB.sphereLocation);
     if (timeA === timeB) {
-      return <TimeCompareResult>{result: "BOTH"}
+      return <TimeCompareResult>{result: "BOTH"} // TODO: why the <TimeCompareResult>? Since you return this, it would already be checked against the TimeCompareResult
     }
     return (timeA > timeB)? <TimeCompareResult>{result: "SINGLE", behaviour: behaviourA}: <TimeCompareResult>{result: "SINGLE", behaviour: behaviourB};
   },
@@ -90,11 +90,14 @@ export const BehaviourAggregatorUtil = {
       const behaviourSupport = new BehaviourSupport(behaviour.behaviour);
       if (behaviourSupport.isUsingSingleRoomPresence()) {
         prioritizedList[1].push(behaviour);
-      } else if (behaviourSupport.isUsingMultiRoomPresence()) {
+      }
+      else if (behaviourSupport.isUsingMultiRoomPresence()) {
         prioritizedList[2].push(behaviour);
-      } else if (behaviourSupport.isUsingSpherePresence()) {
+      }
+      else if (behaviourSupport.isUsingSpherePresence()) {
         prioritizedList[3].push(behaviour);
-      } else {
+      }
+      else {
         prioritizedList[4].push(behaviour);
       }
     }

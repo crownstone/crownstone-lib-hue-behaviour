@@ -111,7 +111,7 @@ export class CrownstoneHue {
     }
   }
 
-  async _handleUpdateEvent(info) {
+  async _handleUpdateEvent(info) { // TODO: type this info field.
     const bridgeInfo = JSON.parse(info);
     persistence.appendBridge(bridgeInfo);
     await persistence.saveConfiguration()
@@ -166,6 +166,7 @@ export class CrownstoneHue {
   async addBridgeByBridgeId(bridgeId: string): Promise<Bridge> {
     const discoveryResult = await Discovery.discoverBridgeById(bridgeId);
     if (discoveryResult.internalipaddress !== "-1") {
+      // TODO: default parameters are added in the constructor, not in the calling. I would make the intialization parameter an object with a clear interface.
       const bridge = new Bridge("", "", "", "", discoveryResult.internalipaddress, discoveryResult.id);
       this.bridges.push(bridge);
       await bridge.init();
@@ -176,6 +177,7 @@ export class CrownstoneHue {
   }
 
   async addBridgeByIpAddress(ipAddress: string): Promise<Bridge> {
+    // TODO: default parameters are added in the constructor, not in the calling. I would make the intialization parameter an object with a clear interface.
     const bridge = new Bridge("", "", "", "", ipAddress, "");
     this.bridges.push(bridge);
     await bridge.init();
@@ -183,6 +185,7 @@ export class CrownstoneHue {
   }
 
   async addBridge(config: BridgeFormat): Promise<Bridge> {
+    // TODO: default parameters are added in the constructor, not in the calling. I would make the intialization parameter an object with a clear interface.
     const bridge = new Bridge(config.name || "", config.username || "", config.clientKey || "", config.macAddress || "", config.ipAddress || "1.1.1.1", config.bridgeId || "");
     if(config.bridgeId == undefined && config.ipAddress == undefined){
       return bridge;
@@ -246,6 +249,8 @@ export class CrownstoneHue {
     }
   };
 
+  // TODO: if you dont want to throw when the lightId can't be found, you can choose to just return a boolean
+  // If someone wants to be sure it was successful they can always check that
   async removeLight(lightId: string) {
     for (const bridge of this.bridges) {
       const light = bridge.lights[lightId];
@@ -256,14 +261,21 @@ export class CrownstoneHue {
         persistence.removeLightFromConfig(bridge, lightId); //
         await persistence.saveConfiguration();
         break;
+        // return true instead of break
       }
     }
+    // return false;
   }
 
+  // TODO: Why would I want to do this? This item has no API for me to use. I suggest you remove this method.
   getAllWrappedLights(): LightAggregatorWrapper[] {
     return Object.values(this.lights);
   }
 
+  // TODO: return a map so I can find my lights
+  // suppose I want to set a scene: I know exactly which lights on my end I want to set to a certain value. I don't know
+  // which of your lights that is without iterating through all of them
+  // {[lightId: string]: Light} would be a helpful format.
   getAllConnectedLights(): Light[] {
     let lights = []
     for (const wrappedLight of Object.values(this.lights)) {

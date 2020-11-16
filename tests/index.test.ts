@@ -1,6 +1,11 @@
 /**
  * @jest-environment node
  */
+// TODO: This test can only be run on your own computer.
+// TODO: index is a bad name for a test.
+// TODO: never put actual client keys in your commits!
+// TODO: this should not be commited to git, or at least not run by default.
+// TODO: if you want to provide this to a user, make index.template.ts and commit that, allow the user to fill in it's own ip and keys.
 import {CrownstoneHueError} from "../src/util/CrownstoneHueError";
 import {persistence} from "../src/util/Persistence";
 import {Discovery} from "../src/hue/Discovery";

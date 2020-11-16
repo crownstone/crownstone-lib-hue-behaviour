@@ -11,15 +11,20 @@ export class PrioritizerBase {
   timestamp = 0;
   composedState: HueLightState;
 
-
   cleanup(): void  {
+    // TODO: if this HAS to be overloaded since it's a parent class, usually you put a throw here
+    throw "cleanup must be overloaded!";
   }
-
 
   addBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): void {
+    // TODO: if this HAS to be overloaded since it's a parent class, usually you put a throw here
+    throw "addBehaviour must be overloaded!";
   }
 
+  // TODO: empty method?
   removeBehaviour(cloudId: string): void {
+    // TODO: if this HAS to be overloaded since it's a parent class, usually you put a throw here
+    throw "removeBehaviour must be overloaded!";
   }
 
   updateBehaviour(behaviour: HueBehaviourWrapper): void {
@@ -43,7 +48,10 @@ export class PrioritizerBase {
     }
   }
 
+  // TODO: empty method?
   _prioritizeBehaviour(): void {
+    // if this HAS to be overloaded since it's a parent class, usually you put a throw here
+    throw "_prioritizeBehaviour must be overloaded!";
   }
 
 

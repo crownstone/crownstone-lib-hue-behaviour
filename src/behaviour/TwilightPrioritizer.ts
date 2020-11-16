@@ -1,4 +1,3 @@
-
 import {BehaviourAggregatorUtil} from "./BehaviourAggregatorUtil";
 import {Twilight} from "./behaviour/Twilight";
 import {PrioritizerBase} from "./PrioritizerBase";
@@ -22,6 +21,7 @@ export class TwilightPrioritizer extends PrioritizerBase {
     }
   }
 
+
   _prioritizeBehaviour() {
     if (this.behaviours === []) {
       this.prioritizedBehaviour = undefined;
@@ -36,8 +36,10 @@ export class TwilightPrioritizer extends PrioritizerBase {
       }
     });
     this.prioritizedBehaviour = BehaviourAggregatorUtil.getPrioritizedTwilight(activeBehaviours);
+    // TODO: why (typeof(this.prioritizedBehaviour) !== "undefined") over (this.prioritizedBehaviour !== undefined) or !this.prioritizedBehaviour ?
+    // TODO: maybe this makes more sense:
+    // this.composedState = this.prioritizedBehaviour && this.prioritizedBehaviour.getComposedState() || {on: false}
     this.composedState = (typeof(this.prioritizedBehaviour) !== "undefined") ? this.prioritizedBehaviour.getComposedState() : {on: false};
   }
 
 }
-
