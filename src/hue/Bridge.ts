@@ -137,7 +137,8 @@ export class Bridge {
         throw e;
       }
     }
-    if (lightInfo == undefined || lightInfo.hadConnectionFailure) {
+    if(lightInfo == undefined ){return;}
+    if (lightInfo.hadConnectionFailure) {
       if(this.reconnecting){
         return {hadConnectionFailure: true};
       } else {

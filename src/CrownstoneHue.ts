@@ -193,20 +193,27 @@ export class CrownstoneHue {
 
   async _addBridgeLights(bridge: Bridge, lightData: LightInitFormat[]): Promise<void> {
     for (const data of lightData) {
-      try {
-        const light = await bridge.configureLight({id: data.id, uniqueId: data.uniqueId});
-        if (!("hadConnectionFailure" in light)) {
-          const lightBehaviourWrapper = this._createLightBehaviourWrapper(light);
-          for (const behaviour of data.behaviours) {
-            this._setBehaviour(lightBehaviourWrapper, behaviour);
+      let attemptingToAdd = true;
+      while (attemptingToAdd) {
+        try {
+          const light = await bridge.configureLight({id: data.id, uniqueId: data.uniqueId});
+          if (light == undefined) {
+            break;
           }
-          lightBehaviourWrapper.init()
-          this.lights[data.uniqueId] = lightBehaviourWrapper
+          if (!("hadConnectionFailure" in light)) {
+            const lightBehaviourWrapper = this._createLightBehaviourWrapper(light);
+            for (const behaviour of data.behaviours) {
+              this._setBehaviour(lightBehaviourWrapper, behaviour);
+            }
+            lightBehaviourWrapper.init()
+            this.lights[data.uniqueId] = lightBehaviourWrapper
+            attemptingToAdd = false;
+          }
         }
-      }
-      catch (e) {
-        if (e.errorCode !== undefined && e.errorCode === 422) {
-          return;
+        catch (e) {
+          if (e.errorCode !== undefined && e.errorCode === 422) {
+            break;
+          }
         }
       }
     }
@@ -245,14 +252,16 @@ export class CrownstoneHue {
           return
         }
         ;
-        const light = await bridge.configureLight(data);
-        if (!("hadConnectionFailure" in light)) {
-          const lightBehaviourWrapper = this._createLightBehaviourWrapper(light);
-          lightBehaviourWrapper.init();
-          return light;
-        }
-        else {
-          return {hadConnectionFailure: true}
+        let attemptingToAdd = true;
+        while (attemptingToAdd) {
+          const light = await bridge.configureLight(data);
+          if(light == undefined){ break};
+          if (!("hadConnectionFailure" in light)) {
+            const lightBehaviourWrapper = this._createLightBehaviourWrapper(light);
+            lightBehaviourWrapper.init();
+            attemptingToAdd = false;
+            return light;
+          }
         }
       }
     }
