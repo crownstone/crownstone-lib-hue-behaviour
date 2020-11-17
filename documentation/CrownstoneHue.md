@@ -143,8 +143,7 @@ await crownstoneHue.addLight(bridgeId,idOnBridge);
 The id that is used, is the light id on the bridge itself and not the light's unique id.
 This will retrieve the information of the light from the given bridge and creates and initializes the light object and wraps it together with a behaviour aggregator.
 After the light is added to the module, the light will be returned.
-When adding during a failed connection, it will return 
-`{hadConnectionFailure: true}`
+When you add a light and there are connection issues, it will retry until its added.
 
 #### Removing a light
 In order to remove a light, you call:
