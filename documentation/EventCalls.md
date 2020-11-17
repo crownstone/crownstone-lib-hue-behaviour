@@ -16,7 +16,8 @@
 The Crownstone Hue module uses some event calls for data transferring.
 Meaning you can subscribe to these topics in case you need to catch something.
 These topic constants are exported from [EventConstants.ts](/src/constants/EventConstants.ts)
-
+## Import
+`import {EventBus} from "."`
 ## Events
 ### ON_BRIDGE_PERSISTENCE_UPDATE
 When a bridge updates itself, it emits an event call with the topic ```"onBridgeUpdate"``` and a data ```object``` with information about itself. Formatted as:
