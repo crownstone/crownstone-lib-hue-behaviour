@@ -5,7 +5,6 @@ export const ERROR_CODES = {
   406: "Link button on Bridge is not pressed.",
   407: "Bridge is not initialized.",
   408: "Bridge has no Bridge Id and thus cannot be rediscovered.",
-  410: "Configuration settings are undefined.",
   422: "Light is not found on the bridge.",
   888: "Unknown action call to Hue Api.",
   999: "Unknown Error, see description."
