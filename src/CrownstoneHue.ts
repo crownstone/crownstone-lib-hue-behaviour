@@ -18,6 +18,10 @@ import {Light} from "./hue/Light";
  * @param lights - List of a wrapped light and aggregator
  *
  */
+
+function timeout(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 export class CrownstoneHue {
   bridges: Bridge[] = [];
   lights: { [uniqueId: string]: LightBehaviourWrapper } = {};
@@ -209,6 +213,10 @@ export class CrownstoneHue {
             this.lights[data.uniqueId] = lightBehaviourWrapper
             attemptingToAdd = false;
           }
+          else {
+            await timeout(10000);
+          }
+
         }
         catch (e) {
           if (e.errorCode !== undefined && e.errorCode === 422) {
@@ -261,6 +269,9 @@ export class CrownstoneHue {
             lightBehaviourWrapper.init();
             attemptingToAdd = false;
             return light;
+          }
+          else {
+            await timeout(10000);
           }
         }
       }
