@@ -59,3 +59,9 @@ When dumb house mode is set, it emits an event call with the topic ```"onDumbHou
 
 ### ON_LIGHT_REACHABILITY_CHANGE
 When a light's reachability is changed, it emits an event call with the topic ```"onLightReachabilitychange"``` and a data object as ```{uniqueId:string,reachable:boolean}```.
+
+### ON_BRIDGE_CONNECTION_REESTABLISHED
+A Bridge object throws this error once when it has reconnected to the Philips Hue Bridge. Topic `onBridgeConnectionReestablished` with `data` the bridge's `bridgeId`
+
+### ON_BRIDGE_CONNECTION_LOST
+A Bridge object throws this error once, when it has lost conenction to the Philips Hue Bridge. Topic `onBridgeConnectionLost` with `data` the bridge's `bridgeId`

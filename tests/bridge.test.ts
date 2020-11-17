@@ -103,7 +103,7 @@ describe("Bridge", () => {
     })
     await bridge.init();
     await bridge.populateLights();
-    return expect(bridge.getConnectedLights().length).toBe(2);
+    return expect(Object.keys(bridge.getConnectedLights()).length).toBe(2);
   })
 
   test('Rediscovery', async () => {
@@ -148,7 +148,7 @@ describe("Bridge", () => {
     await bridge.configureLight({id: 0, uniqueId: "ABCD123"})
     expect(bridge.getLightById("ABCD123").name).toBe("Light 1")
     await bridge.removeLight("ABCD123");
-    expect(bridge.getConnectedLights().length).toBe(0);
+    expect(Object.keys(bridge.getConnectedLights()).length).toBe(0);
   })
   test('Configure wrong light', async () => {
     const bridge = new Bridge({

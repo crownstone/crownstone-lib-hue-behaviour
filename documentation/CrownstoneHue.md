@@ -1,7 +1,7 @@
 # Documentation - Crownstone Hue 
 ## Overview
  - **Crownstone Hue**
-	- [Initialization](#initialization)
+	- [Constructing](#Constructing)
 	- [Adding a Philips Hue Bridge](#adding-a-philips-hue-bridge)
 	- [Removing a Philips Hue Bridge](#removing-a-philips-hue-bridge)
 	- [Adding/Removing Philips Hue Lights](#addingremoving-philips-hue-lights)
@@ -30,14 +30,12 @@ The Crownstone Hue class is the front of the module. To use the module, call one
 ## Usage 
 ### Import
 ```import {CrownstoneHue} from {.}```
-### Initialization
-This should be the first thing to do before using the module.
-The module is initializated with: 
+### Constructing
+
 ``` 
+const crownstoneHue = new CrownstoneHue(sphereLocation:SphereLocation);
+or
 const crownstoneHue = new CrownstoneHue();
-await crownstoneHue.init(sphereLocation:SphereLocation);
-... or ...
-await crownstoneHue.init(sphereLocation:SphereLocation,data:BridgeInitFormat[]);
 
 ``` 
 A SphereLocation object has the following structure:
@@ -48,6 +46,21 @@ interface SphereLocation {
 }
 ```
 This information will be used for the time of sunrise and sunset.
+
+If no sphereLocation object is given or the latitutde or longitude are missing, location of Crownstone will be used as default.
+
+### Adding a Philips Hue Bridge
+To add a bridge to the module there are three ways.
+ - By a config format
+ - By Ip Address
+ - By Bridge Id
+ 
+#### By a config format
+In case you already have certain information about the bridge you can create a bridge with that information, to do this, call:
+
+```
+await crownstoneHue.addBridge(configFormat:BridgeInitFormat);
+``` 
 
 The BridgeInitFormat is of format:
 ```
@@ -67,25 +80,6 @@ interface BridgeInitFormat {
 ```
 
 
-Upon initialization, the module will use the data provided to setup everything.
-If none is provided, it will return an empty array and the module is ready to use.
-If a data model is provided, it will create all corresponding objects and intialize them.
-Eventually it returns a list of Bridges and the module is ready to use.
-
-Note:If a light does not exist, it will skip the light and continue adding the rest. 
-
-### Adding a Philips Hue Bridge
-To add a bridge to the module there are three ways.
- - By a config format
- - By Ip Address
- - By Bridge Id
- 
-#### By a config format
-In case you already have certain information about the bridge you can create a bridge with that information, to do this, call:
-
-```
-await crownstoneHue.addBridge(configFormat:BridgeInitFormat);
-``` 
 
 Based on the information passed with the format, it will create a bridge.
 If any of the keys are missing or undefined, it will use a null on the creation of the object.
@@ -138,12 +132,20 @@ This will remove the bridge, its light's and the behaviours of those lights from
 #### Adding a light
 In order to add a light, call:
 ```
-await crownstoneHue.addLight(bridgeId,idOnBridge);
+await crownstoneHue.addLight(data:LightInitFormat);
 ``` 
-The id that is used, is the light id on the bridge itself and not the light's unique id.
+
+`LightInitFormat` is of type 
+```
+{
+	uniqueId: string,
+	bridgeId: string,
+	id: number,
+} 
+```
 This will retrieve the information of the light from the given bridge and creates and initializes the light object and wraps it together with a behaviour aggregator.
 After the light is added to the module, the light will be returned.
-When you add a light and there are connection issues, it will retry until its added.
+When you add a light and there are connection issues, the bridge will retry until its added.
 
 #### Removing a light
 In order to remove a light, you call:

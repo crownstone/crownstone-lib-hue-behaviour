@@ -34,50 +34,53 @@ describe('Integration Test with mocks', () => {
   })
 
 
-  test('Init from empty config', async () => {
+  test('Init with discovery', async () => {
 
     jest.useFakeTimers();
     const behaviourA = new BehaviourSupport().setCloudId("id0").setLightId(fakeLightsOnBridge[0].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()
     const behaviourB = new BehaviourSupport().setCloudId("id1").setLightId(fakeLightsOnBridge[1].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()
     const crownstoneHue = new CrownstoneHue();
-    let bridges = await crownstoneHue.init(SPHERE_LOCATION);
-    await crownstoneHue.addBridgeByIpAddress((await Discovery.discoverBridges())[0].ipAddress);
-    await crownstoneHue.addLight(fakeBridge.bridgeid, {id: 0, uniqueId: fakeLightsOnBridge[0].uniqueid});
+    const bridge = await crownstoneHue.addBridgeByIpAddress((await Discovery.discoverBridges())[0].ipAddress);
+    const lights = await bridge.getAllLightsFromBridge();
+
+    const light = Object.values(lights)[0]
+    await crownstoneHue.addLight( {bridgeId:fakeBridge.bridgeid, id: light.id, uniqueId: light.uniqueId});
     await crownstoneHue.setBehaviour(behaviourA.rule);
     await crownstoneHue.setBehaviour(behaviourB.rule);
     jest.advanceTimersToNextTimer(1);
     await flushPromises();
-    const lights = crownstoneHue.getAllConnectedLights();
     expect(lights[fakeLightsOnBridge[0].uniqueid].getState()).toMatchObject({on: true, bri: 20 * 2.54})
     return expect(fakeLightsOnBridge[0].state).toMatchObject({on: true, bri: 20 * 2.54})
   })
   test('Init from config', async () => {
     jest.useFakeTimers();
 
-    const config = [{
+    const bridgeConfig = [{
       "name": "Philips Hue Fake Bridge",
       "ipAddress": "192.168.178.26", // Should change itself to the right one
       "macAddress": "AB:DC:FA:KE:91",
       "username": "FakeUsername",
       "bridgeId": "ABDCFFFEAKE91",
-      "clientKey": "FakeKey",
-      "lights": [{
+      "clientKey": "FakeKey"
+    }]
+    const lightsConfig =  [{
         "id": 0,
-        "uniqueId": "ABCD123",
-        "behaviours": []
+      "bridgeId": "ABDCFFFEAKE91",
+        "uniqueId": "ABCD123"
       },
         {
           "uniqueId": "XYZ0987",
-          "id": 1,
-          "behaviours": []
+          "bridgeId": "ABDCFFFEAKE91",
+          "id": 1
         }
       ]
-    }]
 
     const behaviourA = new BehaviourSupport().setCloudId("id0").setLightId(fakeLightsOnBridge[0].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()
     const behaviourB = new BehaviourSupport().setCloudId("id1").setLightId(fakeLightsOnBridge[1].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()
     const crownstoneHue = new CrownstoneHue();
-    let bridges = await crownstoneHue.init(SPHERE_LOCATION, config);
+    const bridge = await crownstoneHue.addBridge(bridgeConfig[0]);
+    await crownstoneHue.addLight(lightsConfig[0]);
+    await crownstoneHue.addLight(lightsConfig[1]);
     await crownstoneHue.setBehaviour(behaviourA.rule);
     await crownstoneHue.setBehaviour(behaviourB.rule);
     const lights = crownstoneHue.getAllConnectedLights();
@@ -91,24 +94,29 @@ describe('Integration Test with mocks', () => {
   test('Scenario', async () => {
     jest.useFakeTimers();
 
-    const config = [{
+    const bridgeConfig = [{
       "name": "Philips Hue Fake Bridge",
       "ipAddress": "192.168.178.26", // Should change itself to the right one
       "macAddress": "AB:DC:FA:KE:91",
       "username": "FakeUsername",
       "bridgeId": "ABDCFFFEAKE91",
-      "clientKey": "FakeKey",
-      "lights": [{
-        "id": 0,
-        "uniqueId": "ABCD123",
-        "behaviours": []
-      }
-      ]
+      "clientKey": "FakeKey"
     }]
+    const lightsConfig =  [{
+      "id": 0,
+      "bridgeId": "ABDCFFFEAKE91",
+      "uniqueId": "ABCD123"
+    },
+      {
+        "uniqueId": "XYZ0987",
+        "bridgeId": "ABDCFFFEAKE91",
+        "id": 1
+      }
+    ]
 
     const crownstoneHue = new CrownstoneHue();
-    let bridges = await crownstoneHue.init(SPHERE_LOCATION, config);
-
+    await crownstoneHue.addBridge(bridgeConfig[0]);
+    await crownstoneHue.addLight(lightsConfig[0]);
     const behaviourA = new BehaviourSupport().setCloudId("id0").setLightId(fakeLightsOnBridge[0].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()
     await crownstoneHue.setBehaviour(behaviourA.rule);
     const behaviourB = new BehaviourSupport().setCloudId("id1").setLightId(fakeLightsOnBridge[1].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()
@@ -123,7 +131,10 @@ describe('Integration Test with mocks', () => {
 //Init, lights should be at 20%.
     expect(lights[fakeLightsOnBridge[0].uniqueid].getState()).toMatchObject({on: true, bri: 20 * 2.54})
     expect(fakeLightsOnBridge[0].state).toMatchObject({on: true, bri: 20 * 2.54})
-    expect(crownstoneHue.lights[fakeLightsOnBridge[0].uniqueid].behaviourAggregator.currentLightState).toMatchObject({on: true, bri: 20 * 2.54})
+    expect(crownstoneHue.lights[fakeLightsOnBridge[0].uniqueid].behaviourAggregator.currentLightState).toMatchObject({
+      on: true,
+      bri: 20 * 2.54
+    })
 
 //User enters house, light should be 80%
     crownstoneHue.presenceChange(<PresenceEvent>EVENT_ENTER_SPHERE);
@@ -132,7 +143,10 @@ describe('Integration Test with mocks', () => {
 
     expect(lights[fakeLightsOnBridge[0].uniqueid].getState()).toMatchObject({on: true, bri: 80 * 2.54})
     expect(fakeLightsOnBridge[0].state).toMatchObject({on: true, bri: 80 * 2.54})
-    expect(crownstoneHue.lights[fakeLightsOnBridge[0].uniqueid].behaviourAggregator.currentLightState).toMatchObject({on: true, bri: 80 * 2.54})
+    expect(crownstoneHue.lights[fakeLightsOnBridge[0].uniqueid].behaviourAggregator.currentLightState).toMatchObject({
+      on: true,
+      bri: 80 * 2.54
+    })
 
 //User has a a visitor and sets dumb House mode on.
     crownstoneHue.setDumbHouseMode(true);
@@ -140,7 +154,10 @@ describe('Integration Test with mocks', () => {
     await flushPromises();
     expect(lights[fakeLightsOnBridge[0].uniqueid].getState()).toMatchObject({on: true, bri: 80 * 2.54})
     expect(fakeLightsOnBridge[0].state).toMatchObject({on: true, bri: 80 * 2.54})
-    expect(crownstoneHue.lights[fakeLightsOnBridge[0].uniqueid].behaviourAggregator.currentLightState).toMatchObject({on: true, bri: 80 * 2.54})
+    expect(crownstoneHue.lights[fakeLightsOnBridge[0].uniqueid].behaviourAggregator.currentLightState).toMatchObject({
+      on: true,
+      bri: 80 * 2.54
+    })
 
 //Everyone leaves the house, lights should stay 80%, forgot to turn off dumb house mode.
     crownstoneHue.presenceChange(<PresenceEvent>EVENT_LEAVE_SPHERE);
@@ -148,7 +165,10 @@ describe('Integration Test with mocks', () => {
     await flushPromises();
     expect(lights[fakeLightsOnBridge[0].uniqueid].getState()).toMatchObject({on: true, bri: 80 * 2.54})
     expect(fakeLightsOnBridge[0].state).toMatchObject({on: true, bri: 80 * 2.54})
-    expect(crownstoneHue.lights[fakeLightsOnBridge[0].uniqueid].behaviourAggregator.currentLightState).toMatchObject({on: true, bri: 80 * 2.54})
+    expect(crownstoneHue.lights[fakeLightsOnBridge[0].uniqueid].behaviourAggregator.currentLightState).toMatchObject({
+      on: true,
+      bri: 80 * 2.54
+    })
     expect(crownstoneHue.lights[fakeLightsOnBridge[0].uniqueid].behaviourAggregator.override).toBe("DIM_STATE_OVERRIDE");
 
 //User turns off dumbhouse mode, lights should stay the same.
@@ -171,28 +191,30 @@ describe('Integration Test with mocks', () => {
 
   test('Removing and updating', async () => {
     jest.useFakeTimers()
-    const config = [{
+    const bridgeConfig = [{
       "name": "Philips Hue Fake Bridge",
       "ipAddress": "192.168.178.26", // Should change itself to the right one
       "macAddress": "AB:DC:FA:KE:91",
       "username": "FakeUsername",
       "bridgeId": "ABDCFFFEAKE91",
-      "clientKey": "FakeKey",
-      "lights": [{
-        "id": 0,
-        "uniqueId": "ABCD123",
-        "behaviours": []
-      },
-        {
-          "uniqueId": "XYZ0987",
-          "id": 1,
-          "behaviours": []
-        }
-      ]
+      "clientKey": "FakeKey"
     }]
-    const crownstoneHue = new CrownstoneHue();
-    let bridges = await crownstoneHue.init(SPHERE_LOCATION, config);
+    const lightsConfig =  [{
+      "id": 0,
+      "bridgeId": "ABDCFFFEAKE91",
+      "uniqueId": "ABCD123"
+    },
+      {
+        "uniqueId": "XYZ0987",
+        "bridgeId": "ABDCFFFEAKE91",
+        "id": 1
+      }
+    ]
 
+    const crownstoneHue = new CrownstoneHue();
+    await crownstoneHue.addBridge(bridgeConfig[0]);
+    await crownstoneHue.addLight(lightsConfig[0]);
+    await crownstoneHue.addLight(lightsConfig[1]);
     const behaviourA = new BehaviourSupport().setCloudId("id0").setLightId(fakeLightsOnBridge[0].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()
     await crownstoneHue.setBehaviour(behaviourA.rule);
     const behaviourB = new BehaviourSupport().setCloudId("id1").setLightId(fakeLightsOnBridge[1].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()

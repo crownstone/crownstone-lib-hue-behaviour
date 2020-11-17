@@ -129,7 +129,6 @@ interface BridgeInitFormat {
   username: string;
   bridgeId: string;
   clientKey: string;
-  lights: LightInitFormat[];
 }
 
 interface LightConfig {
@@ -138,5 +137,5 @@ interface LightConfig {
 }
 
 interface LightInitFormat extends LightConfig {
-  behaviours: HueBehaviourWrapper[];
+  bridgeId: string;
 }

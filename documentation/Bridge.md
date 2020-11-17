@@ -95,7 +95,7 @@ On success, it will return an uninitialized Light object.
 
 In case of a wrong id or the uniqueId doesn't match the id used, it attempts to find by uniqueId.
 When light is not found it throws an error. 
-If a connection failure happened and the light didn't got added, it returns a `{hadConnectionFailure: true}` object.
+If the bridge has connection issues, it attempts to redo this operation every 10 seconds.
 
 ### Removing a light
 

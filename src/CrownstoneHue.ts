@@ -6,6 +6,7 @@ import {Discovery} from "./hue/Discovery";
 import {GenericUtil} from "./util/GenericUtil";
 import {LightBehaviourWrapper} from "./wrapper/LightBehaviourWrapper";
 import {Light} from "./hue/Light";
+import {RECONNECTION_TIMEOUT_TIME, SPHERE_DEFAULT} from "./constants/HueConstants";
 
 /**
  * CrownstoneHue object
@@ -22,36 +23,19 @@ import {Light} from "./hue/Light";
 function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
 export class CrownstoneHue {
   bridges: Bridge[] = [];
   lights: { [uniqueId: string]: LightBehaviourWrapper } = {};
   sphereLocation: SphereLocation;
   dumbHouseModeActive: boolean = false;
   activePresenceEvents: PresenceEvent[] = [];
-  initialized: boolean = false;
 
-  /**
-   * To be called for initialization of the CrownstoneHue.
-   *
-   * @returns a List of Bridge objects configured from the config file.
-   *
-   */
-  async init(sphereLocation: SphereLocation, data?: BridgeInitFormat[]): Promise<Bridge[]> {
-    if (!this.initialized) {
-      this.initialized = true;
-      this.sphereLocation = sphereLocation
-      if (data != null) {
-        await this._setupModule(data);
-      }
-      return this.bridges;
-
+  constructor(sphereLocation?: SphereLocation) {
+    if (!sphereLocation || !sphereLocation.latitude|| !sphereLocation.longitude) {
+      sphereLocation = SPHERE_DEFAULT;
     }
-  }
-
-  async _setupModule(data: BridgeInitFormat[]): Promise<void> {
-    for (const bridgeData of data) {
-      await this.addBridge(bridgeData);
-    }
+    this.sphereLocation = sphereLocation;
   }
 
   /** Call to change/set new Sphere location
@@ -144,7 +128,7 @@ export class CrownstoneHue {
   async addBridgeByBridgeId(bridgeId: string): Promise<Bridge> {
     for (const bridge of this.bridges) {
       if (bridge.bridgeId === bridgeId) {
-        return;
+        throw new CrownstoneHueError(410, bridgeId)
       }
     }
     const discoveryResult = await Discovery.discoverBridgeById(bridgeId);
@@ -162,7 +146,7 @@ export class CrownstoneHue {
   async addBridgeByIpAddress(ipAddress: string): Promise<Bridge> {
     for (const bridge of this.bridges) {
       if (bridge.ipAddress === ipAddress) {
-        return;
+        throw new CrownstoneHueError(411, ipAddress)
       }
     }
     const bridge = new Bridge({ipAddress: ipAddress});
@@ -172,9 +156,8 @@ export class CrownstoneHue {
   }
 
   async addBridge(bridgeData: BridgeInitFormat): Promise<Bridge> {
-
     if (bridgeData.bridgeId == undefined && bridgeData.ipAddress == undefined) {
-      return; // Can't use bridge.
+      throw new CrownstoneHueError(410, bridgeData.bridgeId)
     }
     for (const bridge of this.bridges) {
       if (bridge.bridgeId === bridgeData.bridgeId) {
@@ -189,42 +172,10 @@ export class CrownstoneHue {
       ipAddress: bridgeData.ipAddress,
       bridgeId: bridgeData.bridgeId
     });
+
     this.bridges.push(bridge);
     await bridge.init();
-    await this._addBridgeLights(bridge, bridgeData.lights);
     return bridge;
-  }
-
-  async _addBridgeLights(bridge: Bridge, lightData: LightInitFormat[]): Promise<void> {
-    for (const data of lightData) {
-      let attemptingToAdd = true;
-      while (attemptingToAdd) {
-        try {
-          const light = await bridge.configureLight({id: data.id, uniqueId: data.uniqueId});
-          if (light == undefined) {
-            break;
-          }
-          if (!("hadConnectionFailure" in light)) {
-            const lightBehaviourWrapper = this._createLightBehaviourWrapper(light);
-            for (const behaviour of data.behaviours) {
-              this._setBehaviour(lightBehaviourWrapper, behaviour);
-            }
-            lightBehaviourWrapper.init()
-            this.lights[data.uniqueId] = lightBehaviourWrapper
-            attemptingToAdd = false;
-          }
-          else {
-            await timeout(10000);
-          }
-
-        }
-        catch (e) {
-          if (e.errorCode !== undefined && e.errorCode === 422) {
-            break;
-          }
-        }
-      }
-    }
   }
 
   removeBridge(bridgeId: string): void {
@@ -253,30 +204,23 @@ export class CrownstoneHue {
    * @param bridgeId - The id of the bridge of which the light have to be added to.
    * @param idOnBridge - The id of the light on the bridge.
    */
-  async addLight(bridgeId: string, data: LightConfig): Promise<Light | FailedConnection> {
+  async addLight(data: LightInitFormat): Promise<Light> {
     for (const bridge of this.bridges) {
-      if (bridge.bridgeId === bridgeId) {
+      if (bridge.bridgeId === data.bridgeId) {
         if (bridge.lights[data.uniqueId]) {
-          return
+          throw new CrownstoneHueError(409, data.uniqueId)
         }
-        ;
-        let attemptingToAdd = true;
-        while (attemptingToAdd) {
-          const light = await bridge.configureLight(data);
-          if(light == undefined){ break};
-          if (!("hadConnectionFailure" in light)) {
-            const lightBehaviourWrapper = this._createLightBehaviourWrapper(light);
-            lightBehaviourWrapper.init();
-            attemptingToAdd = false;
-            return light;
-          }
-          else {
-            await timeout(10000);
-          }
+        const light = await bridge.configureLight(data);
+        if (light == undefined) {
+          throw new CrownstoneHueError(412, data.uniqueId)
         }
+
+        const lightBehaviourWrapper = this._createLightBehaviourWrapper(light);
+        lightBehaviourWrapper.init();
+        return light;
       }
     }
-  };
+  }
 
   _createLightBehaviourWrapper(light: Light): LightBehaviourWrapper {
     const lightBehaviourWrapper = new LightBehaviourWrapper(light);

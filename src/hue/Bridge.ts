@@ -6,7 +6,11 @@ import {Discovery} from "./Discovery";
 import {GenericUtil} from "../util/GenericUtil";
 import Api from "node-hue-api/lib/api/Api"; // library import only used for types
 import {eventBus} from "../util/EventBus";
-import {ON_BRIDGE_PERSISTENCE_UPDATE} from "../constants/EventConstants";
+import {
+  ON_BRIDGE_CONNECTION_LOST,
+  ON_BRIDGE_CONNECTION_REESTABLISHED,
+  ON_BRIDGE_PERSISTENCE_UPDATE
+} from "../constants/EventConstants";
 
 const hueApi = v3.api;
 
@@ -39,7 +43,7 @@ const neededForReconnection = {...exemptOfAuthentication}
  *
  */
 export class Bridge {
-  lights: object = {};
+  lights: {[uniqueId :string]:Light} = {};
   api: Api;
   authenticated: boolean = false;
   name: string | null;
@@ -69,15 +73,17 @@ export class Bridge {
    */
   async init(): Promise<void> {
     if (this.bridgeId != null || this.ipAddress != null) {
-      if (this.initialized) { return; }
-      if (this.username == null) {
-          await this.link();
-        }
-        else {
-          await this.connect();
-        }
-        this.initialized = true;
+      if (this.initialized) {
+        return;
       }
+      if (this.username == null) {
+        await this.link();
+      }
+      else {
+        await this.connect();
+      }
+      this.initialized = true;
+    }
   }
 
   /**
@@ -124,43 +130,37 @@ export class Bridge {
    *
    * @Returns uninitialized light object. (Call .init())
    */
-  async configureLight(data: LightConfig): Promise<Light|FailedConnection> {
+  async configureLight(data: LightConfig): Promise<Light> {
     let lightInfo
-    try {
-      lightInfo = await this._useApi("getLightById", data.id);
-    }
-    catch (e) {
-      if (e.errorCode && e.errorCode === 422) {
-        return await this.configureLightByUniqueId(data.uniqueId);
+    let attemptToGetLightInfo = true;
+
+    while (attemptToGetLightInfo) {
+      try {
+        lightInfo = await this._useApi("getLightById", data.id);
+        if (lightInfo.hadConnectionFailure) {
+          await timeout(RECONNECTION_TIMEOUT_TIME)
+        }
+        else {
+          attemptToGetLightInfo = false;
+        }
       }
-      else {
-        throw e;
+      catch (e) {
+        if (e.errorCode && e.errorCode === 422) {
+          return await this.configureLightByUniqueId(data.uniqueId);
+        }
+        else {
+          throw e;
+        }
       }
     }
-    if(lightInfo == undefined ){return;}
-    if (lightInfo.hadConnectionFailure) {
-      if(this.reconnecting){
-        return {hadConnectionFailure: true};
-      } else {
-        return await this.configureLight(data);
-      }
+    if (lightInfo == undefined) {
+      throw new CrownstoneHueError(412, data.uniqueId)
     }
-    if (data.uniqueId !== lightInfo.uniqueId) {
+    else if (data.uniqueId !== lightInfo.uniqueid) {
       return await this.configureLightByUniqueId(data.uniqueId);
     }
     else {
-      const light = new Light({
-        name: lightInfo.name,
-        uniqueId: lightInfo.uniqueid,
-        state: lightInfo.state,
-        id: data.id,
-        bridgeId: this.bridgeId,
-        capabilities: lightInfo.capabilities.control,
-        supportedStates: lightInfo.getSupportedStates(),
-        api: this._useApi.bind(this)
-      })
-      this.lights[light.uniqueId] = light;
-      return light;
+      return this._createLight(lightInfo);
     }
   }
 
@@ -169,17 +169,41 @@ export class Bridge {
    * @param uniqueId
    */
   async configureLightByUniqueId(uniqueId: string): Promise<Light> {
-    const lights = await this.getAllLightsFromBridge();
-    if (lights == undefined || lights.hadConnectionFailure) {
-      return;
+    let attemptToGetLightInfo = true;
+    while (attemptToGetLightInfo) {
+      const lightData = await this._useApi("getAllLights");
+      if (!lightData) {
+        throw new CrownstoneHueError(412,uniqueId);
+      }
+      if(!lightData.hadConnectionFailure){
+        for(const data of lightData){
+          if(data.uniqueid === uniqueId){
+            const light = this._createLight(data);
+            this.lights[data.uniqueId] = light;
+            return light;
+          }
+        }
+          throw new CrownstoneHueError(422, uniqueId);
+      }
+      await timeout(RECONNECTION_TIMEOUT_TIME)
     }
-    const light = lights[uniqueId];
-    if (lights[uniqueId]) {
+  }
+
+  _createLight(data):Light{
+      const light = new Light({
+        name: data.name,
+        uniqueId: data.uniqueid,
+        state: data.state,
+        id: data.id,
+        bridgeId: this.bridgeId,
+        capabilities: data.capabilities.control,
+        supportedStates: data.getSupportedStates(),
+        api: this._useApi.bind(this)
+      })
       this.lights[light.uniqueId] = light;
       return light;
     }
-    throw new CrownstoneHueError(422, uniqueId);
-  }
+
 
 
   removeLight(uniqueLightId: string): void {
@@ -191,8 +215,8 @@ export class Bridge {
   /** Retrieves all the lights that are connected through the module.
    *
    */
-  getConnectedLights(): Light[] {
-    return Object.values(this.lights);
+  getConnectedLights(): { [uniqueId: string]:Light} {
+    return this.lights;
   }
 
   async updateBridgeInfo() {
@@ -360,12 +384,14 @@ export class Bridge {
    */
   async _attemptReconnection(): Promise<FailedConnection> {
     if (!this.reconnecting) {
+      eventBus.emit(ON_BRIDGE_CONNECTION_LOST,this.bridgeId)
       this.reconnecting = true;
       while (this.reconnecting) {
         try {
           this.reachable = false;
           await this._rediscoverMyself();
           this.reconnecting = false;
+          eventBus.emit(ON_BRIDGE_CONNECTION_REESTABLISHED,this.bridgeId)
         }
         catch (err) {
           if (GenericUtil.isConnectionError(err)) {
