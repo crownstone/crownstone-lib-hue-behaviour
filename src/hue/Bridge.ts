@@ -14,13 +14,16 @@ function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-const exemptOfAuthentication = {"createUser": true,"createAuthenticatedApi":true,"createUnauthenticatedApi":true};
+const exemptOfAuthentication = {"createUser": true, "createAuthenticatedApi": true, "createUnauthenticatedApi": true};
 const neededForReconnection = {...exemptOfAuthentication}
+
 /**
  * Bridge object
  *
+ *
  * @remarks
  * init() should be called before using this object.
+ * Uses eventbus topic "onBridgeUpdate" to pass new data.
  *
  * @param lights - Key/Value List of Light objects, Where key is the uniqueId of a list and value the Light object itself
  * @param api - An Api from the Hue Library that is used to connect to the Bridge itself. Empty before init.
@@ -30,46 +33,51 @@ const neededForReconnection = {...exemptOfAuthentication}
  * @param macAddress - The mac-address of the bridge itself
  * @param ipAddress - The last known ip-address of the bridge.
  * @param bridgeId - The unique id of the bridge.
- * @param reachable - Boolean if Bridge is reachable or not.
+ * @param reachable - Boolean if bridge is reachable or not.
+ * @param reconnecting - Boolean if bridge is reconnecting or not.
+ * @param authenticated - Boolean if bridge api connection is authenticated on the Philips Hue Bridge or not.
  *
  */
 export class Bridge {
   lights: object = {};
   api: Api;
   authenticated: boolean = false;
-  name: string;
-  username: string;
-  clientKey: string;
-  macAddress: string;
-  ipAddress: string;
-  bridgeId: string
+  name: string | null;
+  username: string | null;
+  clientKey: string | null;
+  macAddress: string | null;
+  ipAddress: string | null;
+  bridgeId: string | null;
   reachable: boolean = false;
   reconnecting: boolean = false;
+  initialized: boolean = false;
 
-
-  constructor(name: string, username: string, clientKey: string, macAddress: string, ipAddress: string, bridgeId: string) {
-    this.name = name;
-    this.username = username;
-    this.ipAddress = ipAddress;
-    this.clientKey = clientKey;
-    this.macAddress = macAddress;
-    this.bridgeId = bridgeId;
+  constructor(data: BridgeInitialization) {
+    this.name = data.name || null;
+    this.username = data.username || null;
+    this.ipAddress = data.ipAddress || null;
+    this.clientKey = data.clientKey || null;
+    this.macAddress = data.macAddress || null;
+    this.bridgeId = data.bridgeId || null;
   }
 
   /**
    * To be called for initialization of a bridge.
-   * If username is empty, attempts to create user on bridge.
-   * If button not pressed: throws Error that link button have not been pressed.
+   * If username is empty, attempts to create user on bridge then if button not pressed: throws Error that link button have not been pressed.
    *
    * If Bridge can't be found, it will attempt to rediscover itself every 10 seconds.
    */
   async init(): Promise<void> {
-    if (this.username == "") {
-      await this.link();
-    } else {
-      await this.connect();
-
-    }
+    if (this.bridgeId != null || this.ipAddress != null) {
+      if (this.initialized) { return; }
+      if (this.username == null) {
+          await this.link();
+        }
+        else {
+          await this.connect();
+        }
+        this.initialized = true;
+      }
   }
 
   /**
@@ -109,24 +117,69 @@ export class Bridge {
    *
    * @remarks
    * Used to add a light that is connected to the Hue bridge to the list of this class.
-   * id refers to the id of the light on the bridge and NOT the uniqueId of a light.
+   * Uses the LightConfig interface for data passing.{uniqueId:string, id: number}
+   * id refers to the id of the light on the bridge and uniqueId to the uniqueId of a light.
    * Gets info of the light from Bridge and creates a Light object and pushes it to the list.
-   * Throws error on invalid Id.
+   * Attempts to find by uniqueId on invalid id or if uniqueId does not match.
    *
    * @Returns uninitialized light object. (Call .init())
    */
-  async configureLightById(id: number): Promise<Light> {
-    const lightInfo = await this._useApi("getLightById", id);
-    if (lightInfo.hadConnectionFailure) {
+  async configureLight(data: LightConfig): Promise<Light> {
+    let lightInfo
+    try {
+      lightInfo = await this._useApi("getLightById", data.id);
+    }
+    catch (e) {
+      if (e.errorCode && e.errorCode === 422) {
+        return await this.configureLightByUniqueId(data.uniqueId);
+      }
+      else {
+        throw e;
+      }
+    }
+    if (lightInfo == undefined || lightInfo.hadConnectionFailure) {
       return;
     }
-    const light = new Light(lightInfo.name, lightInfo.uniqueid, lightInfo.state, id, this.bridgeId, lightInfo.capabilities.control, lightInfo.getSupportedStates(), this._useApi.bind(this))
-    this.lights[lightInfo.uniqueid] = light;
-    return light;
+    if (data.uniqueId !== lightInfo.uniqueId) {
+      return await this.configureLightByUniqueId(data.uniqueId);
+    }
+    else {
+      const light = new Light({
+        name: lightInfo.name,
+        uniqueId: lightInfo.uniqueid,
+        state: lightInfo.state,
+        id: data.id,
+        bridgeId: this.bridgeId,
+        capabilities: lightInfo.capabilities.control,
+        supportedStates: lightInfo.getSupportedStates(),
+        api: this._useApi.bind(this)
+      })
+      this.lights[light.uniqueId] = light;
+      return light;
+    }
   }
 
-  async removeLight(uniqueLightId: string): Promise<void> {
-    this.lights[uniqueLightId].cleanup();
+  /** Retrieves all lights from bridge and checks by uniqueId.
+   * Used as failsafe for configureLight.
+   * @param uniqueId
+   */
+  async configureLightByUniqueId(uniqueId: string): Promise<Light> {
+    const lights = await this.getAllLightsFromBridge();
+    if (lights == undefined || lights.hadConnectionFailure) {
+      return;
+    }
+    const light = lights[uniqueId];
+    if (lights[uniqueId]) {
+      this.lights[light.uniqueId] = light;
+      return light;
+    }
+    throw new CrownstoneHueError(422, uniqueId);
+  }
+
+
+  removeLight(uniqueLightId: string): void {
+    if (this.lights[uniqueLightId] != undefined)
+      this.lights[uniqueLightId].cleanup();
     delete this.lights[uniqueLightId];
   }
 
@@ -150,18 +203,29 @@ export class Bridge {
     })
   }
 
-  /** Retrieves all lights from the bridge.
+  /** Retrieves all lights from the physical bridge.
    *
    */
-  async getAllLightsFromBridge(): Promise<Light[]> {
-      const lights = await this._useApi("getAllLights");
-      if (typeof (lights) === "undefined" || lights.hadConnectionFailure) {
-        return []
-      }
-      return lights.map(light => {
-        return new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this._useApi.bind(this))
-      });
+  async getAllLightsFromBridge(): Promise<{ [uniqueId: string]: Light }> {
+    const lights = await this._useApi("getAllLights");
+    if (lights === undefined || lights.hadConnectionFailure) {
+      return {}
     }
+    let result = {};
+    lights.forEach(light => {
+      result[light.uniqueid] = new Light({
+        name: light.name,
+        uniqueId: light.uniqueid,
+        state: light.state,
+        id: light.id,
+        bridgeId: this.bridgeId,
+        capabilities: light.capabilities.control,
+        supportedStates: light.getSupportedStates(),
+        api: this._useApi.bind(this)
+      })
+    });
+    return result;
+  }
 
   /**
    * Connects to the bridge and creates an API that has full access to the bridge.
@@ -220,20 +284,29 @@ export class Bridge {
   async populateLights(): Promise<void> {
     let lights = await this._useApi("getAllLights");
     if (lights.hadConnectionFailure) {
-      if(!this.reconnecting){
+      if (!this.reconnecting) {
         await this.populateLights();
       }
       return;
     }
     lights.forEach(light => {
-      this.lights[light.uniqueid] = new Light(light.name, light.uniqueid, light.state, light.id, this.bridgeId, light.capabilities.control, light.getSupportedStates(), this._useApi.bind(this))
+      this.lights[light.uniqueid] = new Light({
+        name: light.name,
+        uniqueId: light.uniqueid,
+        state: light.state,
+        id: light.id,
+        bridgeId: this.bridgeId,
+        capabilities: light.capabilities.control,
+        supportedStates: light.getSupportedStates(),
+        api: this._useApi.bind(this)
+      })
     });
   }
 
 
   /** Extra layer for error handling, in case bridge fails or is turned off.
    */
-  async _useApi(action, extra?) {
+  async _useApi(action: string, extra?: number | [] | StateUpdate) {
     if (!exemptOfAuthentication[action]) {
       this._checkAuthentication()
     }
@@ -241,43 +314,46 @@ export class Bridge {
       return {hadConnectionFailure: true};
     }
     try {
-        switch (action) {
-          case "getAllLights":
-            return await this.api.lights.getAll();
-          case "createUser":
-            return await this.api.users.createUser(APP_NAME, DEVICE_NAME);
-          case "getBridgeConfiguration":
-            return await this.api.configuration.getConfiguration();
-          case "getLightById":
-            return await this.api.lights.getLight(extra);
-          case "setLightState":
-            return await this.api.lights.setLightState(extra[0], extra[1]);
-          case "getLightState":
-            return await this.api.lights.getLightState(extra);
-          case "createAuthenticatedApi":
-            return await hueApi.createLocal(this.ipAddress).connect(this.username) as Api;
-          case "createUnauthenticatedApi":
-            return await hueApi.createLocal(this.ipAddress).connect() as Api;
-          default:
-            throw new CrownstoneHueError(888);
+      switch (action) {
+        case "getAllLights":
+          return await this.api.lights.getAll();
+        case "createUser":
+          return await this.api.users.createUser(APP_NAME, DEVICE_NAME);
+        case "getBridgeConfiguration":
+          return await this.api.configuration.getConfiguration();
+        case "getLightById":
+          return await this.api.lights.getLight(extra);
+        case "setLightState":
+          return await this.api.lights.setLightState(extra[0], extra[1]);
+        case "getLightState":
+          return await this.api.lights.getLightState(extra);
+        case "createAuthenticatedApi":
+          return await hueApi.createLocal(this.ipAddress).connect(this.username) as Api;
+        case "createUnauthenticatedApi":
+          return await hueApi.createLocal(this.ipAddress).connect() as Api;
+        default:
+          throw new CrownstoneHueError(888);
+      }
+    }
+    catch (err) {
+      if (GenericUtil.isConnectionError(err)) {
+        return await this._attemptReconnection();
+      }
+      else {
+        if (typeof (err.getHueErrorType) === "function") {
+          GenericUtil.convertHueLibraryToCrownstoneError(err, extra);
         }
-      } catch (err) {
-        if (GenericUtil.isConnectionError(err)) {
-          return await this._attemptReconnection();
-        } else {
-          if (typeof (err.getHueErrorType) === "function") {
-            GenericUtil.convertHueLibraryToCrownstoneError(err, extra);
-          } else {
-            throw err;
-          }
+        else {
+          throw err;
         }
       }
+    }
   }
 
   /** Reconnection loop.
    *
    */
-  async _attemptReconnection() {
+  async _attemptReconnection(): Promise<FailedConnection> {
     if (!this.reconnecting) {
       this.reconnecting = true;
       while (this.reconnecting) {
@@ -285,10 +361,12 @@ export class Bridge {
           this.reachable = false;
           await this._rediscoverMyself();
           this.reconnecting = false;
-        } catch (err) {
+        }
+        catch (err) {
           if (GenericUtil.isConnectionError(err)) {
             await timeout(RECONNECTION_TIMEOUT_TIME);
-          } else {
+          }
+          else {
             this.reconnecting = false;
             throw err;
           }
@@ -298,7 +376,7 @@ export class Bridge {
     return {hadConnectionFailure: true};
   }
 
-  _checkAuthentication() {
+  _checkAuthentication(): void {
     if (!this.authenticated) {
       throw new CrownstoneHueError(405);
     }
@@ -324,13 +402,14 @@ export class Bridge {
    *
    */
   private async _rediscoverMyself(): Promise<void> {
-    if(this.bridgeId == undefined){
+    if (this.bridgeId == undefined) {
       throw new CrownstoneHueError(408);
     }
     const result = await Discovery.discoverBridgeById(this.bridgeId);
     if (result.internalipaddress === "-1") {
       throw new CrownstoneHueError(404, "Bridge with id " + this.bridgeId + " not found.");
-    } else {
+    }
+    else {
       this.ipAddress = result.internalipaddress;
       await this.init()
       this.update({ipAddress: this.ipAddress});
@@ -347,7 +426,7 @@ export class Bridge {
     })
   }
 
-  update(values: object,onlyUpdate:boolean = false) {
+  update(values: object, onlyUpdate: boolean = false): void {
     let saveValue = false;
     if (values["name"] !== undefined) {
       this.name = values["name"]
@@ -374,7 +453,6 @@ export class Bridge {
       saveValue = true;
     }
 
-
     if (values["reachable"] !== undefined) {
       this.reachable = values["reachable"]
     }
@@ -384,12 +462,14 @@ export class Bridge {
     if (values["reconnecting"] !== undefined) {
       this.reconnecting = values["reconnecting"]
     }
-    if(saveValue && !onlyUpdate){
+    if (saveValue && !onlyUpdate) {
       this.save();
     }
   }
 
-  save() {
+  /** Sends out an event with topic "onBridgeUpdate" with the current variable values for saving.
+   */
+  save(): void {
     const saveState =
       {
         name: this.name,
@@ -399,12 +479,11 @@ export class Bridge {
         clientKey: this.clientKey,
         bridgeId: this.bridgeId,
         lights: Object.values(this.lights).map((light) => {
-          return {name: light.name, id: light.id, uniqueId: light.uniqueId} as LightInfoObject
+          return {name: light.name, id: light.id, uniqueId: light.uniqueId}
         })
       }
     eventBus.emit(ON_BRIDGE_PERSISTENCE_UPDATE, JSON.stringify(saveState))
   }
-
 
   getInfo(): object {
     return {
@@ -417,7 +496,7 @@ export class Bridge {
       reachable: this.reachable,
       authenticated: this.authenticated,
       reconnecting: this.reconnecting,
-      lights: Object.values(this.lights)
+      lights: this.lights
     };
   }
 }

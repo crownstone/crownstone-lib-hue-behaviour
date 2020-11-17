@@ -9,46 +9,50 @@ export class BehaviourSupport {
   }
 
   //########Setters###########
-  setTypeBehaviour(){
+  setTypeBehaviour(): BehaviourSupport {
     this.rule.type = "BEHAVIOUR"
     this.rule.data.action.type = "BE_ON";
-    if(!("presence" in this.rule.data)){
+    if (!("presence" in this.rule.data)) {
       this.rule.type["Presence"] = {}
       this.setTimeAllDay();
     }
     return this;
   }
-  setTypeTwilight(){
-    this.rule.type= "BEHAVIOUR";
+
+  setTypeTwilight(): BehaviourSupport {
+    this.rule.type = "BEHAVIOUR";
     this.rule.data.action.type = "DIM_WHEN_TURNED_ON";
     delete this.rule.data["presence"];
     delete this.rule.data["endCondition"];
     return this;
   }
-  setCloudId(value:string){
+
+  setCloudId(value: string): BehaviourSupport {
     this.rule.cloudId = value;
     return this;
   }
-  setLightId(value:string){
+
+  setLightId(value: string) {
     this.rule.lightId = value;
     return this;
   }
-  setActionState(value: number) {
+
+  setActionState(value: number): BehaviourSupport {
     this.rule.data.action.data = value;
     return this;
   }
 
-  setDimPercentage(value: number) {
+  setDimPercentage(value: number): BehaviourSupport {
     this.rule.data.action.data = value;
     return this;
   }
 
-  setTimeAllDay() {
+  setTimeAllDay(): BehaviourSupport {
     this.rule.data.time = {type: "ALL_DAY"};
     return this;
   }
 
-  setTimeWhenDark() {
+  setTimeWhenDark(): BehaviourSupport {
     this.rule.data.time = {
       type: "RANGE",
       from: {type: "SUNSET", offsetMinutes: 0},
@@ -57,7 +61,7 @@ export class BehaviourSupport {
     return this;
   }
 
-  setTimeWhenSunUp() {
+  setTimeWhenSunUp(): BehaviourSupport {
     this.rule.data.time = {
       type: "RANGE",
       from: {type: "SUNRISE", offsetMinutes: 0},
@@ -66,7 +70,7 @@ export class BehaviourSupport {
     return this;
   }
 
-  setTimeFromSunrise(offsetMinutes: number = 0) {
+  setTimeFromSunrise(offsetMinutes: number = 0): BehaviourSupport {
     // if the time was ALL_DAY, set it to an acceptable range, given the name of this method.
     if (this.rule.data.time.type === "ALL_DAY") {
       this.setTimeWhenSunUp();
@@ -78,7 +82,7 @@ export class BehaviourSupport {
     return this;
   }
 
-  setTimeFromSunset(offsetMinutes: number = 0) {
+  setTimeFromSunset(offsetMinutes: number = 0): BehaviourSupport {
     // if the time was ALL_DAY, set it to an acceptable range, given the name of this method.
     if (this.rule.data.time.type === "ALL_DAY") {
       this.setTimeWhenDark();
@@ -90,7 +94,7 @@ export class BehaviourSupport {
     return this;
   }
 
-  setTimeToSunrise(offsetMinutes: number = 0) {
+  setTimeToSunrise(offsetMinutes: number = 0): BehaviourSupport {
     // if the time was ALL_DAY, set it to an acceptable range, given the name of this method.
     if (this.rule.data.time.type === "ALL_DAY") {
       this.setTimeWhenDark();
@@ -102,7 +106,7 @@ export class BehaviourSupport {
     return this;
   }
 
-  setTimeToSunset(offsetMinutes: number = 0) {
+  setTimeToSunset(offsetMinutes: number = 0): BehaviourSupport {
     // if the time was ALL_DAY, set it to an acceptable range, given the name of this method.
     if (this.rule.data.time.type === "ALL_DAY") {
       this.setTimeWhenSunUp();
@@ -114,12 +118,13 @@ export class BehaviourSupport {
     return this;
   }
 
-  setTimeFromClock(hours: number, minutes: number) {
+  setTimeFromClock(hours: number, minutes: number): BehaviourSupport {
     // if the time was ALL_DAY, set it to an acceptable range, given the name of this method.
     if (this.rule.data.time.type === "ALL_DAY") {
       if (hours < 14) {
         this.setTimeWhenSunUp();
-      } else {
+      }
+      else {
         this.setTimeWhenDark();
       }
     }
@@ -130,14 +135,16 @@ export class BehaviourSupport {
     return this;
   }
 
-  setTimeToClock(hours: number, minutes: number) {
+  setTimeToClock(hours: number, minutes: number): BehaviourSupport {
     // if the time was ALL_DAY, set it to an acceptable range, given the name of this method.
     if (this.rule.data.time.type === "ALL_DAY") {
       if (hours > 20) {
         this.setTimeFromClock(18, 0);
-      } else if (hours > 8) {
+      }
+      else if (hours > 8) {
         this.setTimeFromClock(8, 0);
-      } else {
+      }
+      else {
         this.setTimeFromClock(0, 0);
       }
     }
@@ -148,12 +155,12 @@ export class BehaviourSupport {
     return this;
   }
 
-  setTime(time: Time) {
+  setTime(time: Time): BehaviourSupport {
     this.rule.data.time = time;
     return this;
   }
 
-  insertTimeDataFrom(timeData: TimeData) {
+  insertTimeDataFrom(timeData: TimeData): BehaviourSupport {
     if (this.rule.data.time.type === "ALL_DAY") {
       this.setTimeWhenDark();
     }
@@ -161,9 +168,10 @@ export class BehaviourSupport {
     if (this.rule.data.time.type === "RANGE") {
       this.rule.data.time.from = timeData;
     }
+    return this;
   }
 
-  insertTimeDataTo(timeData: TimeData) {
+  insertTimeDataTo(timeData: TimeData): BehaviourSupport {
     if (this.rule.data.time.type === "ALL_DAY") {
       this.setTimeWhenDark();
     }
@@ -171,11 +179,12 @@ export class BehaviourSupport {
     if (this.rule.data.time.type === "RANGE") {
       this.rule.data.time.to = timeData;
     }
+    return this;
   }
 
   ignorePresence(): BehaviourSupport {
 
-    if(this.rule.type === "BEHAVIOUR") {
+    if (this.rule.type === "BEHAVIOUR") {
       this.rule.data.presence = {type: "IGNORE"};
     }
     return this;
@@ -187,10 +196,10 @@ export class BehaviourSupport {
 
   setPresenceSomebody(): BehaviourSupport {
 
-    if(this.rule.type === "BEHAVIOUR"){
-    if (this.rule.data.presence.type === "IGNORE") {
-      this.setPresenceSomebodyInSphere()
-    }
+    if (this.rule.type === "BEHAVIOUR") {
+      if (this.rule.data.presence.type === "IGNORE") {
+        this.setPresenceSomebodyInSphere()
+      }
 
       this.rule.data.presence.type = "SOMEBODY";
     }
@@ -214,7 +223,8 @@ export class BehaviourSupport {
     }
     return this;
   }
-  setPresenceDelay(delay:number){
+
+  setPresenceDelay(delay: number) {
     if (this.rule.type === "BEHAVIOUR" && this.rule.data.presence.type !== "IGNORE") {
       this.rule.data.presence.delay = delay;
     }
@@ -234,19 +244,21 @@ export class BehaviourSupport {
     if (this.rule.type === "BEHAVIOUR") {
       if (this.rule.data.presence.type === "IGNORE") {
         this.setPresenceSomebodyInSphere()
-      } else {
+      }
+      else {
         this.rule.data.presence.data.type = "SPHERE";
       }
     }
     return this;
   }
 
-  setPresenceInLocations(locationIds: number[]) {
+  setPresenceInLocations(locationIds: number[]): BehaviourSupport {
 
     if (this.rule.type === "BEHAVIOUR") {
       if (this.rule.data.presence.type === "IGNORE") {
         this.setPresenceSomebodyInLocations(locationIds);
-      } else {
+      }
+      else {
         this.rule.data.presence.data = {type: "LOCATION", locationIds: locationIds}
       }
     }
@@ -267,7 +279,7 @@ export class BehaviourSupport {
 
   setPresenceNobodyInLocations(locationIds: number[]): BehaviourSupport {
 
-    if(this.rule.type === "BEHAVIOUR") {
+    if (this.rule.type === "BEHAVIOUR") {
       this.rule.data.presence = {
         type: "NOBODY",
         data: {type: "LOCATION", locationIds: locationIds},
@@ -307,7 +319,7 @@ export class BehaviourSupport {
     return this;
   }
 
-  setActiveDays(activeDays: ActiveDays) {
+  setActiveDays(activeDays: ActiveDays): BehaviourSupport {
     this.rule.activeDays = activeDays;
     return this;
   }
@@ -326,7 +338,8 @@ export class BehaviourSupport {
   isUsingPresence(): boolean {
     if (this.rule.type === "BEHAVIOUR") {
       return this.rule.data.presence.type !== "IGNORE";
-    } else {
+    }
+    else {
       return false;
     }
   }
@@ -438,7 +451,8 @@ export class BehaviourSupport {
     if (currentTimeInMinutes < 4 * 60) {
       //Checks if yesterday should be active.
       return this.rule.activeDays[BehaviourUtil.getWeekday(timestamp, -1)]
-    } else {//Else means 04:00 -> 23:59.
+    }
+    else {//Else means 04:00 -> 23:59.
       //Is Today active. Thus 04:00 -> 23:59
       return this.rule.activeDays[BehaviourUtil.getWeekday(timestamp)]
     }
@@ -456,7 +470,8 @@ export class BehaviourSupport {
         default:
           return false;
       }
-    } else {
+    }
+    else {
       return false;
     }
   }

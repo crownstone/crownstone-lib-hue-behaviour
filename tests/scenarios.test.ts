@@ -30,10 +30,10 @@ describe("Scenarios", () =>{
     const api = new mockApi();
     const light = new mockLight(api);
     const behaviourAggregator = light.behaviourAggregator;
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperBehaviour>switchOn30Range,SPHERE_LOCATION)
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperBehaviour>switchOn100Range,SPHERE_LOCATION)
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperTwilight>twilight60BetweenRange,SPHERE_LOCATION)
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperTwilight>twilight80BetweenSunriseSunset,SPHERE_LOCATION)
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn30Range,SPHERE_LOCATION)
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn100Range,SPHERE_LOCATION)
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperTwilight>twilight60BetweenRange,SPHERE_LOCATION)
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperTwilight>twilight80BetweenSunriseSunset,SPHERE_LOCATION)
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 13, 0).toString()));
 
     await behaviourAggregator._loop();
@@ -65,8 +65,8 @@ describe("Scenarios", () =>{
     const api = new mockApi();
     const light = new mockLight(api);
     const behaviourAggregator = light.behaviourAggregator;
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperBehaviour>switchOn70Range1310sunset,SPHERE_LOCATION)
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperTwilight>twilight80BetweenSunriseSunset,SPHERE_LOCATION)
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn70Range1310sunset,SPHERE_LOCATION)
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperTwilight>twilight80BetweenSunriseSunset,SPHERE_LOCATION)
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 13, 0).toString()));
     await behaviourAggregator._loop();
     api.user.turnLightOff();
@@ -96,10 +96,10 @@ describe("Scenarios", () =>{
     const api = new mockApi();
     const light = new mockLight(api);
     const behaviourAggregator = light.behaviourAggregator;
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperTwilight>twilight80BetweenSunriseSunset,SPHERE_LOCATION)
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperBehaviour>switchOn70Range1310sunset,SPHERE_LOCATION)
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperBehaviour>switchOn30Range,SPHERE_LOCATION)
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperBehaviour>switchOn50Range23500500,SPHERE_LOCATION)
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperTwilight>twilight80BetweenSunriseSunset,SPHERE_LOCATION)
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn70Range1310sunset,SPHERE_LOCATION)
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn30Range,SPHERE_LOCATION)
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn50Range23500500,SPHERE_LOCATION)
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 13, 0).toString()));
     await behaviourAggregator._loop();
     api.user.turnLightOff();
@@ -143,8 +143,8 @@ describe("Scenarios", () =>{
     const api = new mockApi();
     const light = new mockLight(api);
     const behaviourAggregator = light.behaviourAggregator;
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperTwilight>twilight70Range12001500,SPHERE_LOCATION);
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperBehaviour>switchOn80Range13001500,SPHERE_LOCATION);
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperTwilight>twilight70Range12001500,SPHERE_LOCATION);
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn80Range13001500,SPHERE_LOCATION);
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 13, 0).toString()));
     await behaviourAggregator._loop();
     //End setup
@@ -166,8 +166,8 @@ describe("Scenarios", () =>{
     const api = new mockApi();
     const light = new mockLight(api);
     const behaviourAggregator = light.behaviourAggregator;
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperTwilight>twilight70Range12001500,SPHERE_LOCATION);
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperBehaviour>switchOn80Range13001500,SPHERE_LOCATION);
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperTwilight>twilight70Range12001500,SPHERE_LOCATION);
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn80Range13001500,SPHERE_LOCATION);
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 12, 0).toString()));
     await behaviourAggregator._loop();
     //End setup
@@ -192,8 +192,8 @@ describe("Scenarios", () =>{
     const api = new mockApi();
     const light = new mockLight(api);
     const behaviourAggregator = light.behaviourAggregator;
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperTwilight>twilight70Range12001500,SPHERE_LOCATION);
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperBehaviour>switchOn100Range,SPHERE_LOCATION);
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperTwilight>twilight70Range12001500,SPHERE_LOCATION);
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn100Range,SPHERE_LOCATION);
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 14, 0).toString()));
     await behaviourAggregator._loop();
     //End setup
@@ -218,7 +218,7 @@ describe("Scenarios", () =>{
     const api = new mockApi();
     const light = new mockLight(api);
     const behaviourAggregator = light.behaviourAggregator;
-    behaviourAggregator.addBehaviour(<HueBehaviourWrapperBehaviour>switchOn80Range13001500,SPHERE_LOCATION);
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn80Range13001500,SPHERE_LOCATION);
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 14, 0).toString()));
     await behaviourAggregator._loop();
     //End setup

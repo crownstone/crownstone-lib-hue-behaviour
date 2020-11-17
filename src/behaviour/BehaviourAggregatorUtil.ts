@@ -5,15 +5,15 @@ import {Twilight} from "./behaviour/Twilight";
 
 interface TimeCompareResult {
   result: "BOTH" | "SINGLE";
-  Behaviour?: SwitchBehaviour
+  behaviour?: SwitchBehaviour
 }
+
 export const SWITCH_STATE_OVERRIDE = "SWITCH_STATE_OVERRIDE";
 export const DIM_STATE_OVERRIDE = "DIM_STATE_OVERRIDE";
 export const NO_OVERRIDE = "NO_OVERRIDE";
 export const AGGREGATOR_POLLING_RATE = 500;
 
 export const BehaviourAggregatorUtil = {
-
 
 
   /** Loops through a list of active behaviours, comparing them with each other to find the one with the latest starting time.
@@ -28,7 +28,8 @@ export const BehaviourAggregatorUtil = {
       const result = this.compareStartingTime(filteredBehaviour, behaviours[i]);
       if (result.result === "BOTH") {
         filteredBehaviour = this.compareByDimPercentage(filteredBehaviour, behaviours[i]);
-      } else {
+      }
+      else {
         filteredBehaviour = result.behaviour;
       }
     }
@@ -47,7 +48,7 @@ export const BehaviourAggregatorUtil = {
     const behaviourSupportA = new BehaviourSupport(behaviourA.behaviour);
     const behaviourSupportB = new BehaviourSupport(behaviourB.behaviour);
 
-    if (typeof(behaviourB) === "undefined") {
+    if (behaviourB === undefined) {
       return <TimeCompareResult>{result: "SINGLE", behaviour: behaviourA};
     }
     if (!behaviourSupportA.isActiveAllDay() && behaviourSupportB.isActiveAllDay()) {
@@ -56,15 +57,15 @@ export const BehaviourAggregatorUtil = {
     if (behaviourSupportA.isActiveAllDay() && !behaviourSupportB.isActiveAllDay()) {
       return <TimeCompareResult>{result: "SINGLE", behaviour: behaviourB};
     }
-    if (behaviourSupportA.isActiveAllDay() && behaviourSupportB.isActiveAllDay()){
+    if (behaviourSupportA.isActiveAllDay() && behaviourSupportB.isActiveAllDay()) {
       return <TimeCompareResult>{result: "BOTH"}
     }
     const timeA = behaviourSupportA.getSwitchingTime("from", behaviourA.timestamp, behaviourA.sphereLocation);
     const timeB = behaviourSupportB.getSwitchingTime("from", behaviourB.timestamp, behaviourB.sphereLocation);
     if (timeA === timeB) {
-      return <TimeCompareResult>{result: "BOTH"}
+      return {result: "BOTH"}
     }
-    return (timeA > timeB)? <TimeCompareResult>{result: "SINGLE", behaviour: behaviourA}: <TimeCompareResult>{result: "SINGLE", behaviour: behaviourB};
+    return (timeA > timeB) ? {result: "SINGLE", behaviour: behaviourA} : {result: "SINGLE", behaviour: behaviourB};
   },
 
   /** Compares given behaviours for their dim percentage.
@@ -74,7 +75,7 @@ export const BehaviourAggregatorUtil = {
    *
    * @returns Behaviour with lowest percentage.
    */
-  compareByDimPercentage(behaviourA: SwitchBehaviour|Twilight, behaviourB: SwitchBehaviour|Twilight): SwitchBehaviour|Twilight {
+  compareByDimPercentage(behaviourA: SwitchBehaviour | Twilight, behaviourB: SwitchBehaviour | Twilight): SwitchBehaviour | Twilight {
     return (behaviourA.behaviour.data.action.data <= behaviourB.behaviour.data.action.data) ? behaviourA : behaviourB;
   },
 
@@ -90,11 +91,14 @@ export const BehaviourAggregatorUtil = {
       const behaviourSupport = new BehaviourSupport(behaviour.behaviour);
       if (behaviourSupport.isUsingSingleRoomPresence()) {
         prioritizedList[1].push(behaviour);
-      } else if (behaviourSupport.isUsingMultiRoomPresence()) {
+      }
+      else if (behaviourSupport.isUsingMultiRoomPresence()) {
         prioritizedList[2].push(behaviour);
-      } else if (behaviourSupport.isUsingSpherePresence()) {
+      }
+      else if (behaviourSupport.isUsingSpherePresence()) {
         prioritizedList[3].push(behaviour);
-      } else {
+      }
+      else {
         prioritizedList[4].push(behaviour);
       }
     }
@@ -111,7 +115,8 @@ export const BehaviourAggregatorUtil = {
       if (prioritizedList[i].length > 0) {
         if (prioritizedList[i].length === 1) {
           return prioritizedList[i][0];
-        } else if (prioritizedList[i].length > 1) {
+        }
+        else if (prioritizedList[i].length > 1) {
           return <SwitchBehaviour>this.filterBehaviours(prioritizedList[i]);
         }
       }
@@ -127,7 +132,8 @@ export const BehaviourAggregatorUtil = {
   getPrioritizedBehaviour(behaviours: SwitchBehaviour[]): SwitchBehaviour {
     if (behaviours === []) {
       return undefined;
-    } else {
+    }
+    else {
       const prioritizedList = this.prioritizeBehaviours(behaviours);
       return this.getBehaviourWithHighestPriority(prioritizedList);
     }
@@ -141,7 +147,8 @@ export const BehaviourAggregatorUtil = {
   getPrioritizedTwilight(twilights: Twilight[]): Twilight {
     if (twilights === []) {
       return undefined;
-    } else {
+    }
+    else {
       return this.filterBehaviours(twilights);
     }
   }

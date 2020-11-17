@@ -10,7 +10,7 @@ import {TwilightPrioritizer} from "../src/behaviour/TwilightPrioritizer";
 function aggregatorCreator(behaviours):TwilightPrioritizer{
   const behaviourAggregator = new TwilightPrioritizer();
   for(const behaviour of behaviours){
-    behaviourAggregator.addBehaviour({...behaviour},SPHERE_LOCATION);
+    behaviourAggregator.setBehaviour({...behaviour},SPHERE_LOCATION);
   }
   return behaviourAggregator;
 }
@@ -33,7 +33,7 @@ describe("Function checks", () =>{
     const behaviourAggregator = aggregatorCreator([twilightDim50AllDay])
     let updatedBehaviour = {...twilightDim50AllDay};
     updatedBehaviour.data.action.data = 100;
-    behaviourAggregator.updateBehaviour(updatedBehaviour);
+    behaviourAggregator.setBehaviour(<HueBehaviourWrapperTwilight>updatedBehaviour,SPHERE_LOCATION);
     expect(behaviourAggregator.behaviours.length).toBe(1);
     return expect(behaviourAggregator.behaviours[0].behaviour.data.action.data).toBe(100);
   })

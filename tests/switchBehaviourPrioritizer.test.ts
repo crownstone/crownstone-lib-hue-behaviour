@@ -38,7 +38,7 @@ describe("Function checks", () => {
   test("Add behaviour", () => {
     const behaviourAggregator = new SwitchBehaviourPrioritizer();
     const behaviourSupport = new BehaviourSupport(switchOn10AllDay)
-    behaviourAggregator.addBehaviour(behaviourSupport.rule, SPHERE_LOCATION);
+    behaviourAggregator.setBehaviour(behaviourSupport.rule, SPHERE_LOCATION);
     return expect(behaviourAggregator.behaviours[0].behaviour.cloudId).toBe(switchOn10AllDay.cloudId);
   })
 
@@ -50,9 +50,9 @@ describe("Function checks", () => {
 
   test("Update behaviour", () => {
     const behaviourAggregator = aggregatorCreator([switchOn10AllDay])
-    let updatedBehaviour = <HueBehaviourWrapper>{...switchOn10AllDay};
+    let updatedBehaviour = <HueBehaviourWrapperBehaviour>{...switchOn10AllDay};
     updatedBehaviour.data.action.data = 100;
-    behaviourAggregator.updateBehaviour(updatedBehaviour);
+    behaviourAggregator.setBehaviour(updatedBehaviour,SPHERE_LOCATION);
     expect(behaviourAggregator.behaviours.length).toBe(1);
     return expect(behaviourAggregator.behaviours[0].behaviour.data.action.data).toBe(100);
   })
@@ -76,7 +76,7 @@ describe("Function checks", () => {
 function aggregatorCreator(behaviours): SwitchBehaviourPrioritizer {
   const behaviourAggregator = new SwitchBehaviourPrioritizer();
   for (const behaviour of behaviours) {
-    behaviourAggregator.addBehaviour({...behaviour}, SPHERE_LOCATION);
+    behaviourAggregator.setBehaviour({...behaviour}, SPHERE_LOCATION);
   }
   return behaviourAggregator;
 }

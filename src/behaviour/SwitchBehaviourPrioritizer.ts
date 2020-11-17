@@ -7,15 +7,17 @@ export class SwitchBehaviourPrioritizer extends PrioritizerBase {
   behaviours: SwitchBehaviour[] = [];
   prioritizedBehaviour: SwitchBehaviour = undefined;
 
-  cleanup(): void {
-    for (const behaviour of this.behaviours) {
-      behaviour.cleanup();
+
+
+  setBehaviour(behaviour: HueBehaviourWrapperBehaviour, sphereLocation: SphereLocation): number {
+    for (let i = 0; i < this.behaviours.length; i++) {
+      if (this.behaviours[i].behaviour.cloudId === behaviour.cloudId) {
+        this.behaviours[i].behaviour = behaviour;
+        this.behaviours[i].presenceLocations = []; //Reset in case Presence rules has changed.
+        return i;
+      }
     }
-  }
-
-
-  addBehaviour(behaviour: HueBehaviourWrapperBehaviour, sphereLocation: SphereLocation): number {
-   return this.behaviours.push(new SwitchBehaviour(behaviour, sphereLocation));
+    return this.behaviours.push(new SwitchBehaviour(behaviour, sphereLocation));
   }
 
   removeBehaviour(cloudId: string): void {
@@ -28,7 +30,7 @@ export class SwitchBehaviourPrioritizer extends PrioritizerBase {
     }
   }
 
-  _prioritizeBehaviour() {
+  _prioritizeBehaviour():void {
 
     if (this.behaviours === []) {
       this.prioritizedBehaviour = undefined;
@@ -43,7 +45,7 @@ export class SwitchBehaviourPrioritizer extends PrioritizerBase {
       }
     });
     this.prioritizedBehaviour = BehaviourAggregatorUtil.getPrioritizedBehaviour(activeBehaviours);
-    this.composedState = (typeof(this.prioritizedBehaviour) !== "undefined") ? this.prioritizedBehaviour.getComposedState() : {on: false};
+    this.composedState = (this.prioritizedBehaviour) ? this.prioritizedBehaviour.getComposedState() : {on: false};
   }
 }
 

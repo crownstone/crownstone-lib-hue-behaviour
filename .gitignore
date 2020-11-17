@@ -118,3 +118,6 @@ dist
 
 # IDEA directories
 .idea/
+
+#Integration test
+/tests/integration/Integration.test.ts

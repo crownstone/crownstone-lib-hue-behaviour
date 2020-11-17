@@ -1,10 +1,9 @@
-
 interface DiscoverResult {
   id: string,
   internalipaddress: string
 }
 
-interface HueStateBase{
+interface HueStateBase {
   on?: boolean,
   bri?: number,
   hue?: number,
@@ -12,11 +11,12 @@ interface HueStateBase{
   xy?: [number, number],
   ct?: number,
 }
-interface HueLightState extends HueStateBase{
+
+interface HueLightState extends HueStateBase {
   on: boolean
 }
 
-interface HueFullState extends HueLightState{
+interface HueFullState extends HueLightState {
   effect?: string,
   alert?: string,
   colormode?: string,
@@ -24,7 +24,7 @@ interface HueFullState extends HueLightState{
   reachable: boolean
 }
 
-interface StateUpdate extends HueStateBase{
+interface StateUpdate extends HueStateBase {
   effect?: string,
   alert?: string,
   bri_inc?: number;
@@ -32,19 +32,9 @@ interface StateUpdate extends HueStateBase{
   sat_inc?: number;
   ct_inc?: number;
   xy_inc?: [number, number];
-  transitiontime?:number
+  transitiontime?: number
 }
 
-
-interface BridgeFormat {
-  name: string;
-  username: string;
-  clientKey: string;
-  macAddress: string;
-  ipAddress: string;
-  bridgeId: string;
-  lights?: object;
-}
 
 interface PresenceProfileLocation {
   type: "LOCATION"
@@ -61,7 +51,7 @@ type PresenceProfile = PresenceProfileLocation | PresenceProfileSphere
 
 type PresenceEventType = "ENTER" | "LEAVE"
 
-interface PresenceEvent{
+interface PresenceEvent {
   type: PresenceEventType
   data: PresenceProfile
 }
@@ -70,7 +60,8 @@ interface SphereLocation {
   latitude: number,
   longitude: number
 }
-interface PrioritizedList{
+
+interface PrioritizedList {
   1: SwitchBehaviourInterface[];
   2: SwitchBehaviourInterface[];
   3: SwitchBehaviourInterface[];
@@ -79,21 +70,73 @@ interface PrioritizedList{
 
 type EventUnsubscriber = () => void
 
+interface BridgeInfo {
+  name: string;
+  username: string;
+  clientKey: string;
+  macAddress: string;
+  ipAddress: string;
+  bridgeId: string;
+  lights: BridgeLightInfo;
+}
+
+interface BridgeLightInfo {
+  uniqueId: string,
+  id: number,
+  name: string;
+}
+
 interface lightInfo {
   name: string
   uniqueId: string,
   state: HueFullState,
   bridgeId: string,
   id: number,
-  supportedStates: {  },
+  supportedStates: {},
   capabilities: [],
   lastUpdate: number
 }
 
-interface failedConnection{
-  hadConnectionFailure:true;
+interface FailedConnection {
+  hadConnectionFailure: true;
 }
 
-interface BridgeInfo extends BridgeFormat{
-  lights: [];
+interface BridgeInitialization {
+  name?: string,
+  username?: string,
+  clientKey?: string,
+  macAddress?: string,
+  ipAddress?: string,
+  bridgeId?: string
+}
+
+interface LightInitialization {
+  name: string,
+  uniqueId: string,
+  state: HueFullState,
+  id: number,
+  bridgeId: string,
+  capabilities: object,
+  supportedStates: string[],
+  api: any
+}
+
+
+interface BridgeInitFormat {
+  name: string;
+  ipAddress: string;
+  macAddress: string;
+  username: string;
+  bridgeId: string;
+  clientKey: string;
+  lights: LightInitFormat[];
+}
+
+interface LightConfig {
+  uniqueId: string;
+  id: number;
+}
+
+interface LightInitFormat extends LightConfig {
+  behaviours: HueBehaviourWrapper[];
 }

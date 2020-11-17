@@ -1,6 +1,3 @@
-
-
-
 import {Twilight} from "./behaviour/Twilight";
 import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
 
@@ -11,24 +8,14 @@ export class PrioritizerBase {
   timestamp = 0;
   composedState: HueLightState;
 
-
-  cleanup(): void  {
-  }
-
-
-  addBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): void {
-  }
-
-  removeBehaviour(cloudId: string): void {
-  }
-
-  updateBehaviour(behaviour: HueBehaviourWrapper): void {
-    for (let i = 0; i < this.behaviours.length; i++) {
-      if (this.behaviours[i].behaviour.cloudId === behaviour.cloudId) {
-        this.behaviours[i].behaviour = behaviour;
-        break;
-      }
+  cleanup(): void {
+    for (const behaviour of this.behaviours) {
+      behaviour.cleanup();
     }
+  }
+
+  setBehaviour(behaviour: HueBehaviourWrapper,sphereLocation): number {
+    throw("setBehaviour has to be overloaded!")
   }
 
   tick(timestamp: number): void {
@@ -44,6 +31,7 @@ export class PrioritizerBase {
   }
 
   _prioritizeBehaviour(): void {
+    throw "_prioritizeBehaviour must be overloaded!";
   }
 
 

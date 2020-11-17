@@ -1,31 +1,34 @@
-
 import {BehaviourUtil} from "./BehaviourUtil";
 import {eventBus} from "../../util/EventBus";
 import {ON_SPHERE_CHANGE} from "../../constants/EventConstants";
 
 
-export abstract class BehaviourBase{
+export abstract class BehaviourBase {
   behaviour: HueBehaviourWrapper;
   isActive: boolean;
   timestamp: number | null = null;
   sphereLocation: SphereLocation
-  unsubscribeSphereChange: EventUnsubscriber;
+  unsubscribeSphereChangeEvent: EventUnsubscriber;
 
   protected constructor(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation) {
     this.behaviour = behaviour;
     this.sphereLocation = sphereLocation;
-    this.unsubscribeSphereChange = eventBus.subscribe(ON_SPHERE_CHANGE, this.setSphereLocation.bind(this));
-
+    this.unsubscribeSphereChangeEvent = eventBus.subscribe(ON_SPHERE_CHANGE, this.setSphereLocation.bind(this));
   }
 
-  setSphereLocation(sphereLocation: SphereLocation) {
+  cleanup():void {
+    this.unsubscribeSphereChangeEvent();
+  }
+
+  setSphereLocation(sphereLocation: SphereLocation):void {
     this.sphereLocation = sphereLocation;
   }
 
-  tick(timestamp: number) {
+  tick(timestamp: number):void {
     this.timestamp = timestamp;
     this._behaviourActiveCheck();
   }
+
   /**
    * Retrieves the SwitchBehaviour's composed state.
    *
@@ -46,6 +49,6 @@ export abstract class BehaviourBase{
    *
    */
   _behaviourActiveCheck(): void {
-
+    throw "_behaviourActiveCheck has to be overloaded!"
   }
 }

@@ -1,6 +1,7 @@
 import {Bridge} from "./Bridge";
 import {v3} from "node-hue-api";
 import {DISCOVERY_URL} from "../constants/HueConstants";
+
 const fetch = require('node-fetch');
 const discovery = v3.discovery;
 
@@ -17,24 +18,20 @@ export const Discovery = {
       const discoveryResults = await discovery.nupnpSearch();
       if (discoveryResults.length === 0) {
         return discoveryResults;
-      } else {
+      }
+      else {
         let bridges: Bridge[] = [];
         discoveryResults.forEach(item => {
-          bridges.push(new Bridge(
-            item.name,
-            "",
-            "",
-            "",
-            item.ipaddress,
-            ""
-          ))
+          bridges.push(new Bridge({name: item.name, ipAddress: item.ipaddress}));
         })
         return bridges;
       }
-    } catch (err) {
+    }
+    catch (err) {
       if (err.message.includes("ETIMEDOUT")) {
         return [];
-      } else {
+      }
+      else {
         throw err;
       }
     }
@@ -65,7 +62,8 @@ export const Discovery = {
     let possibleBridges = await Discovery.getBridgesFromDiscoveryUrl();
     if (possibleBridges.length === 0) {
       return {id: bridgeId, internalipaddress: "-1"}
-    } else {
+    }
+    else {
       let result: DiscoverResult = {id: "", internalipaddress: ""};
       for (const item of possibleBridges) {
         if (bridgeId.toLowerCase() === item.id.toLowerCase()) {
@@ -75,7 +73,8 @@ export const Discovery = {
       }
       if (result.id === "") {
         return {id: bridgeId, internalipaddress: "-1"}
-      } else {
+      }
+      else {
         return result;
       }
     }

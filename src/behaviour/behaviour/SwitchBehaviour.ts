@@ -5,18 +5,19 @@ import {ON_PRESENCE_CHANGE} from "../../constants/EventConstants";
 import {BehaviourBase} from "./BehaviourBase";
 
 
-export class SwitchBehaviour extends BehaviourBase implements SwitchBehaviourInterface{
+export class SwitchBehaviour extends BehaviourBase implements SwitchBehaviourInterface {
   presenceLocations: PresenceProfile[] = []; // Empty when no one is present for this behaviour.
   lastPresenceUpdate: number = 0;
-  unsubscribePresenceChange: EventUnsubscriber
+  unsubscribePresenceChangeEvent: EventUnsubscriber
 
   constructor(behaviour: HueBehaviourWrapperBehaviour, sphereLocation: SphereLocation) {
-    super(behaviour,sphereLocation);
-    this.unsubscribePresenceChange = eventBus.subscribe(ON_PRESENCE_CHANGE, this.onPresenceDetect.bind(this));
+    super(behaviour, sphereLocation);
+    this.unsubscribePresenceChangeEvent = eventBus.subscribe(ON_PRESENCE_CHANGE, this.onPresenceDetect.bind(this));
   }
 
-  cleanup() {
-    this.unsubscribePresenceChange();
+  cleanup():void {
+    this.unsubscribePresenceChangeEvent();
+    this.unsubscribeSphereChangeEvent();
   }
 
   /**
@@ -29,7 +30,8 @@ export class SwitchBehaviour extends BehaviourBase implements SwitchBehaviourInt
     if (this.behaviour.type === "BEHAVIOUR") {
       if (this.behaviour.data.presence.type !== "IGNORE") {
         this._handlePresenceEvent(presenceEvent, this.behaviour.data.presence)
-      } else if ("endCondition" in this.behaviour.data && this.behaviour.data.endCondition.presence.type === "SOMEBODY") {
+      }
+      else if ("endCondition" in this.behaviour.data && this.behaviour.data.endCondition.presence.type === "SOMEBODY") {
         this._handlePresenceEvent(presenceEvent, this.behaviour.data.endCondition.presence)
       }
     }
@@ -41,10 +43,11 @@ export class SwitchBehaviour extends BehaviourBase implements SwitchBehaviourInt
    * @param presenceEvent - PresenceEvent object of type ENTER or LEAVE
    * @param presenceObject - Presence object, can be the one of SwitchBehaviour.presence or SwitchBehaviour.endCondition.
    */
-  _handlePresenceEvent(presenceEvent: PresenceEvent, presenceObject): void {
+  _handlePresenceEvent(presenceEvent: PresenceEvent, presenceObject:Presence): void {
     if (presenceEvent.type === "ENTER") {
       this._onPresenceEnterEvent(presenceEvent, presenceObject);
-    } else if (presenceEvent.type === "LEAVE") {
+    }
+    else if (presenceEvent.type === "LEAVE") {
       this._onPresenceLeaveEvent(presenceEvent);
     }
   }
@@ -64,7 +67,8 @@ export class SwitchBehaviour extends BehaviourBase implements SwitchBehaviourInt
         this.presenceLocations.push(presenceEvent.data);
         this.lastPresenceUpdate = this.timestamp;
       }
-    } else if (presenceEvent.data.type === "LOCATION") {
+    }
+    else if (presenceEvent.data.type === "LOCATION") {
       if ("data" in presenceObject && presenceObject.data.type === "LOCATION") {
         if (presenceObject.data.locationIds.includes(presenceEvent.data.locationId)) {
           this.presenceLocations.push(presenceEvent.data);
@@ -113,7 +117,8 @@ export class SwitchBehaviour extends BehaviourBase implements SwitchBehaviourInt
           this.isActive = true;
           return;
         }
-      } else if (behaviourObj.hasEndCondition() && this.isActive) {
+      }
+      else if (behaviourObj.hasEndCondition() && this.isActive) {
         if (BehaviourUtil.isSomeonePresent(this.presenceLocations)
           || msSinceLastUpdate < this.behaviour.data.endCondition.presence.delay * 1000) {
           this.isActive = true;

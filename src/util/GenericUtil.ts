@@ -1,7 +1,7 @@
 import {CrownstoneHueError} from "./CrownstoneHueError";
 
 export const GenericUtil = {
-  deepCopy(obj: any) {
+  deepCopy(obj: any): any {
     let clonedObj: any
     if (obj instanceof Array) {
       clonedObj = []
@@ -19,19 +19,20 @@ export const GenericUtil = {
       return clonedObj;
     }
   },
-  isConnectionError(err): boolean {
-    if ((typeof (err.errorCode) !== "undefined" && err.errorCode === 404)
-      ||((typeof(err.code) !== "undefined") && (err.code == "ENOTFOUND"
-      || err.code == "ECONNREFUSED" || err.code == "ETIMEDOUT" || err.code == "ECONNRESET"))
-      || err.message.includes("ECONNRESET") || err.message.includes("ECONNREFUSED")
-      || err.message.includes("ETIMEDOUT") || err.message.includes("ENOTFOUND")
-      || err.message.includes("EHOSTUNREACH")) {
+  isConnectionError(err: any): boolean {
+    if ((err.errorCode !== undefined && err.errorCode === 404)
+      || ((err.code !== undefined) && (err.code == "ENOTFOUND"
+        || err.code == "ECONNREFUSED" || err.code == "ETIMEDOUT"
+        || err.code == "ECONNRESET")) || err.message.includes("ECONNRESET")
+      || err.message.includes("ECONNREFUSED") || err.message.includes("ETIMEDOUT")
+      || err.message.includes("ENOTFOUND") || err.message.includes("EHOSTUNREACH")) {
       return true;
-    } else {
+    }
+    else {
       return false;
     }
   },
-  convertHueLibraryToCrownstoneError(err, extra?) {
+  convertHueLibraryToCrownstoneError(err: any, extra?: any): void {
     if (typeof (err.getHueErrorType) === "function") {
       switch (err.getHueErrorType()) {
         case 1:
@@ -39,14 +40,14 @@ export const GenericUtil = {
         case 101:
           throw new CrownstoneHueError(406);
         case -1:
-          this.convertUnspecifiedError(err,extra);
+          this.convertUnspecifiedError(err, extra);
         default:
           throw new CrownstoneHueError(999, err.message);
       }
     }
   },
-  convertUnspecifiedError(err,extra){
-    switch(err.message){
+  convertUnspecifiedError(err: any, extra: any): void {
+    switch (err.message) {
       case `Light ${extra} not found`:
         throw new CrownstoneHueError(422, extra);
       case `Light ${extra[0]} not found`:

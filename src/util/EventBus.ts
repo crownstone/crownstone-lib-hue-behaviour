@@ -1,5 +1,3 @@
-
-
 class IdGenerator {
   currentId: number
 
@@ -7,10 +5,11 @@ class IdGenerator {
     this.currentId = 0;
   }
 
-  getId() {
+  getId():number {
     return this.currentId++;
   }
 }
+
 const idGenerator = new IdGenerator();
 
 export class EventBus {
@@ -56,7 +55,6 @@ export class EventBus {
         if (this._subscriptions[topic].length === 0) {
           delete this._subscriptions[topic];
         }
-
       }
     };
   }
@@ -81,7 +79,7 @@ export class EventBus {
 
   }
 
-  reset() {
+  reset():void {
     this._subscriptions = {};
     this._subscriptionIds = {};
   }

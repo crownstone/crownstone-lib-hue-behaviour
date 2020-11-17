@@ -2,11 +2,12 @@ import {BehaviourSupport} from "./BehaviourSupport";
 import {BehaviourBase} from "./BehaviourBase";
 
 
-export class Twilight extends BehaviourBase{
+export class Twilight extends BehaviourBase {
 
   constructor(behaviour: HueBehaviourWrapperTwilight, sphereLocation: SphereLocation) {
-    super(behaviour,sphereLocation);
+    super(behaviour, sphereLocation);
   }
+
   /**
    * Checks if the behaviour is active according to the defined rules.
    *

@@ -1,4 +1,5 @@
 import {v3} from "node-hue-api";
+
 export const fakeBridgeKey = {clientkey: "FakeKey", username: "FakeUsername"}
 export const fakeBridge = {
   bridgeid: "ABDCFFFEAKE91",
@@ -43,10 +44,13 @@ export const fakeLightsOnBridge = [{
 export const fakeCreateLocal = ((ipaddress) => {
   if (ipaddress === fakeBridge.ipaddress) {
     return {
-      connect: ((ignore) => {return fakeHueApi})
+      connect: ((ignore) => {
+        return fakeHueApi
+      })
     }
-  } else {
-    return {connect: ( () => Promise.reject({code: "ETIMEDOUT"}))}
+  }
+  else {
+    return {connect: (() => Promise.reject({code: "ETIMEDOUT"}))}
   }
 })
 const fakeApiLights = {
@@ -54,9 +58,13 @@ const fakeApiLights = {
     return fakeLightsOnBridge;
   }),
   getLight: ((id) => {
+    if (fakeLightsOnBridge[id] == undefined) {
+      return {message: `Light ${id} not found`}
+    }
     return fakeLightsOnBridge[id]
   }),
-  setLightState: ((id, state) => {fakeLightsOnBridge[id].state = {...state};
+  setLightState: ((id, state) => {
+    fakeLightsOnBridge[id].state = {...state};
     return true;
   }),
   getLightState: ((id) => {
