@@ -9,9 +9,8 @@ Module is still a W.I.P., thus imports aren't correctly specified yet and some p
  - [Bridge](/documentation/Bridge.md)
  - [Light](/documentation/Light.md)
  - [Errors](/documentation/Errors.md)
- - [Event calls](/documentation/EventCalls.md)
- - [Persistence](/documentation/Persistence.md)
- - [LightAggregatorWrapper](/documentation/LightAggregatorWrapper.md)
+ - [Event calls](/documentation/EventCalls.md) 
+ - [LightBehaviourWrapper](/documentation/LightBehaviourWrapper.md)
  - [Behaviour Aggregator](/documentation/BehaviourAggregator.md)
  - [SwitchBehaviour- & Twilight Prioritizer](/documentation/Prioritizer.md)
  - [Behaviours](/documentation/Behaviours.md)
@@ -30,23 +29,19 @@ In the following piece of code we give some broad examples of how the module can
 ```
 ... Init ...
 const crownstoneHue = new CrownstoneHue({latitude: 51.916064, longitude: 4.472683})
-await crownstoneHue.init(); 
-... Adding a bridge ...
-const bridge = await crownstoneHue.addBridge({
+await crownstoneHue.init([{
                   name: "Philips Hue Bridge",  
                   username: "Fx2lvBYflb", 
                   clientKey: "Msvh8y4zOc", 
                   macAddress: "FD:83:......", 
                   ipAddress: "xx.xx.xx.xx",
                   bridgeId: "FD83......", 
-                  lights: {
-                    "AS:FD:52....": 
-                      {name: "Color light" , 
+                  lights: [ 
+                      {uniqueId: "AS:FD:52...." , 
                       id: 4,
                       behaviours: []
-                      },
-                      "GD:F6:51....": 
-                      {name: "Dimmable light" , 
+                      }, 
+                      {uniqueId: "GD:F6:51...." , 
                       id: 2, 
                       behaviours: [{
 				    type: "BEHAVIOUR",
@@ -56,9 +51,38 @@ const bridge = await crownstoneHue.addBridge({
 				    cloudId:"GNt03PZqyOVb7xkJCC5v"
 				    }]
                       }
-                    }
-                  }
-                })              
+		    ]
+		  }
+		])
+
+..or..
+await crownstoneHue.init(); 
+... Adding a bridge ...
+const bridge = await crownstoneHue.addBridge([{
+                  name: "Philips Hue Bridge",  
+                  username: "Fx2lvBYflb", 
+                  clientKey: "Msvh8y4zOc", 
+                  macAddress: "FD:83:......", 
+                  ipAddress: "xx.xx.xx.xx",
+                  bridgeId: "FD83......", 
+                  lights: [ 
+                      {uniqueId: "AS:FD:52...." , 
+                      id: 4,
+                      behaviours: []
+                      }, 
+                      {uniqueId: "GD:F6:51...." , 
+                      id: 2, 
+                      behaviours: [{
+				    type: "BEHAVIOUR",
+				    data:{...},
+				    activeDays: {...},
+				    lightId: "GD:F6:51....",
+				    cloudId:"GNt03PZqyOVb7xkJCC5v"
+				    }]
+                      }
+		    ]
+		  }
+		])              
 ... Some time passes and a new behaviour is made ... 
 await crownstoneHue.addBehaviour({
 				  type: "BEHAVIOUR",
