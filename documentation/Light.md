@@ -13,9 +13,8 @@
    - [Cleanup](#cleanup)
    - [Getters](#getters) 
  - [Errors](/documentation/Errors.md)
- - [Event calls](/documentation/EventCalls.md)
- - [Persistence](/documentation/Persistence.md)
- - [LightAggregatorWrapper](/documentation/LightAggregatorWrapper.md)
+ - [Event calls](/documentation/EventCalls.md) 
+ - [LightBehaviourWrapper](/documentation/LightBehaviourWrapper.md)
  - [Behaviour Aggregator](/documentation/BehaviourAggregator.md)
  - [SwitchBehaviour- & Twilight Prioritizer](/documentation/Prioritizer.md)
  - [Behaviours](/documentation/Behaviours.md)
@@ -27,12 +26,36 @@ The Light object represents a single Philips Hue Light and is dependent on a Bri
 ### Import
 ```import {Light} from {.}```
 ### Constructing
-`const light = new Light(name: string, uniqueId: string, state: HueFullState, id: number, bridgeId: string, capabilities: object, supportedStates: [], api: any)`
+`const light = new Light(data:LightInitialization)`
 
+`LightInitialization` is of type 
+```
+{
+  name: string, 
+  uniqueId: string, 
+  state: HueFullState, 
+  id: number, 
+  bridgeId: string, 
+  capabilities: object, 
+  supportedStates: [], 
+  api: any
+}
+```
 `capabilities` and `supportedStates` is only used for extra information and the light object isn't depended on this.
 
 In the module, this is done by the Bridge. This looks something like this:
-`new Light(result.name, result.uniqueid, result.state, result.id, this.bridgeId, result.capabilities.control, result.getSupportedStates(), this._useApi.bind(this))`
+```
+new Light({
+        name: light.name,
+        uniqueId: light.uniqueid,
+        state: light.state,
+        id: light.id,
+        bridgeId: this.bridgeId,
+        capabilities: light.capabilities.control,
+        supportedStates: light.getSupportedStates(),
+        api: this._useApi.bind(this)
+      })
+```
 ### Initialization
 To initialize a light, call:
 
@@ -50,10 +73,12 @@ This is automatically done every 500ms when the light object is initialized.
 
 It obtains the latest lightstate of the actual Philips Hue Light and when there is a state difference, the new state will be passed with the defined callback. The data passed is of type `HueFullState`.
 
+If the light's state didn't change but its reachability is changed, it will send out an event with topic `onLightReachabilityChange` with a stringified object as `{uniqueId:string,reachable:boolean}`.
+
 ### Setting the callback for a light state change
 To set the callback for when there is a light state change, call: 
 
-`light.setCallback(callback)`
+`light.setStateUpdateCallback(callback)`
 
 In the module a callback to the aggregator is used, passing the new state. 
 

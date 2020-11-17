@@ -6,9 +6,8 @@
  - [Bridge](/documentation/Bridge.md)
  - [Light](/documentation/Light.md)
  - [Errors](/documentation/Errors.md)
- - [Event calls](/documentation/EventCalls.md)
- - [Persistence](/documentation/Persistence.md)
- - **LightAggregatorWrapper**
+ - [Event calls](/documentation/EventCalls.md) 
+ - **LightBehaviourWrapper**
 	 - [Constructing](#constructing)
 	 - [Initialization](#initialization)
 	 - [Cleanup](#cleanup)
@@ -23,20 +22,20 @@ This is just a wrapper used to connect a Behaviour Aggregator with a Light objec
 ### Import
 ```import {Discovery} from {.}```
 ### Constructing
-`new LightAggregatorWrapper(light:Light)`
+`new LightBehaviourWrapper(light:Light)`
 
 On constructing it creates a BehaviourAggregator with a callback for the light's setState function.
 
 ### Initialization
 To initialize the object, call:
 
-`lightAggregatorWrapper.init()`
+`LightBehaviourWrapper.init()`
 
 This initializes the BehaviourAggregator and the Light object and sets the state change callback of the light object.
 
 ### Cleanup
 To cleanup, call:
 
-`lightAggregatorWrapper.cleanup()`
+`LightBehaviourWrapper.cleanup()`
 
 This calls `behaviourAgggregator.cleanup()` and `light.cleanup()`.

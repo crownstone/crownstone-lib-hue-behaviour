@@ -138,6 +138,11 @@ export class CrownstoneHue {
   }
 
   async addBridgeByBridgeId(bridgeId: string): Promise<Bridge> {
+    for (const bridge of this.bridges) {
+      if (bridge.bridgeId === bridgeId) {
+        return;
+      }
+    }
     const discoveryResult = await Discovery.discoverBridgeById(bridgeId);
     if (discoveryResult.internalipaddress !== "-1") {
       const bridge = new Bridge({ipAddress: discoveryResult.internalipaddress, bridgeId: discoveryResult.id});
@@ -151,6 +156,11 @@ export class CrownstoneHue {
   }
 
   async addBridgeByIpAddress(ipAddress: string): Promise<Bridge> {
+    for (const bridge of this.bridges) {
+      if (bridge.ipAddress === ipAddress) {
+        return;
+      }
+    }
     const bridge = new Bridge({ipAddress: ipAddress});
     this.bridges.push(bridge);
     await bridge.init();
@@ -158,8 +168,14 @@ export class CrownstoneHue {
   }
 
   async addBridge(bridgeData: BridgeInitFormat): Promise<Bridge> {
+
     if (bridgeData.bridgeId == undefined && bridgeData.ipAddress == undefined) {
       return; // Can't use bridge.
+    }
+    for (const bridge of this.bridges) {
+      if (bridge.bridgeId === bridgeData.bridgeId) {
+        return;
+      }
     }
     const bridge = new Bridge({
       name: bridgeData.name,
@@ -179,7 +195,7 @@ export class CrownstoneHue {
     for (const data of lightData) {
       try {
         const light = await bridge.configureLight({id: data.id, uniqueId: data.uniqueId});
-        if (light) {
+        if (!("hadConnectionFailure" in light)) {
           const lightBehaviourWrapper = this._createLightBehaviourWrapper(light);
           for (const behaviour of data.behaviours) {
             this._setBehaviour(lightBehaviourWrapper, behaviour);
@@ -195,7 +211,6 @@ export class CrownstoneHue {
       }
     }
   }
-
 
   removeBridge(bridgeId: string): void {
     for (let i = 0; i < this.bridges.length; i++) {
@@ -223,15 +238,22 @@ export class CrownstoneHue {
    * @param bridgeId - The id of the bridge of which the light have to be added to.
    * @param idOnBridge - The id of the light on the bridge.
    */
-  async addLight(bridgeId: string, data: LightConfig): Promise<Light> {
+  async addLight(bridgeId: string, data: LightConfig): Promise<Light | FailedConnection> {
     for (const bridge of this.bridges) {
       if (bridge.bridgeId === bridgeId) {
+        if (bridge.lights[data.uniqueId]) {
+          return
+        }
+        ;
         const light = await bridge.configureLight(data);
-        if (light) {
+        if (!("hadConnectionFailure" in light)) {
           const lightBehaviourWrapper = this._createLightBehaviourWrapper(light);
           lightBehaviourWrapper.init();
+          return light;
         }
-        return light;
+        else {
+          return {hadConnectionFailure: true}
+        }
       }
     }
   };

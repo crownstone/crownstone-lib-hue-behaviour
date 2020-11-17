@@ -124,7 +124,7 @@ export class Bridge {
    *
    * @Returns uninitialized light object. (Call .init())
    */
-  async configureLight(data: LightConfig): Promise<Light> {
+  async configureLight(data: LightConfig): Promise<Light|FailedConnection> {
     let lightInfo
     try {
       lightInfo = await this._useApi("getLightById", data.id);
@@ -138,7 +138,11 @@ export class Bridge {
       }
     }
     if (lightInfo == undefined || lightInfo.hadConnectionFailure) {
-      return;
+      if(this.reconnecting){
+        return {hadConnectionFailure: true};
+      } else {
+        return await this.configureLight(data);
+      }
     }
     if (data.uniqueId !== lightInfo.uniqueId) {
       return await this.configureLightByUniqueId(data.uniqueId);

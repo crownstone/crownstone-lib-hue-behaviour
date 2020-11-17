@@ -7,8 +7,7 @@
  - [Light](/documentation/Light.md)
  - [Errors](/documentation/Errors.md)
  - **Event calls**
- - [Persistence](/documentation/Persistence.md)
- - [LightAggregatorWrapper](/documentation/LightAggregatorWrapper.md)
+ - [LightBehaviourWrapper](/documentation/LightBehaviourWrapper.md)
  - [Behaviour Aggregator](/documentation/BehaviourAggregator.md)
  - [SwitchBehaviour- & Twilight Prioritizer](/documentation/Prioritizer.md)
  - [Behaviours](/documentation/Behaviours.md)
@@ -55,3 +54,7 @@ data: {
 
 ### ON_DUMB_HOUSE_MODE_SWITCH
 When dumb house mode is set, it emits an event call with the topic ```"onDumbHouseModeSwitch"``` and a data ```boolean```.
+
+
+### ON_LIGHT_REACHABILITY_CHANGE
+When a light's reachability is changed, it emits an event call with the topic ```"onLightReachabilitychange"``` and a data object as ```{uniqueId:string,reachable:boolean}```.

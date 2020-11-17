@@ -37,8 +37,17 @@ The Bridge is an object that represents the Philips Hue Bridge. This object is u
 `import {Bridge} from {.}`
 
 ### Constructing
+```
+const bridge = new Bridge({
+  name?: string,
+  username?: string,
+  clientKey?: string,
+  macAddress?: string,
+  ipAddress?: string,
+  bridgeId?: string
+});
+```
 
-`const bridge = new Bridge("name","username", "clientKey", "macAddress", "ipAddress","bridgeId");`
 Several fields may be left empty on constructing, it will try to gather their information on initialization.  
 Note that either `ip address` or `bridge id` have to be set and if the `username` is empty while initializing, the link button should be pressed on the physical bridge.
 
@@ -62,7 +71,7 @@ On success `bridge.reachable` is set to `true` and it's ready for user creation.
 ##### User creation
 
 After an unauthenticated api session is created, `await this.createNewUser()` is called.
-This attempts to create a user on the physical Philips Hue Bridge with the identifiers set by `APP_NAME` and `DEVICE_NAME` in the HueConstants.ts[ToDo: Link to consts]. If the link button on the physical bridge is not pressed during this, it will throw an error.
+This attempts to create a user on the physical Philips Hue Bridge with the identifiers set by `APP_NAME` and `DEVICE_NAME` in the [HueConstants.ts](/src/constants/HueConstants.ts). If the link button on the physical bridge is not pressed during this, it will throw an error.
 
 On success, a user is created on the Philips Hue Bridge and the bridge will update itself with the new `username` and `clientkey`.
 
@@ -78,19 +87,21 @@ When the username is wrong or denied by the Philips Hue bridge, it will throw an
 
 To configure a light that is connected to the Philips Bridge, call:
 
-`await bridge.configureLightById(id)` 
+`await bridge.configureLight({id:number,uniqueId:string})` 
 
-`Id` is of type `number` and represents the id of the light on the bridge, not the uniqueId.
+`Id` represents the id of the light on the bridge and `uniqueId` represents the light's uniqueId.
 
 On success, it will return an uninitialized Light object.
 
-In case of a wrong id used, it throws an error.
+In case of a wrong id or the uniqueId doesn't match the id used, it attempts to find by uniqueId.
+When light is not found it throws an error. 
+If a connection failure happened and the light didn't got added, it returns a `{hadConnectionFailure: true}` object.
 
 ### Removing a light
 
 To remove the light from the Bridge object, call:
 
-`await bridge.removeLight(uniqueLightId)`
+`bridge.removeLight(uniqueLightId)`
 
 This only removes the light from the object's light list, not from the actual Philips Hue Bridge.
 

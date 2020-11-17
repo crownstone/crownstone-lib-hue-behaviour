@@ -7,7 +7,7 @@
  - [Errors](/documentation/Errors.md)
  - [Event calls](/documentation/EventCalls.md)
  - [Persistence](/documentation/Persistence.md)
- - [LightAggregatorWrapper](/documentation/LightAggregatorWrapper.md)
+ - [LightBehaviourWrapper](/documentation/LightBehaviourWrapper.md)
  - [Behaviour Aggregator](/documentation/BehaviourAggregator.md)
  - **SwitchBehaviour- & Twilight Prioritizer**
    - [Constructing](#constructing)
@@ -31,11 +31,9 @@ Everything is handled by the module itself, though its public functionalities ar
 ### Adding/Updating/Removing behaviours
 To add, update or remove a twilight or behaviour, use one of the following functions:
 
-`addBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): number` - This returns the behaviour's index position in the array.
+`setBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): number` - This returns the behaviour's index position in the array.
 
-`removeBehaviour(cloudId: string): void`
-
-`updateBehaviour(behaviour: HueBehaviourWrapper): void`
+`removeBehaviour(cloudId: string): void` 
 
 ### Prioritizing
 To prioritize the behaviours, call:

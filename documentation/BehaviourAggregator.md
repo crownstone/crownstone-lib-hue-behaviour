@@ -7,9 +7,8 @@
 - [Bridge](/documentation/Bridge.md)
 - [Light](/documentation/Light.md)
 - [Errors](/documentation/Errors.md)
-- [Event calls](/documentation/EventCalls.md)
-- [Persistence](/documentation/Persistence.md)
-- [LightAggregatorWrapper](/documentation/LightAggregatorWrapper.md)
+- [Event calls](/documentation/EventCalls.md) 
+- [LightBehaviourWrapper](/documentation/LightBehaviourWrapper.md)
 - **Behaviour Aggregator**
   - [Constructing](#constructing)
   - [Initialization](#initialization)
@@ -82,9 +81,8 @@ This removes the subscription from the event bus, stops the interval and calls t
 The BehaviourAggregator do not keep track of the behaviours and twilight itself but pass them to their respective prioritizers.
 This is done by using one of the following functions:
 
-`addBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): number` - This returns the behaviour's index position in the array.
-
-`removeBehaviour(cloudId: string): void`
+`setBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): number` - This returns the behaviour's index position in the array.
+ 
 
 `updateBehaviour(behaviour: HueBehaviourWrapper): void`
 

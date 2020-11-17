@@ -7,9 +7,8 @@
 - [Bridge](/documentation/Bridge.md)
 - [Light](/documentation/Light.md)
 - [Errors](/documentation/Errors.md)
-- [Event calls](/documentation/EventCalls.md)
-- [Persistence](/documentation/Persistence.md)
-- [LightAggregatorWrapper](/documentation/LightAggregatorWrapper.md)
+- [Event calls](/documentation/EventCalls.md) 
+- [LightBehaviourWrapper](/documentation/LightBehaviourWrapper.md)
 - [Behaviour Aggregator](/documentation/BehaviourAggregator.md)
 - [SwitchBehaviour- & Twilight Prioritizer](/documentation/Prioritizer.md)
 - **Behaviours**
