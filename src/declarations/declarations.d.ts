@@ -121,16 +121,6 @@ interface LightInitialization {
   api: any
 }
 
-
-interface BridgeInitFormat {
-  name: string;
-  ipAddress: string;
-  macAddress: string;
-  username: string;
-  bridgeId: string;
-  clientKey: string;
-}
-
 interface LightConfig {
   uniqueId: string;
   id: number;

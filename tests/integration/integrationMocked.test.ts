@@ -40,7 +40,7 @@ describe('Integration Test with mocks', () => {
     const behaviourA = new BehaviourSupport().setCloudId("id0").setLightId(fakeLightsOnBridge[0].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()
     const behaviourB = new BehaviourSupport().setCloudId("id1").setLightId(fakeLightsOnBridge[1].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()
     const crownstoneHue = new CrownstoneHue();
-    const bridge = await crownstoneHue.addBridgeByIpAddress((await Discovery.discoverBridges())[0].ipAddress);
+    const bridge = await crownstoneHue.addBridge({ipAddress:(await Discovery.discoverBridges())[0].ipAddress});
     const lights = await bridge.getAllLightsFromBridge();
 
     const light = Object.values(lights)[0]

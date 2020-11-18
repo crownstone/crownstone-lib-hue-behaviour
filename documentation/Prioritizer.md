@@ -31,7 +31,7 @@ Everything is handled by the module itself, though its public functionalities ar
 ### Adding/Updating/Removing behaviours
 To add, update or remove a twilight or behaviour, use one of the following functions:
 
-`setBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): number` - This returns the behaviour's index position in the array.
+`setBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): number` - This updates or creates a new behaviour and returns the behaviour's index position in the array.
 
 `removeBehaviour(cloudId: string): void` 
 

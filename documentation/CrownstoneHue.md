@@ -59,23 +59,18 @@ To add a bridge to the module there are three ways.
 In case you already have certain information about the bridge you can create a bridge with that information, to do this, call:
 
 ```
-await crownstoneHue.addBridge(configFormat:BridgeInitFormat);
+await crownstoneHue.addBridge(configFormat:BridgeInitialization);
 ``` 
 
 The BridgeInitFormat is of format:
 ```
-interface BridgeInitFormat {  
-  name: string;  
-  username: string;  
-  clientKey: string;  
-  macAddress: string;  
-  ipAddress: string;  
-  bridgeId: string;  
-  lights: {   
-	  uniqueId:string;
-	  id: number;  
-	  behaviours: HueBehaviourWrapper[];  
-	}[];  
+interface BridgeInitialization {  
+  name?: string;  
+  username?: string;  
+  clientKey?: string;  
+  macAddress?: string;  
+  ipAddress?: string;  
+  bridgeId?: string;  
 }
 ```
 
@@ -84,41 +79,19 @@ interface BridgeInitFormat {
 Based on the information passed with the format, it will create a bridge.
 If any of the keys are missing or undefined, it will use a null on the creation of the object.
 
-The most important parts of the format are the username, bridgeId and ip address as the bridge object relies on these and will attempt to find them itself if any or a combination of those are missing.
+The most important parts of the format are the username, bridge id and ip address as the bridge object relies on these and will attempt to find them itself if any or a combination of those are missing.
 When there is/are...
  - No username: The bridge's linking procedure will be started and the physical
-   link button has to be pressed or it will throw an error. 
+   link button has to be pressed. If not done, the bridge will throw an error with ``errorCode`` `406`. 
   - No ip address: The bridge's (re)discovery procedure will be started and it tries to find an ip address linked to the bridge id.
-  - No bridge id: The bridge has 1 attempt to find the bridge id with the given ip address, in case of failure it throws an error.
-  - No bridge id and no ip address: The function will return an uninitialized bridge object because the object cannot function without those.
+  - No bridge id: The bridge has 1 attempt to find the bridge id with the given ip address, in case of failure: the bridge throws an `errorCode` `408`.
+  - No bridge id and no ip address, the function will throw `errorCode` `413`, because it cannot initialize without both.
+  - The bridge corresponding the bridge id given is already configured,  the function will throw `errorCode` `410`.
+  - The bridge corresponding the bridge ip address given is already configured,  the function will throw `errorCode` `411`.
 
-On a successful initialization, it then adds the lights and wraps them with their behaviours if they are defined.
-Afterwards, it will return the Bridge object.
+On a successful initialization it returns the Bridge object.
 
-#### By Ip address
-To add a Bridge to the module by Ip address, call:
-```
-await crownstoneHue.addBridgeByIpAddress(ipAddress);
-```
-The given ip address should be of type string and only IPv4 is supported.
-
-After calling the function, it will create a Bridge object with only an IP address defined and initializes it. This will make the bridge object try to connect to the Philips Hue Bridge and attempt to create a user. Note that the link button on the physical bridge has to be pressed to make this work.
-
-On success, it will fill update itself with all the needed information and return the bridge object.
-On failure, it throws an error when the link button isn't pressed or when IP Address is wrong as it cannot discover itself without a bridge Id. 
-
-#### By Bridge Id
-In order to add a Bridge to the module by Bridge Id, call:
-```
-await crownstoneHue.addBridgeByBridgeId(bridgeId);
-``` 
-This will attempt to find the Philips Hue Bridge in the network through a discovery call. 
-Upon a successful discovery call, it will create a bridge object with an IP address and bridge id filled in and initializes it.
-The bridge object then tries to connect to the Philips Hue Bridge and attempts to create a user. Note that the link button on the physical bridge has to be pressed to make this work.
-
-On success, it will fill update itself with all the needed information and return the bridge object.
-On failure, It will throw an error when no Bridge is found in the network or when the link button isn't pressed.
-
+ 
 
 ### Removing a Philips Hue Bridge
 To remove a bridge from the module, call:
@@ -126,7 +99,6 @@ To remove a bridge from the module, call:
 crownstoneHue.removeBridge(bridgeId);
 ``` 
 This will remove the bridge, its light's and the behaviours of those lights from the module.
-
 
 ### Adding/Removing Philips Hue Lights
 #### Adding a light
@@ -152,8 +124,7 @@ In order to remove a light, you call:
 ```
 crownstoneHue.removeLight(lightId);
 ``` 
-The id that is used, is the light's unique id.
-After the light is removed.
+The id that is used, is the light's unique id. 
 
 ### Adding/Updating/Removing Behaviours
 #### Adding/Updating a Behaviour
@@ -164,7 +135,6 @@ crownstoneHue.setBehaviour(behaviour:HueBehaviourWrapper);
 See [HueBehaviourWrapper](/src/declarations/behaviourTypes.d.ts) for the format.
  
 This function will add/update the behaviour based on the ```cloudId``` and ```lightId ``` variable inside the object. 
-
 Returning a true when done or false when there is no light corresponding the behaviour's light.
 
 #### Removing a Behaviour 

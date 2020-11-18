@@ -62,7 +62,7 @@ export class CrownstoneHue {
     const behaviour = GenericUtil.deepCopy(newBehaviour) as HueBehaviourWrapper;
     for (const bridge of this.bridges) {
       const light = bridge.lights[behaviour.lightId];
-      if (light !== undefined) {
+      if (light !== undefined && this.lights[behaviour.lightId] !== undefined) {
         this._setBehaviour(this.lights[light.uniqueId], behaviour);
         return true;
       }
@@ -125,43 +125,16 @@ export class CrownstoneHue {
     }
   }
 
-  async addBridgeByBridgeId(bridgeId: string): Promise<Bridge> {
-    for (const bridge of this.bridges) {
-      if (bridge.bridgeId === bridgeId) {
-        throw new CrownstoneHueError(410, bridgeId)
-      }
-    }
-    const discoveryResult = await Discovery.discoverBridgeById(bridgeId);
-    if (discoveryResult.internalipaddress !== "-1") {
-      const bridge = new Bridge({ipAddress: discoveryResult.internalipaddress, bridgeId: discoveryResult.id});
-      this.bridges.push(bridge);
-      await bridge.init();
-      return bridge;
-    }
-    else {
-      throw new CrownstoneHueError(404, "Bridge with id " + bridgeId + " not found.");
-    }
-  }
-
-  async addBridgeByIpAddress(ipAddress: string): Promise<Bridge> {
-    for (const bridge of this.bridges) {
-      if (bridge.ipAddress === ipAddress) {
-        throw new CrownstoneHueError(411, ipAddress)
-      }
-    }
-    const bridge = new Bridge({ipAddress: ipAddress});
-    this.bridges.push(bridge);
-    await bridge.init();
-    return bridge;
-  }
-
-  async addBridge(bridgeData: BridgeInitFormat): Promise<Bridge> {
+  async addBridge(bridgeData: BridgeInitialization): Promise<Bridge> {
     if (bridgeData.bridgeId == undefined && bridgeData.ipAddress == undefined) {
-      throw new CrownstoneHueError(410, bridgeData.bridgeId)
+      throw new CrownstoneHueError(413, bridgeData.bridgeId)
     }
     for (const bridge of this.bridges) {
       if (bridge.bridgeId === bridgeData.bridgeId) {
-        return;
+        throw new CrownstoneHueError(410, bridgeData.bridgeId)
+      }
+      if (bridge.ipAddress === bridgeData.ipAddress) {
+        throw new CrownstoneHueError(411, bridgeData.bridgeId)
       }
     }
     const bridge = new Bridge({
@@ -172,9 +145,8 @@ export class CrownstoneHue {
       ipAddress: bridgeData.ipAddress,
       bridgeId: bridgeData.bridgeId
     });
-
-    this.bridges.push(bridge);
     await bridge.init();
+    this.bridges.push(bridge);
     return bridge;
   }
 

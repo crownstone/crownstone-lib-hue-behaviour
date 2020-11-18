@@ -7,8 +7,9 @@ export const ERROR_CODES = {
   408: "Bridge has no Bridge Id and thus cannot be rediscovered.",
   409: "The given light already exists.",
   410: "The given bridge already exists.",
-  411: "The given bridge ipaddress already exists.",
+  411: "The given bridge ip address already exists.",
   412: "Something went wrong when trying to configure a light.",
+  413: "Bridge can not be created, neither a ip address nor a bridge id is given.",
   422: "Light is not found on the bridge.",
   888: "Unknown action call to Hue Api.",
   999: "Unknown Error, see description."
