@@ -1,4 +1,4 @@
-import {Light} from "..";
+import {Light} from "../../../crownstone-lib-hue";
 import {BehaviourAggregator} from "../behaviour/BehaviourAggregator";
 
 export class LightBehaviourWrapper {

@@ -1,35 +1,52 @@
-import {mockApi} from "./Api";
-import {BehaviourAggregator} from "../../src/behaviour/BehaviourAggregator";
-
 /** Simulates an Hue Light object, for testing Purposes
  *
  */
-interface StateUpdate{on:boolean, bri:number}
-interface  HueLightState extends StateUpdate{}
+
 export class mockLight {
-  state: HueLightState;
-  behaviourAggregator: BehaviourAggregator
-  api: mockApi;
-  constructor(api) {
-    this.api = api;
-    this.state = api.lights.getLightState();
-    this.behaviourAggregator = new BehaviourAggregator(async (value:StateUpdate)=>{ await this.setState(value)},{...this.state});
+  uniqueId: string;
+  state: HueFullState;
+  id: number;
+  apiState: HueFullState
+  stateUpdateCallback = ((state) => {
+  });
+  intervalId;
+  constructor(uniqueId, id, state) {
+    this.state =  {...state};
+    this.apiState =  {...state};
+    this.id = id;
+    this.uniqueId = uniqueId;
   }
 
-  setState(state){
-    this.api.lights.setState(0,{...state});
+  init(){ this.intervalId = setInterval(async () => await this.renewState(), 500);
+  }
+
+  setState(state) {
     this.state = {...state};
+    this.apiState = {...state};
+  }
+
+  getState(){
+    return {...this.state};
+  }
+
+  setStateUpdateCallback(callback:(state) => {}):void {
+    this.stateUpdateCallback = callback;
   }
 
   async renewState(){
-    let oldState = {} as HueLightState;
-    Object.keys(this.state).forEach((key) => {
-      oldState[key] = this.state[key]
-    })
-    this.state = this.api.lights.getLightState();
+    const oldState = {...this.state};
+    this.state = {...this.apiState};
     if(oldState.on !== this.state.on || oldState.bri !== this.state.bri ){
-      await this.behaviourAggregator.lightStateChanged(<HueFullState>{...this.state});
+      await this.stateUpdateCallback({...this.state});
     }
+  }
+
+  getUniqueId(){
+    return this.uniqueId;
+  }
+
+  cleanup(){
+    clearInterval(this.intervalId);
   }
 
   printInfo(){

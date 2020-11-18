@@ -1,10 +1,10 @@
 
-- There is no method to change the sphere location on CrownstoneHue.
+- There is no method to change the sphere location on CrownstoneHueBehaviour.
 - How am I supposed to use this with a different persistence?
 - What exactly is the purpose of persistence here? On every start of this module, wouldnt I just do a addBridge and addLight?
 
 - When using a database to store hues and lights, I would have a table of Bridge entries, a table of light entries and finally a table of behaviour entries.
-I would query the bridge table to get me the bridge, it's connected lights, and their connected behaviours. I would expect to then have a CrownstoneHue.init(data, sphereLocation) method where I drop the data in.
+I would query the bridge table to get me the bridge, it's connected lights, and their connected behaviours. I would expect to then have a CrownstoneHueBehaviour.init(data, sphereLocation) method where I drop the data in.
 
 There would nearly always be a managing layer on top of your code. It would receive updates from a cloud, update it's database and apply these changes to your code by say removeLight. The link to persitance at that point does not seem required.
 
@@ -75,7 +75,7 @@ tests/integration/integrationMocked.test.ts (7.709 s)
       142 |   updateBehaviour(bridgeId:string, lightId:string, updatedBehaviour:HueBehaviourWrapper): void {
 
       at Persistence.appendBehaviour (src/util/Persistence.ts:139:74)
-      at CrownstoneHue.addBehaviour (src/CrownstoneHue.ts:95:27)
+      at CrownstoneHueBehaviour.addBehaviour (src/CrownstoneHueBehaviour.ts:95:27)
       at Object.<anonymous> (tests/integration/integrationMocked.test.ts:55:25)
 
   ● Integration Test with mocks › Init from config
@@ -91,7 +91,7 @@ tests/integration/integrationMocked.test.ts (7.709 s)
       142 |   updateBehaviour(bridgeId:string, lightId:string, updatedBehaviour:HueBehaviourWrapper): void {
 
       at Persistence.appendBehaviour (src/util/Persistence.ts:139:74)
-      at CrownstoneHue.addBehaviour (src/CrownstoneHue.ts:95:27)
+      at CrownstoneHueBehaviour.addBehaviour (src/CrownstoneHueBehaviour.ts:95:27)
       at Object.<anonymous> (tests/integration/integrationMocked.test.ts:97:25)
 
   ● Integration Test with mocks › Scenario
@@ -107,7 +107,7 @@ tests/integration/integrationMocked.test.ts (7.709 s)
       142 |   updateBehaviour(bridgeId:string, lightId:string, updatedBehaviour:HueBehaviourWrapper): void {
 
       at Persistence.appendBehaviour (src/util/Persistence.ts:139:74)
-      at CrownstoneHue.addBehaviour (src/CrownstoneHue.ts:95:27)
+      at CrownstoneHueBehaviour.addBehaviour (src/CrownstoneHueBehaviour.ts:95:27)
       at Object.<anonymous> (tests/integration/integrationMocked.test.ts:136:25)
 
   ● Integration Test with mocks › Removing and updating
@@ -123,7 +123,7 @@ tests/integration/integrationMocked.test.ts (7.709 s)
       142 |   updateBehaviour(bridgeId:string, lightId:string, updatedBehaviour:HueBehaviourWrapper): void {
 
       at Persistence.appendBehaviour (src/util/Persistence.ts:139:74)
-      at CrownstoneHue.addBehaviour (src/CrownstoneHue.ts:95:27)
+      at CrownstoneHueBehaviour.addBehaviour (src/CrownstoneHueBehaviour.ts:95:27)
       at Object.<anonymous> (tests/integration/integrationMocked.test.ts:229:25)
 
 ```

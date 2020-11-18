@@ -18,19 +18,19 @@ Module is still a W.I.P., thus imports aren't correctly specified yet and some p
 ### Installation
 
 ### Import
-```import {CrownstoneHue} from {.}```
+```import {CrownstoneHueBehaviour} from {.}```
 
 ### Usage
-The CrownstoneHue class is the front of the module, this should be used for every operation needed on the module. (See [CrownstoneHue](/documentation/CrownstoneHue.md) for all it's functions)
+The CrownstoneHueBehaviour class is the front of the module, this should be used for every operation needed on the module. (See [CrownstoneHueBehaviour](/documentation/CrownstoneHue.md) for all it's functions)
 With the only exceptions as of retrieving information of certain Bridges/Lights, this can done by calling their respective get functions.
 
 #### Examples
 In the following piece of code we give some broad examples of how the module can be used.  
 ```
 ... Constructing ...
-const crownstoneHue = new CrownstoneHue({latitude: 51.916064, longitude: 4.472683})  
+const crownstoneHue = new CrownstoneHueBehaviour({latitude: 51.916064, longitude: 4.472683})  
 ..or..
-const crownstoneHue = new CrownstoneHue()  
+const crownstoneHue = new CrownstoneHueBehaviour()  
 
 ..Adding Bridges...
 const bridge = await crownstoneHue.addBridge({

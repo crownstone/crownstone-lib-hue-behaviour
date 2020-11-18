@@ -29,13 +29,13 @@
 The Crownstone Hue class is the front of the module. To use the module, call one of its functions as this will handle all passed data from outside and calls the persistence functions when needed.
 ## Usage 
 ### Import
-```import {CrownstoneHue} from {.}```
+```import {CrownstoneHueBehaviour} from {.}```
 ### Constructing
 
 ``` 
-const crownstoneHue = new CrownstoneHue(sphereLocation:SphereLocation);
+const crownstoneHue = new CrownstoneHueBehaviour(sphereLocation:SphereLocation);
 or
-const crownstoneHue = new CrownstoneHue();
+const crownstoneHue = new CrownstoneHueBehaviour();
 
 ``` 
 A SphereLocation object has the following structure:

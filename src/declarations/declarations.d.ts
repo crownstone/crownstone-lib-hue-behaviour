@@ -1,8 +1,3 @@
-interface DiscoverResult {
-  id: string,
-  internalipaddress: string
-}
-
 interface HueStateBase {
   on?: boolean,
   bri?: number,
@@ -70,62 +65,3 @@ interface PrioritizedList {
 
 type EventUnsubscriber = () => void
 
-interface BridgeInfo {
-  name: string;
-  username: string;
-  clientKey: string;
-  macAddress: string;
-  ipAddress: string;
-  bridgeId: string;
-  lights: BridgeLightInfo;
-}
-
-interface BridgeLightInfo {
-  uniqueId: string,
-  id: number,
-  name: string;
-}
-
-interface lightInfo {
-  name: string
-  uniqueId: string,
-  state: HueFullState,
-  bridgeId: string,
-  id: number,
-  supportedStates: {},
-  capabilities: [],
-  lastUpdate: number
-}
-
-interface FailedConnection {
-  hadConnectionFailure: true;
-}
-
-interface BridgeInitialization {
-  name?: string,
-  username?: string,
-  clientKey?: string,
-  macAddress?: string,
-  ipAddress?: string,
-  bridgeId?: string
-}
-
-interface LightInitialization {
-  name: string,
-  uniqueId: string,
-  state: HueFullState,
-  id: number,
-  bridgeId: string,
-  capabilities: object,
-  supportedStates: string[],
-  api: any
-}
-
-interface LightConfig {
-  uniqueId: string;
-  id: number;
-}
-
-interface LightInitFormat extends LightConfig {
-  bridgeId: string;
-}
