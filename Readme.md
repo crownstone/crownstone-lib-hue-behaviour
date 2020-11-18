@@ -27,63 +27,24 @@ With the only exceptions as of retrieving information of certain Bridges/Lights,
 #### Examples
 In the following piece of code we give some broad examples of how the module can be used.  
 ```
-... Init ...
-const crownstoneHue = new CrownstoneHue({latitude: 51.916064, longitude: 4.472683})
-await crownstoneHue.init([{
-                  name: "Philips Hue Bridge",  
-                  username: "Fx2lvBYflb", 
-                  clientKey: "Msvh8y4zOc", 
-                  macAddress: "FD:83:......", 
-                  ipAddress: "xx.xx.xx.xx",
-                  bridgeId: "FD83......", 
-                  lights: [ 
-                      {uniqueId: "AS:FD:52...." , 
-                      id: 4,
-                      behaviours: []
-                      }, 
-                      {uniqueId: "GD:F6:51...." , 
-                      id: 2, 
-                      behaviours: [{
-				    type: "BEHAVIOUR",
-				    data:{...},
-				    activeDays: {...},
-				    lightId: "GD:F6:51....",
-				    cloudId:"GNt03PZqyOVb7xkJCC5v"
-				    }]
-                      }
-		    ]
-		  }
-		])
-
+... Constructing ...
+const crownstoneHue = new CrownstoneHue({latitude: 51.916064, longitude: 4.472683})  
 ..or..
-await crownstoneHue.init(); 
-... Adding a bridge ...
-const bridge = await crownstoneHue.addBridge([{
+const crownstoneHue = new CrownstoneHue()  
+
+..Adding Bridges...
+const bridge = await crownstoneHue.addBridge({
                   name: "Philips Hue Bridge",  
                   username: "Fx2lvBYflb", 
                   clientKey: "Msvh8y4zOc", 
                   macAddress: "FD:83:......", 
                   ipAddress: "xx.xx.xx.xx",
                   bridgeId: "FD83......", 
-                  lights: [ 
-                      {uniqueId: "AS:FD:52...." , 
-                      id: 4,
-                      behaviours: []
-                      }, 
-                      {uniqueId: "GD:F6:51...." , 
-                      id: 2, 
-                      behaviours: [{
-				    type: "BEHAVIOUR",
-				    data:{...},
-				    activeDays: {...},
-				    lightId: "GD:F6:51....",
-				    cloudId:"GNt03PZqyOVb7xkJCC5v"
-				    }]
-                      }
-		    ]
-		  }
-		])              
-... Some time passes and a new behaviour is made ... 
+                  })
+.. Adding Lights...
+const light = await crownstoneHue.addLight({ bridgeId: "FD83......", id: 0, uniqueId:"AS:FD:52...."})
+
+... Adding Behaviours...
 await crownstoneHue.addBehaviour({
 				  type: "BEHAVIOUR",
 				  data:{...},
