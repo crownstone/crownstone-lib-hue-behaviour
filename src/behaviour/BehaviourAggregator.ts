@@ -187,7 +187,7 @@ export class BehaviourAggregator {
   }
 
 
-  async lightStateChanged(state: HueFullState):Promise<void> {
+  async onStateChange(state: HueFullState):Promise<void> {
     if (!this.dumbHouseModeActive) {
       if (await this._onSwitchOnWithActiveBehaviour(state)) {
         return;

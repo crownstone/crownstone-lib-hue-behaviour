@@ -11,15 +11,15 @@ export class LightBehaviourWrapper {
     this.behaviourAggregator = new BehaviourAggregator(async (value: StateUpdate) => {
       await light.setState(value)
     }, light.getState());
+    this.light.setStateUpdateCallback(async (value: HueFullState) => {
+      await this.behaviourAggregator.onStateChange(value)
+    })
   }
 
   init(): void {
     if (this.initialized) { return; }
     this.initialized = true;
       this.behaviourAggregator.init();
-      this.light.setStateUpdateCallback(async (value: HueFullState) => {
-        await this.behaviourAggregator.lightStateChanged(value)
-      })
       this.light.init();
   }
 

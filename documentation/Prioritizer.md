@@ -1,9 +1,6 @@
 # Documentation - Prioritizers
 ## Overview
- - [Crownstone Hue](/documentation/CrownstoneHue.md)
- - [Discovery](/documentation/Discovery.md)
- - [Bridge](/documentation/Bridge.md)
- - [Light](/documentation/Light.md)
+ - [Crownstone Hue Behaviour](/documentation/CrownstoneHueBehaviour.md)
  - [Errors](/documentation/Errors.md)
  - [Event calls](/documentation/EventCalls.md)
  - [Persistence](/documentation/Persistence.md)

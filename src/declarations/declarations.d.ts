@@ -65,3 +65,12 @@ interface PrioritizedList {
 
 type EventUnsubscriber = () => void
 
+interface GenericBehaviourUsage
+{
+  setState: (() => {})
+  setCallback: (() => {})
+  getState: (() => {})
+
+  isDimmable: (() =>{})
+  isRgb: (() =>{})
+}

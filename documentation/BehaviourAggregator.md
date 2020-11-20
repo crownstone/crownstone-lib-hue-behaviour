@@ -2,7 +2,7 @@
 
 ## Overview
 
-- [Crownstone Hue](/documentation/CrownstoneHue.md)
+- [Crownstone Hue](/documentation/CrownstoneHueBehaviour.md)
 - [Discovery](/documentation/Discovery.md)
 - [Bridge](/documentation/Bridge.md)
 - [Light](/documentation/Light.md)

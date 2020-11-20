@@ -38,7 +38,7 @@ describe("Scenarios", () =>{
   test("Scenario 0",  async ()=>{
     const light = new mockLight("5f4e47660bc0da0004b4fe16",0,{on:false, bri:100})
     const behaviourAggregator = new BehaviourAggregator(light.setState.bind(light),{on:false, bri:100});
-    light.setStateUpdateCallback(behaviourAggregator.lightStateChanged.bind(behaviourAggregator))
+    light.setStateUpdateCallback(behaviourAggregator.onStateChange.bind(behaviourAggregator))
     behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn30Range,SPHERE_LOCATION)
     behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn100Range,SPHERE_LOCATION)
     behaviourAggregator.setBehaviour(<HueBehaviourWrapperTwilight>twilight60BetweenRange,SPHERE_LOCATION)
@@ -73,7 +73,7 @@ describe("Scenarios", () =>{
   test("Scenario 1", async () =>{
     const light = new mockLight("5f4e47660bc0da0004b4fe16",0,{on:false, bri:100})
     const behaviourAggregator = new BehaviourAggregator(light.setState.bind(light),{on:false, bri:100});
-    light.setStateUpdateCallback(behaviourAggregator.lightStateChanged.bind(behaviourAggregator))
+    light.setStateUpdateCallback(behaviourAggregator.onStateChange.bind(behaviourAggregator))
     behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn70Range1310sunset,SPHERE_LOCATION)
     behaviourAggregator.setBehaviour(<HueBehaviourWrapperTwilight>twilight80BetweenSunriseSunset,SPHERE_LOCATION)
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 13, 0).toString()));
@@ -104,7 +104,7 @@ describe("Scenarios", () =>{
   test("Scenario 2", async () =>{
     const light = new mockLight("5f4e47660bc0da0004b4fe16",0,{on:false, bri:100})
     const behaviourAggregator = new BehaviourAggregator(light.setState.bind(light),{on:false, bri:100});
-    light.setStateUpdateCallback(behaviourAggregator.lightStateChanged.bind(behaviourAggregator))
+    light.setStateUpdateCallback(behaviourAggregator.onStateChange.bind(behaviourAggregator))
     behaviourAggregator.setBehaviour(<HueBehaviourWrapperTwilight>twilight80BetweenSunriseSunset,SPHERE_LOCATION)
     behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn70Range1310sunset,SPHERE_LOCATION)
     behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn30Range,SPHERE_LOCATION)
@@ -151,7 +151,7 @@ describe("Scenarios", () =>{
   test("Scenario 3",async ()=>{
     const light = new mockLight("5f4e47660bc0da0004b4fe16",0,{on:false, bri:100})
     const behaviourAggregator = new BehaviourAggregator(light.setState.bind(light),{on:false, bri:100});
-    light.setStateUpdateCallback(behaviourAggregator.lightStateChanged.bind(behaviourAggregator))
+    light.setStateUpdateCallback(behaviourAggregator.onStateChange.bind(behaviourAggregator))
     behaviourAggregator.setBehaviour(<HueBehaviourWrapperTwilight>twilight70Range12001500,SPHERE_LOCATION);
     behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn80Range13001500,SPHERE_LOCATION);
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 13, 0).toString()));
@@ -174,7 +174,7 @@ describe("Scenarios", () =>{
   test("Scenario 4",async ()=>{
     const light = new mockLight("5f4e47660bc0da0004b4fe16",0,{on:false, bri:100})
     const behaviourAggregator = new BehaviourAggregator(light.setState.bind(light),{on:false, bri:100});
-    light.setStateUpdateCallback(behaviourAggregator.lightStateChanged.bind(behaviourAggregator))
+    light.setStateUpdateCallback(behaviourAggregator.onStateChange.bind(behaviourAggregator))
     behaviourAggregator.setBehaviour(<HueBehaviourWrapperTwilight>twilight70Range12001500,SPHERE_LOCATION);
     behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn80Range13001500,SPHERE_LOCATION);
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 12, 0).toString()));
@@ -200,7 +200,7 @@ describe("Scenarios", () =>{
   test("Scenario 5",async ()=>{
     const light = new mockLight("5f4e47660bc0da0004b4fe16",0,{on:false, bri:100})
     const behaviourAggregator = new BehaviourAggregator(light.setState.bind(light),{on:false, bri:100});
-    light.setStateUpdateCallback(behaviourAggregator.lightStateChanged.bind(behaviourAggregator))
+    light.setStateUpdateCallback(behaviourAggregator.onStateChange.bind(behaviourAggregator))
     behaviourAggregator.setBehaviour(<HueBehaviourWrapperTwilight>twilight70Range12001500,SPHERE_LOCATION);
     behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn100Range,SPHERE_LOCATION);
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 14, 0).toString()));
@@ -226,7 +226,7 @@ describe("Scenarios", () =>{
   test("Scenario 6",async ()=>{
     const light = new mockLight("5f4e47660bc0da0004b4fe16",0,{on:false, bri:100})
     const behaviourAggregator = new BehaviourAggregator(light.setState.bind(light),{on:false, bri:100});
-    light.setStateUpdateCallback(behaviourAggregator.lightStateChanged.bind(behaviourAggregator))
+    light.setStateUpdateCallback(behaviourAggregator.onStateChange.bind(behaviourAggregator))
     behaviourAggregator.setBehaviour(<HueBehaviourWrapperBehaviour>switchOn80Range13001500,SPHERE_LOCATION);
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 14, 0).toString()));
     await behaviourAggregator._loop();
