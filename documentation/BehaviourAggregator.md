@@ -12,7 +12,7 @@
 - **Behaviour Aggregator**
   - [Constructing](#constructing)
   - [Initialization](#initialization)
-  - [On Light state change](#on-light-state-change)
+  - [On State Change](#on-state-change)
   - [Dumb house mode](#dumb-house-mode)
   - [Cleanup](#cleanup)
   - [Adding/Updating/Removing behaviours](#addingupdatingremoving-behaviours)
@@ -54,11 +54,11 @@ To initialize the aggregator, call:
 This will start an interval that calls every 500ms a loop function.
 The rate is defined as `AGGREGATOR_POLLING_RATE` and exists in [BehaviourAggregatorUtil.ts](/src/behaviour/BehaviourAggregatorUtil.ts)
 
-### On Light state change
+### On state change
 
 When a light state has changed and it has to be passed to the aggregator, call:
 
-`await behaviourAggregator.lightStateChanged(state: HueFullState)`
+`await behaviourAggregator.onStateChange(state: HueFullState)`
 
 In the module, this is used as the light state changed callback for the Light object.
 
