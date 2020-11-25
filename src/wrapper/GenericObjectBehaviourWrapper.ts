@@ -1,5 +1,6 @@
 import {BehaviourAggregator} from "../behaviour/BehaviourAggregator";
 
+
 export class GenericObjectBehaviourWrapper {
   genericObject: any
   behaviourAggregator: BehaviourAggregator

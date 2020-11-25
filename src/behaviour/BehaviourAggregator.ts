@@ -1,4 +1,3 @@
-import {Light} from "../../../crownstone-lib-hue";
 import {eventBus} from "../util/EventBus";
 import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
 import {ON_DUMB_HOUSE_MODE_SWITCH} from "../constants/EventConstants";
@@ -26,14 +25,14 @@ export class BehaviourAggregator {
   dumbHouseModeActive: boolean = false;
   aggregatedBehaviour: SwitchBehaviour | Twilight = undefined;
   timestamp = 0;
-  currentLightState: HueLightState;  // State of the light.
+  currentDeviceState: HueLightState;  // State of the Device.
   override: string = NO_OVERRIDE;
   intervalId: Timeout;
   updateStateCallback: (state) => {};
 
   constructor(callback, state) {
     this.updateStateCallback = callback;
-    this.currentLightState = GenericUtil.deepCopy(state);
+    this.currentDeviceState = GenericUtil.deepCopy(state);
     this.unsubscribeDumbHouseModeEvent = eventBus.subscribe(ON_DUMB_HOUSE_MODE_SWITCH, this.onDumbHouseModeSwitch.bind(this));
   }
 
@@ -65,7 +64,7 @@ export class BehaviourAggregator {
     await this._handleBehaviours();
 
     if (this.dumbHouseModeActive) {
-      this._setOverrideOnLightStateChange(this.currentLightState);
+      this._setOverrideOnDeviceStateChange(this.currentDeviceState);
     }
   }
 
@@ -114,7 +113,7 @@ export class BehaviourAggregator {
     this._checkIfStateMatchesWithNewBehaviour();
     if (newBehaviour !== undefined) {
       if (newBehaviour.behaviour.type === "TWILIGHT") {
-        await this._twilightHandling(newBehaviour);
+        await this._TwilightHandling(newBehaviour);
       }
       else if (newBehaviour.behaviour.type === "BEHAVIOUR" && this.override === NO_OVERRIDE
         && oldBehaviour !== undefined && oldBehaviour.behaviour.cloudId != newBehaviour.behaviour.cloudId) {
@@ -122,7 +121,7 @@ export class BehaviourAggregator {
       }
     }
 
-    //Light is on, but dimmed, user leaves room/behaviour deactivates  >  light should still turn off.
+    //Device is on, but dimmed, user leaves room/behaviour deactivates  >  Device should still turn off.
     if (oldBehaviour !== undefined && newBehaviour === undefined) {
       await this._onBehaviourDeactivation();
     }
@@ -135,12 +134,12 @@ export class BehaviourAggregator {
 
   }
 
-  /** Separate case for twilights.
+  /** Separate case for Twilights.
    * Checks if Twilight dims or not
    * @param behaviour
    */
-  async _twilightHandling(behaviour: Twilight): Promise<void> {
-    if (this.currentLightState.on && this.currentLightState.bri > BehaviourUtil.mapBehaviourActionToHue(behaviour.behaviour.data.action.data)) {
+  async _TwilightHandling(behaviour: Twilight): Promise<void> {
+    if (this.currentDeviceState.on && this.currentDeviceState.bri > BehaviourUtil.mapBehaviourActionToHue(behaviour.behaviour.data.action.data)) {
       await this._activateNewBehaviour();
     }
   }
@@ -168,13 +167,13 @@ export class BehaviourAggregator {
 
   async _activateNewBehaviour():Promise<void> {
     if (!this.dumbHouseModeActive) {
-      await this._setLightState();
+      await this._setDeviceState();
     }
   }
 
-  async _setLightState():Promise<void> {
+  async _setDeviceState():Promise<void> {
     const state = this.getComposedState()
-    this.currentLightState = GenericUtil.deepCopy(state);
+    this.currentDeviceState = GenericUtil.deepCopy(state);
 
     await this.updateStateCallback(state);
   }
@@ -194,15 +193,15 @@ export class BehaviourAggregator {
       }
     }
 
-    this._setOverrideOnLightStateChange(state)
-    this.currentLightState = BehaviourUtil.mapStateObjectToTheOther(state, this.currentLightState);
+    this._setOverrideOnDeviceStateChange(state)
+    this.currentDeviceState = BehaviourUtil.mapStateObjectToTheOther(state, this.currentDeviceState);
   }
 
-  /** Sets the override variable based on passed light state.
+  /** Sets the override variable based on passed Device state.
    *
    * @param state
    */
-  _setOverrideOnLightStateChange(state): void {
+  _setOverrideOnDeviceStateChange(state): void {
     const composedState = this.getComposedState();
     if (composedState.on !== state.on && this.switchBehaviourPrioritizer.prioritizedBehaviour !== undefined) {
       this.override = SWITCH_STATE_OVERRIDE;
@@ -216,16 +215,16 @@ export class BehaviourAggregator {
     }
   }
 
-  /** If a light turns manually on while behaviour is active, behaviour's state will be used as light's state.
+  /** If a Device turns manually on while behaviour is active, behaviour's state will be used as Device's state.
    *
    * @param state
    *
-   * @returns True light state is changed
+   * @returns True Device state is changed
    */
   async _onSwitchOnWithActiveBehaviour(state: HueFullState): Promise<boolean> {
-    //Light gets turned on, behaviour still active
-    if (this.aggregatedBehaviour !== undefined && !this.currentLightState.on && state.on) {
-      await this._setLightState();
+    //Device gets turned on, behaviour still active
+    if (this.aggregatedBehaviour !== undefined && !this.currentDeviceState.on && state.on) {
+      await this._setDeviceState();
       this.override = NO_OVERRIDE;
       return true;
     }
@@ -234,12 +233,12 @@ export class BehaviourAggregator {
 
   _checkIfStateMatchesWithNewBehaviour():void {
     if (this.aggregatedBehaviour === undefined) {
-      if (!this.currentLightState.on) {
+      if (!this.currentDeviceState.on) {
         this.override = NO_OVERRIDE
       }
     }
     else {
-      if (lightUtil.stateEqual(this.currentLightState, this.aggregatedBehaviour.getComposedState())) {
+      if (lightUtil.stateEqual(this.currentDeviceState, this.aggregatedBehaviour.getComposedState())) {
         this.override = NO_OVERRIDE
       }
     }

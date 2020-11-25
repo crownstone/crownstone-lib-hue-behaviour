@@ -53,11 +53,11 @@ describe("Scenarios", () =>{
     //User turns on light
     light.apiState.on = true;
     await light.renewState();
-    expect(behaviourAggregator.currentLightState).toStrictEqual({on:true,bri:80*2.54});
+    expect(behaviourAggregator.currentDeviceState).toStrictEqual({on:true,bri:80*2.54});
     //Twilight gets active
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 13, 10).toString()));
     await behaviourAggregator._loop();
-    expect(behaviourAggregator.currentLightState).toStrictEqual({on:true,bri:60*2.54});
+    expect(behaviourAggregator.currentDeviceState).toStrictEqual({on:true,bri:60*2.54});
 
     //SwitchBehaviour  with 100% gets active.
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 13, 15).toString()));
@@ -67,7 +67,7 @@ describe("Scenarios", () =>{
     //SwitchBehaviour  with 30% gets active.
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 13, 20).toString()));
     await behaviourAggregator._loop();
-    expect(behaviourAggregator.currentLightState).toStrictEqual({on:true,bri:30*2.54});
+    expect(behaviourAggregator.currentDeviceState).toStrictEqual({on:true,bri:30*2.54});
   })
   //
   test("Scenario 1", async () =>{
@@ -157,17 +157,17 @@ describe("Scenarios", () =>{
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 13, 0).toString()));
     await behaviourAggregator._loop();
     //End setup
-    expect(behaviourAggregator.currentLightState).toStrictEqual({on:true,bri:70*2.54});
+    expect(behaviourAggregator.currentDeviceState).toStrictEqual({on:true,bri:70*2.54});
     //Users dims light to 50.
     light.apiState.bri = 50*2.54;
     await light.renewState();
-    expect(behaviourAggregator.currentLightState).toStrictEqual({on:true,bri:50*2.54});
+    expect(behaviourAggregator.currentDeviceState).toStrictEqual({on:true,bri:50*2.54});
     expect(behaviourAggregator.override === "DIM_STATE_OVERRIDE")
 
     //All behaviours inactive
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 15, 0).toString()));
     await behaviourAggregator._loop();
-    expect(behaviourAggregator.currentLightState.on).toBeFalsy();
+    expect(behaviourAggregator.currentDeviceState.on).toBeFalsy();
     expect(behaviourAggregator.override === "NO_OVERRIDE")
   })
 
@@ -180,20 +180,20 @@ describe("Scenarios", () =>{
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 12, 0).toString()));
     await behaviourAggregator._loop();
     //End setup
-    expect(behaviourAggregator.currentLightState).toStrictEqual({on:true,bri:70*2.54});
+    expect(behaviourAggregator.currentDeviceState).toStrictEqual({on:true,bri:70*2.54});
     //Users dims light to 50.
     light.apiState.bri = 50*2.54
     await light.renewState();
-    expect(behaviourAggregator.currentLightState).toStrictEqual({on:true,bri:50*2.54});
+    expect(behaviourAggregator.currentDeviceState).toStrictEqual({on:true,bri:50*2.54});
     expect(behaviourAggregator.override === "DIM_STATE_OVERRIDE")
     //Behaviour gets active
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 13, 0).toString()));
     await behaviourAggregator._loop();
-    expect(behaviourAggregator.currentLightState).toStrictEqual({on:true,bri:50*2.54});
+    expect(behaviourAggregator.currentDeviceState).toStrictEqual({on:true,bri:50*2.54});
     //All behaviours inactive
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 15, 0).toString()));
     await behaviourAggregator._loop();
-    expect(behaviourAggregator.currentLightState.on).toBeFalsy();
+    expect(behaviourAggregator.currentDeviceState.on).toBeFalsy();
     expect(behaviourAggregator.override === "NO_OVERRIDE")
   })
 
@@ -206,20 +206,20 @@ describe("Scenarios", () =>{
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 14, 0).toString()));
     await behaviourAggregator._loop();
     //End setup
-    expect(behaviourAggregator.currentLightState).toStrictEqual({on:true,bri:70*2.54});
+    expect(behaviourAggregator.currentDeviceState).toStrictEqual({on:true,bri:70*2.54});
     //Users dims light to 50.
     light.apiState.bri = 50 * 2.54
     await light.renewState();
-    expect(behaviourAggregator.currentLightState).toStrictEqual({on:true,bri:50*2.54});
+    expect(behaviourAggregator.currentDeviceState).toStrictEqual({on:true,bri:50*2.54});
     expect(behaviourAggregator.override === "DIM_STATE_OVERRIDE")
     //User turns off light
     light.apiState.on = false
     await light.renewState();
-    expect(behaviourAggregator.currentLightState.on).toBeFalsy();
+    expect(behaviourAggregator.currentDeviceState.on).toBeFalsy();
     //User turns on light
     light.apiState.on = true;
     await light.renewState();
-    expect(behaviourAggregator.currentLightState).toStrictEqual({on:true,bri:70*2.54});
+    expect(behaviourAggregator.currentDeviceState).toStrictEqual({on:true,bri:70*2.54});
     expect(behaviourAggregator.override === "NO_OVERRIDE")
   })
 
@@ -231,16 +231,16 @@ describe("Scenarios", () =>{
     Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 14, 0).toString()));
     await behaviourAggregator._loop();
     //End setup
-    expect(behaviourAggregator.currentLightState).toStrictEqual({on:true,bri:80*2.54});
+    expect(behaviourAggregator.currentDeviceState).toStrictEqual({on:true,bri:80*2.54});
     //User turns off light
     light.apiState.on = false
     await light.renewState();
-    expect(behaviourAggregator.currentLightState.on).toBeFalsy();
+    expect(behaviourAggregator.currentDeviceState.on).toBeFalsy();
     expect(behaviourAggregator.override === "SWITCH_STATE_OVERRIDE")
     //User turns on light
     light.apiState.on = true
     await light.renewState();
-    expect(behaviourAggregator.currentLightState).toStrictEqual({on:true,bri:80*2.54});
+    expect(behaviourAggregator.currentDeviceState).toStrictEqual({on:true,bri:80*2.54});
     expect(behaviourAggregator.override === "NO_OVERRIDE")
   })
 })

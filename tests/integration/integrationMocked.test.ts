@@ -55,7 +55,7 @@ describe('Integration Test with mocks', () => {
     const crownstoneHueBehaviour = new CrownstoneHueBehaviour();
     let light = await crownstoneHue.addLight({id:0})
 
-    crownstoneHueBehaviour.addLight(light);
+    crownstoneHueBehaviour.addDevice(light);
     await crownstoneHueBehaviour.setBehaviour(behaviourA.rule);
     await crownstoneHueBehaviour.setBehaviour(behaviourB.rule);
     jest.advanceTimersToNextTimer(1);
@@ -68,7 +68,7 @@ describe('Integration Test with mocks', () => {
 
     const crownstoneHueBehaviour = new CrownstoneHueBehaviour();
     const light = await crownstoneHue.addLight({id:0});
-    crownstoneHueBehaviour.addLight(light);
+    crownstoneHueBehaviour.addDevice(light);
 
     const behaviourA = new BehaviourSupport().setCloudId("id0").setLightId(fakeLightsOnBridge[0].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()
     await crownstoneHueBehaviour.setBehaviour(behaviourA.rule);
@@ -80,7 +80,7 @@ describe('Integration Test with mocks', () => {
     await crownstoneHueBehaviour.setBehaviour(behaviourD.rule);
     jest.advanceTimersToNextTimer()
     await flushPromises();
-    const lights = crownstoneHueBehaviour.getAllConnectedLights();
+    const lights = crownstoneHueBehaviour.getAllDevices();
 //Init, lights should be at 20%.
     expect(lights[fakeLightsOnBridge[0].uniqueid].getState()).toMatchObject({on: true, bri: 20 * 2.54})
 
@@ -126,8 +126,8 @@ describe('Integration Test with mocks', () => {
   test('Removing and updating', async () => {
     jest.useFakeTimers()
     const crownstoneHueBehaviour = new CrownstoneHueBehaviour();
-    crownstoneHueBehaviour.addLight(await crownstoneHue.addLight({id:0}));
-    crownstoneHueBehaviour.addLight(await crownstoneHue.addLight({id:1}));
+    crownstoneHueBehaviour.addDevice(await crownstoneHue.addLight({id:0}));
+    crownstoneHueBehaviour.addDevice(await crownstoneHue.addLight({id:1}));
 
     const behaviourA = new BehaviourSupport().setCloudId("id0").setLightId(fakeLightsOnBridge[0].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()
     await crownstoneHueBehaviour.setBehaviour(behaviourA.rule);
@@ -138,19 +138,19 @@ describe('Integration Test with mocks', () => {
     crownstoneHueBehaviour.presenceChange(<PresenceEvent>EVENT_ENTER_SPHERE);
     jest.advanceTimersToNextTimer()
     await flushPromises();
-    const lights = crownstoneHueBehaviour.getAllConnectedLights();
+    const lights = crownstoneHueBehaviour.getAllDevices();
     await crownstoneHueBehaviour.removeBehaviour(behaviourC.rule.lightId, behaviourC.rule.cloudId);
     jest.advanceTimersToNextTimer()
     await flushPromises();
     expect(lights[fakeLightsOnBridge[0].uniqueid].getState()).toMatchObject({on: true, bri: 20 * 2.54})
     expect(crownstoneHueBehaviour.wrappers[fakeLightsOnBridge[0].uniqueid].behaviourAggregator.override).toBe("NO_OVERRIDE")
-    await crownstoneHueBehaviour.removeLight("XYZ0987");
+    await crownstoneHueBehaviour.removeDevice("XYZ0987");
     const behaviourD = new BehaviourSupport().setCloudId("id0").setLightId(fakeLightsOnBridge[0].uniqueid).setTimeAllDay().setDimPercentage(80).setPresenceIgnore();
     await crownstoneHueBehaviour.setBehaviour(behaviourD.rule)
     jest.advanceTimersToNextTimer()
     await flushPromises();
     expect(lights[fakeLightsOnBridge[0].uniqueid].getState()).toMatchObject({on: true, bri: 80 * 2.54})
-    expect(Object.keys(crownstoneHueBehaviour.getAllConnectedLights()).length).toBe(1);
+    expect(Object.keys(crownstoneHueBehaviour.getAllDevices()).length).toBe(1);
     await crownstoneHue.stop();
   })
 

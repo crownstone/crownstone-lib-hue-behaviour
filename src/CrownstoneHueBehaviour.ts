@@ -110,37 +110,37 @@ export class CrownstoneHueBehaviour {
   }
 
 
-  addLight(light: Light): LightBehaviourWrapper {
-    const lightBehaviourWrapper = new LightBehaviourWrapper(light);
+  addDevice(device: Light): LightBehaviourWrapper {
+    const lightBehaviourWrapper = new LightBehaviourWrapper(device);
     lightBehaviourWrapper.init();
-    this.wrappers[light.getUniqueId()] = lightBehaviourWrapper;
+    this.wrappers[device.getUniqueId()] = lightBehaviourWrapper;
     lightBehaviourWrapper.behaviourAggregator.onDumbHouseModeSwitch(this.dumbHouseModeActive)
     return lightBehaviourWrapper;
   }
 
-  removeLight(lightId: string): void {
-    if (this.wrappers[lightId] !== undefined) {
-      this.wrappers[lightId].cleanup();
-      delete this.wrappers[lightId];
+  removeDevice(uniqueId: string): void {
+    if (this.wrappers[uniqueId] !== undefined) {
+      this.wrappers[uniqueId].cleanup();
+      delete this.wrappers[uniqueId];
     }
   }
 
 
-  /** Returns a map of all connected lights by uniqueId
+  /** Returns a map of all connected devices by uniqueId
 
    */
-  getAllConnectedLights(): { [uniqueId: string]: Light } {
-    let lights = {}
-    for (const wrappedLight of Object.values(this.wrappers)) {
-      lights[wrappedLight.light.uniqueId] = wrappedLight.light;
+  getAllDevices(): { [uniqueId: string]: Light } {
+    let devices = {}
+    for (const wrappedDevice of Object.values(this.wrappers)) {
+      devices[wrappedDevice.light.getUniqueId()] = wrappedDevice.light;
     }
-    return lights;
+    return devices;
   }
 
 
   stop(): void {
-    Object.values(this.wrappers).forEach(wrappedLight => {
-      wrappedLight.cleanup();
+    Object.values(this.wrappers).forEach(wrappedDevice => {
+      wrappedDevice.cleanup();
     });
   }
 }

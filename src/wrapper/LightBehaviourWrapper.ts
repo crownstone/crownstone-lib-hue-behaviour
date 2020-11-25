@@ -20,7 +20,6 @@ export class LightBehaviourWrapper {
     if (this.initialized) { return; }
     this.initialized = true;
       this.behaviourAggregator.init();
-      this.light.init();
   }
 
   cleanup(): void {
