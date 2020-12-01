@@ -15,27 +15,6 @@ export const BehaviourUtil = {
     return (presenceLocations.length > 0);
   },
 
-  mapBehaviourActionToHue(value: number):number {
-    return value * 2.54
-  },
-
-  /** Maps State A to State B
-   *
-   * @param stateA
-   * @param stateB
-   *
-   * Returns stateB with stateB objects.
-   */
-  mapStateObjectToTheOther(stateA:HueLightState, stateB:HueLightState):HueLightState {
-    for (const key of Object.keys(stateA)) {
-      if ((hueStateVariables[key])) {
-        stateB[key] = stateA[key];
-      }
-    }
-    return {...stateB};
-  },
-
-
   /** returns the sunset time in minutes, given the timestamp and sphereLocation
    * @param sphereLocation
    * @param timestamp

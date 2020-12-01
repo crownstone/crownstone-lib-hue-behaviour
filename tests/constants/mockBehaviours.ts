@@ -1,4 +1,4 @@
-export const switchOnWhenAny1Home: HueBehaviourWrapper = {
+export const switchOnWhenAny1Home: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 100},
@@ -18,10 +18,10 @@ export const switchOnWhenAny1Home: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "CLOUDID-1124",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
-export const switchOn80WhenAny1Home: HueBehaviourWrapper = {
+export const switchOn80WhenAny1Home: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 80},
@@ -41,10 +41,10 @@ export const switchOn80WhenAny1Home: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "CLOUDID-1125",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
-export const switchOnOnlyAtWeekend: HueBehaviourWrapper = {
+export const switchOnOnlyAtWeekend: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 100},
@@ -64,10 +64,10 @@ export const switchOnOnlyAtWeekend: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "CLOUDID-1126",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
-export const switchOnBetweenRangeWithSpherePresence: HueBehaviourWrapper = {
+export const switchOnBetweenRangeWithSpherePresence: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 100},
@@ -95,11 +95,11 @@ export const switchOnBetweenRangeWithSpherePresence: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "CLOUDID-1127",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
 
-export const switchOnAllDayIgnorePresence: HueBehaviourWrapper = {
+export const switchOnAllDayIgnorePresence: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 100},
@@ -118,11 +118,11 @@ export const switchOnAllDayIgnorePresence: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "CLOUDID-1128",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
 
-export const twilightDim50AllDay: HueBehaviourWrapper = {
+export const twilightDim50AllDay: BehaviourWrapper = {
   "type": "TWILIGHT",
   "data": {
     "action": {"type": "DIM_WHEN_TURNED_ON", "data": 50},
@@ -140,10 +140,10 @@ export const twilightDim50AllDay: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "CLOUD-ID-123123",
-  "lightId": "5f4e47660bc0da0004b4fe16",
+  "deviceId": "5f4e47660bc0da0004b4fe16",
 }
 
-export const twilightDim50AllDayUpdated100: HueBehaviourWrapper = {
+export const twilightDim50AllDayUpdated100: BehaviourWrapper = {
   "type": "TWILIGHT",
   "data": {
     "action": {"type": "DIM_WHEN_TURNED_ON", "data": 100},
@@ -161,10 +161,10 @@ export const twilightDim50AllDayUpdated100: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "CLOUD-ID-123123",
-  "lightId": "5f4e47660bc0da0004b4fe16",
+  "deviceId": "5f4e47660bc0da0004b4fe16",
 }
 
-export const twilight40BetweenSunriseSunset: HueBehaviourWrapper = {
+export const twilight40BetweenSunriseSunset: BehaviourWrapper = {
   "type": "TWILIGHT",
   "data": {
     "action": {"type": "DIM_WHEN_TURNED_ON", "data": 40},
@@ -184,11 +184,11 @@ export const twilight40BetweenSunriseSunset: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "CLOUDID-1129",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
 
-export const twilight80BetweenSunriseSunset: HueBehaviourWrapper = {
+export const twilight80BetweenSunriseSunset: BehaviourWrapper = {
   "type": "TWILIGHT",
   "data": {
     "action": {"type": "DIM_WHEN_TURNED_ON", "data": 80},
@@ -208,11 +208,11 @@ export const twilight80BetweenSunriseSunset: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "CLOUDID-2120",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
 
-export const twilight60BetweenRange: HueBehaviourWrapper = {
+export const twilight60BetweenRange: BehaviourWrapper = {
   "type": "TWILIGHT",
   "data": {
     "action": {"type": "DIM_WHEN_TURNED_ON", "data": 60},
@@ -232,9 +232,9 @@ export const twilight60BetweenRange: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "REALCLOUDID-1",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
-export const switchOn100Range: HueBehaviourWrapper = {
+export const switchOn100Range: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 100},
@@ -256,11 +256,11 @@ export const switchOn100Range: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "CLOUDID-2121",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
 
-export const switchOn70Range1310sunset: HueBehaviourWrapper = {
+export const switchOn70Range1310sunset: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 70},
@@ -282,11 +282,11 @@ export const switchOn70Range1310sunset: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "CLOUDID-2122",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
 
-export const switchOn30Range: HueBehaviourWrapper = {
+export const switchOn30Range: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 30},
@@ -308,11 +308,11 @@ export const switchOn30Range: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "CLOUDID-2123",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
 
-export const switchOn50Range23500500: HueBehaviourWrapper = {
+export const switchOn50Range23500500: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 50},
@@ -334,11 +334,11 @@ export const switchOn50Range23500500: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "ACTUALCLOUDID-3",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
 
-export const switchOnAllDayRoom1: HueBehaviourWrapper = {
+export const switchOnAllDayRoom1: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 100},
@@ -358,10 +358,10 @@ export const switchOnAllDayRoom1: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "ACTUALCLOUDID-6",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
-export const switchOn80AllDayRoom1n2: HueBehaviourWrapper = {
+export const switchOn80AllDayRoom1n2: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 80},
@@ -381,10 +381,10 @@ export const switchOn80AllDayRoom1n2: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "ACTUALCLOUDID-12",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
-export const switchOn60AllDayRoom3: HueBehaviourWrapper = {
+export const switchOn60AllDayRoom3: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 60},
@@ -404,10 +404,10 @@ export const switchOn60AllDayRoom3: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "ACTUALCLOUDID-9",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
-export const switchOn40WhenInRoom5n6: HueBehaviourWrapper = {
+export const switchOn40WhenInRoom5n6: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 40},
@@ -427,10 +427,10 @@ export const switchOn40WhenInRoom5n6: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "ACTUALCLOUDID-999",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
-export const switchOn50Sphere: HueBehaviourWrapper = {
+export const switchOn50Sphere: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 50},
@@ -452,11 +452,11 @@ export const switchOn50Sphere: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "ACTUALCLOUDID-169",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
 
-export const switchOn20Between19002200: HueBehaviourWrapper = {
+export const switchOn20Between19002200: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 20},
@@ -480,11 +480,11 @@ export const switchOn20Between19002200: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "ACTUALCLOUDID-129",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
 
-export const switchOn10AllDay: HueBehaviourWrapper = {
+export const switchOn10AllDay: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 10},
@@ -506,10 +506,10 @@ export const switchOn10AllDay: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "ACTUALCLOUDID-149",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
-export const switchOn80Range13001500: HueBehaviourWrapper = {
+export const switchOn80Range13001500: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
     "action": {"type": "BE_ON", "data": 80},
@@ -531,10 +531,10 @@ export const switchOn80Range13001500: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "CLOUDID-2125",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
-export const twilight70Range12001500: HueBehaviourWrapper = {
+export const twilight70Range12001500: BehaviourWrapper = {
   "type": "TWILIGHT",
   "data": {
     "action": {"type": "DIM_WHEN_TURNED_ON", "data": 70},
@@ -555,5 +555,5 @@ export const twilight70Range12001500: HueBehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "CLOUDID-2126",
-  "lightId": "5f4e47660bc0da0004b4fe16"
+  "deviceId": "5f4e47660bc0da0004b4fe16"
 }

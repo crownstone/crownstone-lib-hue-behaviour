@@ -18,17 +18,17 @@ interface HueFullState extends HueLightState {
   mode?: string,
   reachable: boolean
 }
-
-interface StateUpdate extends HueStateBase {
-  effect?: string,
-  alert?: string,
-  bri_inc?: number;
-  hue_inc?: number;
-  sat_inc?: number;
-  ct_inc?: number;
-  xy_inc?: [number, number];
-  transitiontime?: number
-}
+//
+// interface StateUpdate extends HueStateBase {
+//   effect?: string,
+//   alert?: string,
+//   bri_inc?: number;
+//   hue_inc?: number;
+//   sat_inc?: number;
+//   ct_inc?: number;
+//   xy_inc?: [number, number];
+//   transitiontime?: number
+// }
 
 
 interface PresenceProfileLocation {
@@ -65,12 +65,15 @@ interface PrioritizedList {
 
 type EventUnsubscriber = () => void
 
-interface GenericBehaviourUsage
-{
-  setState: (() => {})
-  setCallback: (() => {})
-  getState: (() => {})
+interface DeviceBehaviourSupport {
+  receiveStateUpdate(state:StateUpdate): void
 
-  isDimmable: (() =>{})
-  isRgb: (() =>{})
+  setStateUpdateCallback(callback:((state:StateUpdate) => {})): void
+
+  getUniqueId(): string
+
+  getDeviceType(): DeviceType
+
+  getState(): DeviceStates
 }
+

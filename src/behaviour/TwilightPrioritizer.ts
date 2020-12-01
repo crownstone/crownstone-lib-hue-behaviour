@@ -8,7 +8,7 @@ export class TwilightPrioritizer extends PrioritizerBase {
   prioritizedBehaviour: Twilight = undefined;
 
 
-  setBehaviour(behaviour: HueBehaviourWrapperTwilight, sphereLocation: SphereLocation): number {
+  setBehaviour(behaviour: BehaviourWrapperTwilight, sphereLocation: SphereLocation): number {
     for (let i = 0; i < this.behaviours.length; i++) {
       if (this.behaviours[i].behaviour.cloudId === behaviour.cloudId) {
         this.behaviours[i].behaviour = behaviour;
@@ -42,7 +42,6 @@ export class TwilightPrioritizer extends PrioritizerBase {
       }
     });
     this.prioritizedBehaviour = BehaviourAggregatorUtil.getPrioritizedTwilight(activeBehaviours);
-    this.composedState = this.prioritizedBehaviour && this.prioritizedBehaviour.getComposedState() || {on: false}
+    this.composedState = this.prioritizedBehaviour && this.prioritizedBehaviour.getComposedState() || undefined
   }
-
 }

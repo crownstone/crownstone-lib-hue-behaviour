@@ -1,6 +1,8 @@
 import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
 import {BehaviourSupport} from "./behaviour/BehaviourSupport";
 import {Twilight} from "./behaviour/Twilight";
+import {MaxStateValue, MinStateValue} from "../constants/StateConstants";
+import {hueStateVariables} from "../constants/HueConstants";
 
 
 interface TimeCompareResult {
@@ -151,7 +153,96 @@ export const BehaviourAggregatorUtil = {
     else {
       return this.filterBehaviours(twilights);
     }
-  }
+  },
 
+
+  /** Maps the state update to the actual state.
+   *
+   * @param deviceState
+   * @param updateState
+   *
+   * Returns deviceState with updateState values.
+   */
+  addUpdateToState(deviceState: DeviceStates, updateState: StateUpdate): DeviceStates {
+    if (updateState.type === "SWITCH") {
+      deviceState.on = updateState.value;
+    }
+    if (updateState.type === "DIMMING" && deviceState.type !== "SWITCHABLE") {
+      deviceState.brightness = updateState.value;
+
+      if (updateState.value > 0) {
+        deviceState.on = true;
+      }
+      else {
+        deviceState.on = false;
+      }
+    }
+    if (updateState.type === "COLOR" && deviceState.type == "COLORABLE") {
+      deviceState.hue = updateState.hue;
+      deviceState.saturation = updateState.saturation;
+    }
+
+    return deviceState;
+  },
+
+
+  stateEqual(deviceState: DeviceStates, stateUpdate: StateUpdate): boolean {
+    let returnType = false;
+    if (deviceState.type === "SWITCHABLE") {
+      if (stateUpdate.type === "SWITCH") {
+        returnType = (stateUpdate.value === deviceState.on)
+      }
+      else {
+        throw "Unsupported behaviour."
+      }
+    }
+    if (deviceState.type === "DIMMABLE") {
+      if (stateUpdate.type === "SWITCH") {
+        returnType = (stateUpdate.value === deviceState.on)
+      }
+      else if (stateUpdate.type === "DIMMING") {
+        returnType = (stateUpdate.value === deviceState.brightness && deviceState.on)
+      }
+      else {
+        throw "Unsupported behaviour."
+      }
+    }
+    if (deviceState.type === "COLORABLE") {
+      if (stateUpdate.type === "SWITCH") {
+        returnType = (stateUpdate.value === deviceState.on)
+      }
+      else if (stateUpdate.type === "DIMMING") {
+        returnType = (stateUpdate.value === deviceState.brightness)
+      }
+      if (stateUpdate.type === "COLOR") {
+        returnType = (stateUpdate.brightness === deviceState.brightness) && (stateUpdate.hue === deviceState.hue) && (stateUpdate.saturation === deviceState.saturation)
+      }
+      else {
+        throw "Unsupported behaviour."
+      }
+    }
+    return returnType;
+  },
+
+
+  convertExceedingMinMaxValues(state: DeviceStates | StateUpdate): void {
+    if (state.type === "SWITCH") {
+      return
+    }
+    ;
+    if (state.type === "DIMMING") {
+      state.value = Math.min(MaxStateValue["brightness"], Math.max(MinStateValue["brightness"], state.value))
+    }
+    if (state.type === "DIMMABLE") {
+      state.brightness = Math.min(MaxStateValue["brightness"], Math.max(MinStateValue["brightness"], state.brightness))
+    }
+    if (state.type === "COLORABLE") {
+      state.brightness = Math.min(MaxStateValue["brightness"], Math.max(MinStateValue["brightness"], state.brightness))
+      state.hue = Math.min(MaxStateValue["hue"], Math.max(MinStateValue["hue"], state.hue))
+      state.saturation = Math.min(MaxStateValue["saturation"], Math.max(MinStateValue["saturation"], state.saturation))
+    }
+
+
+  }
 
 }

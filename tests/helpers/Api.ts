@@ -18,7 +18,7 @@ export class mockApi {
  *
  */
 export class ApiLight {
-  state: {  } = {on: false, bri: 100};
+  state: {  } = {on: false, brightness: 100};
 
   getLightState(id?) {
     return {...this.state};

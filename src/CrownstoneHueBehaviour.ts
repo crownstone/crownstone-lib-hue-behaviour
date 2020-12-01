@@ -1,22 +1,21 @@
-import {Light} from "../../crownstone-lib-hue/"
 import {eventBus} from "./util/EventBus";
 import {ON_DUMB_HOUSE_MODE_SWITCH, ON_PRESENCE_CHANGE, ON_SPHERE_CHANGE} from "./constants/EventConstants";
 import {GenericUtil} from "./util/GenericUtil";
-import {LightBehaviourWrapper} from "./wrapper/LightBehaviourWrapper";
-import { SPHERE_DEFAULT} from "./constants/HueConstants";
+import {DeviceBehaviourWrapper} from "./wrapper/DeviceBehaviourWrapper";
+export const SPHERE_DEFAULT =  {latitude: 51.9233355, longitude: 4.469152};
 
 /**
  * CrownstoneHueBehaviour object
  *
  *
  * @param sphereLocation - Longitude and Latitude of the location of where the Sphere is.
- * @param wrappers - List of a wrapped light and behaviours
+ * @param wrappers - List of a wrapped device and behaviours
  *
  */
 
 
 export class CrownstoneHueBehaviour {
-  wrappers: { [uniqueId: string]: LightBehaviourWrapper } = {};
+  wrappers: { [uniqueId: string]: DeviceBehaviourWrapper } = {};
   sphereLocation: SphereLocation;
   dumbHouseModeActive: boolean = false;
   activePresenceEvents: PresenceEvent[] = [];
@@ -44,33 +43,33 @@ export class CrownstoneHueBehaviour {
     this.dumbHouseModeActive = on;
   }
 
-  /** Adds/Updates the new behaviour on its light.
+  /** Adds/Updates the new behaviour on its device.
    * Passes the active presence events to the new behaviour.
    * @param newBehaviour
    */
-  setBehaviour(newBehaviour: HueBehaviourWrapper): boolean {
-    const behaviour = GenericUtil.deepCopy(newBehaviour) as HueBehaviourWrapper;
-      if (this.wrappers[behaviour.lightId] !== undefined) {
-        this._setBehaviour(this.wrappers[behaviour.lightId], behaviour);
+  setBehaviour(newBehaviour: BehaviourWrapper): boolean {
+    const behaviour = GenericUtil.deepCopy(newBehaviour) as BehaviourWrapper;
+      if (this.wrappers[behaviour.deviceId] !== undefined) {
+        this._setBehaviour(this.wrappers[behaviour.deviceId], behaviour);
         return true;
       }
     return false;
   };
 
-  _setBehaviour(lightBehaviourWrapper: LightBehaviourWrapper, behaviour: HueBehaviourWrapper): void {
-    const index = lightBehaviourWrapper.behaviourAggregator.setBehaviour(behaviour, this.sphereLocation);
+  _setBehaviour(deviceBehaviourWrapper: DeviceBehaviourWrapper, behaviour: BehaviourWrapper): void {
+    const index = deviceBehaviourWrapper.behaviourAggregator.setBehaviour(behaviour, this.sphereLocation);
     if (behaviour.type === "BEHAVIOUR") {
       for (const event of this.activePresenceEvents) {
-        lightBehaviourWrapper.behaviourAggregator.switchBehaviourPrioritizer.behaviours[index].onPresenceDetect(event);
+        deviceBehaviourWrapper.behaviourAggregator.switchBehaviourPrioritizer.behaviours[index].onPresenceDetect(event);
       }
     }
   }
 
 
-  removeBehaviour(lightId: string, cloudId: string): void {
-      const light = this.wrappers[lightId];
-      if (light !== undefined) {
-        light.behaviourAggregator.removeBehaviour(cloudId);
+  removeBehaviour(deviceId: string, cloudId: string): void {
+      const device = this.wrappers[deviceId];
+      if (device !== undefined) {
+        device.behaviourAggregator.removeBehaviour(cloudId);
     }
   };
 
@@ -110,12 +109,12 @@ export class CrownstoneHueBehaviour {
   }
 
 
-  addDevice(device: Light): LightBehaviourWrapper {
-    const lightBehaviourWrapper = new LightBehaviourWrapper(device);
-    lightBehaviourWrapper.init();
-    this.wrappers[device.getUniqueId()] = lightBehaviourWrapper;
-    lightBehaviourWrapper.behaviourAggregator.onDumbHouseModeSwitch(this.dumbHouseModeActive)
-    return lightBehaviourWrapper;
+  addDevice(device: DeviceBehaviourSupport): DeviceBehaviourWrapper {
+    const deviceBehaviourWrapper = new DeviceBehaviourWrapper(device);
+    deviceBehaviourWrapper.init();
+    this.wrappers[device.getUniqueId()] = deviceBehaviourWrapper;
+    deviceBehaviourWrapper.behaviourAggregator.onDumbHouseModeSwitch(this.dumbHouseModeActive)
+    return deviceBehaviourWrapper;
   }
 
   removeDevice(uniqueId: string): void {
@@ -129,10 +128,10 @@ export class CrownstoneHueBehaviour {
   /** Returns a map of all connected devices by uniqueId
 
    */
-  getAllDevices(): { [uniqueId: string]: Light } {
+  getAllDevices(): { [uniqueId: string]: DeviceBehaviourSupport } {
     let devices = {}
     for (const wrappedDevice of Object.values(this.wrappers)) {
-      devices[wrappedDevice.light.getUniqueId()] = wrappedDevice.light;
+      devices[wrappedDevice.device.getUniqueId()] = wrappedDevice.device;
     }
     return devices;
   }

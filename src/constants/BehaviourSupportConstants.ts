@@ -11,11 +11,11 @@ export const EMPTY_RULE_ACTIVE_DAYS: ActiveDays = {
   Fri: true, Mon: true, Sat: true, Sun: true, Thu: true, Tue: true, Wed: true
 };
 
-export const EMPTY_RULE: HueBehaviourWrapper = {
+export const EMPTY_RULE: BehaviourWrapper = {
   type: "BEHAVIOUR",
   activeDays: {...EMPTY_RULE_ACTIVE_DAYS},
   data: {...EMPTY_RULE_DATA},
   cloudId: "ci" + Date.now(),
-  lightId: "22:FF:DD:TT:AA:CC:GG"
+  deviceId: "22:FF:DD:TT:AA:CC:GG"
 
 }

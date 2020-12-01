@@ -2,9 +2,9 @@ import {BehaviourUtil} from "./BehaviourUtil";
 import {EMPTY_RULE, SPHERE_DELAY} from "../../constants/BehaviourSupportConstants"
 
 export class BehaviourSupport {
-  rule: HueBehaviourWrapper;
+  rule: BehaviourWrapper;
 
-  constructor(behaviour: HueBehaviourWrapper = EMPTY_RULE) {
+  constructor(behaviour: BehaviourWrapper = EMPTY_RULE) {
     this.rule = {...behaviour}
   }
 
@@ -32,8 +32,8 @@ export class BehaviourSupport {
     return this;
   }
 
-  setLightId(value: string) {
-    this.rule.lightId = value;
+  setDeviceId(value: string) {
+    this.rule.deviceId = value;
     return this;
   }
 

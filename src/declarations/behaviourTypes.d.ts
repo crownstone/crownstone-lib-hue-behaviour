@@ -97,27 +97,27 @@ interface HueTwilight {
   time: Time,
 }
 
-type HueBehaviourWrapper = HueBehaviourWrapperTwilight | HueBehaviourWrapperBehaviour
+type BehaviourWrapper =  BehaviourWrapperTwilight | BehaviourWrapperBehaviour
 
-interface HueBehaviourWrapperBehaviour {
+interface BehaviourWrapperBehaviour {
   type: "BEHAVIOUR"
   data: HueBehaviour
   activeDays: ActiveDays,
-  lightId: string,
+  deviceId: string,
   cloudId: string
 }
 
 
-interface HueBehaviourWrapperTwilight {
+interface BehaviourWrapperTwilight {
   type: "TWILIGHT"
   data: HueTwilight
   activeDays: ActiveDays,
-  lightId: string,
+  deviceId: string,
   cloudId: string
 }
 
 interface BehaviourBaseInterface {
-  behaviour: HueBehaviourWrapper;
+  behaviour: BehaviourWrapper;
   isActive: boolean;
   timestamp: number | null;
   sphereLocation: SphereLocation
