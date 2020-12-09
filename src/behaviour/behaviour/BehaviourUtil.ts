@@ -31,5 +31,4 @@ export const BehaviourUtil = {
     const sunTimes = SunCalc.getTimes(new Date(timestamp), sphereLocation.latitude, sphereLocation.longitude);
     return (sunTimes.sunriseEnd.getHours() * 60) + sunTimes.sunriseEnd.getMinutes();
   }
-
 }

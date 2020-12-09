@@ -5,7 +5,7 @@ import {
 } from "../constants/testConstants";
 import {BehaviourSupport} from "../../src/behaviour/behaviour/BehaviourSupport";
 import {eventBus} from "../../src/util/EventBus";
-import {CrownstoneHue,DeviceBehaviourWrapper} from "../../../crownstone-lib-hue/"
+import {CrownstoneHue,BehaviourWrapper as DeviceWrapper} from "../../../crownstone-lib-hue/"
 import {mockLight} from "../helpers/Light";
 
 /**
@@ -54,13 +54,14 @@ describe('Integration Test with mocks', () => {
     const behaviourB = new BehaviourSupport().setCloudId("id1").setDeviceId(fakeLightsOnBridge[1].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()
     const crownstoneHueBehaviour = new CrownstoneHueBehaviour();
     let light = await crownstoneHue.addLight({id:0})
-    const wrapped = new DeviceBehaviourWrapper(light)
+    const wrapped = new DeviceWrapper(light)
     crownstoneHueBehaviour.addDevice(wrapped);
     await crownstoneHueBehaviour.setBehaviour(behaviourA.rule);
     await crownstoneHueBehaviour.setBehaviour(behaviourB.rule);
     jest.advanceTimersToNextTimer(1);
     await flushPromises();
    return expect(light.getState()).toMatchObject({on: true, bri: 20 * 2.54})
+
   })
 
   test('Scenario', async () => {
@@ -68,7 +69,7 @@ describe('Integration Test with mocks', () => {
 
     const crownstoneHueBehaviour = new CrownstoneHueBehaviour();
     const light = await crownstoneHue.addLight({id:0});
-    crownstoneHueBehaviour.addDevice(new DeviceBehaviourWrapper(light));
+    crownstoneHueBehaviour.addDevice(new DeviceWrapper(light));
 
     const behaviourA = new BehaviourSupport().setCloudId("id0").setDeviceId(fakeLightsOnBridge[0].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()
     await crownstoneHueBehaviour.setBehaviour(behaviourA.rule);
@@ -127,8 +128,8 @@ describe('Integration Test with mocks', () => {
     jest.useFakeTimers()
     const crownstoneHueBehaviour = new CrownstoneHueBehaviour();
     const light = await crownstoneHue.addLight({id:0})
-    crownstoneHueBehaviour.addDevice(new DeviceBehaviourWrapper(light));
-    crownstoneHueBehaviour.addDevice(new DeviceBehaviourWrapper(await crownstoneHue.addLight({id:1})));
+    crownstoneHueBehaviour.addDevice(new DeviceWrapper(light));
+    crownstoneHueBehaviour.addDevice(new DeviceWrapper(await crownstoneHue.addLight({id:1})));
 
     const behaviourA = new BehaviourSupport().setCloudId("id0").setDeviceId(fakeLightsOnBridge[0].uniqueid).setTimeAllDay().setDimPercentage(20).setPresenceIgnore()
     await crownstoneHueBehaviour.setBehaviour(behaviourA.rule);

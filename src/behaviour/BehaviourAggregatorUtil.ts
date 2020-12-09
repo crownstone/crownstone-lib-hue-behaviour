@@ -12,8 +12,12 @@ interface TimeCompareResult {
 
 export const SWITCH_STATE_OVERRIDE = "SWITCH_STATE_OVERRIDE";
 export const DIM_STATE_OVERRIDE = "DIM_STATE_OVERRIDE";
+export const MULTI_STATE_OVERRIDE = "MULTI_STATE_OVERRIDE";
+export const HUE_STATE_OVERRIDE = "COLOR_STATE_OVERRIDE";
+export const SAT_STATE_OVERRIDE = "SAT_STATE_OVERRIDE";
+export const TEMPERATURE_STATE_OVERRIDE = "TEMPERATURE_STATE_OVERRIDE";
 export const NO_OVERRIDE = "NO_OVERRIDE";
-export const AGGREGATOR_POLLING_RATE = 500;
+export const AGGREGATOR_ITERATION_RATE = 500;
 
 export const BehaviourAggregatorUtil = {
 
@@ -78,7 +82,11 @@ export const BehaviourAggregatorUtil = {
    * @returns Behaviour with lowest percentage.
    */
   compareByDimPercentage(behaviourA: SwitchBehaviour | Twilight, behaviourB: SwitchBehaviour | Twilight): SwitchBehaviour | Twilight {
-    return (behaviourA.behaviour.data.action.data <= behaviourB.behaviour.data.action.data) ? behaviourA : behaviourB;
+   return (this.getDimPercentageFromBehaviour(behaviourA) <= this.getDimPercentageFromBehaviour(behaviourB)) ? behaviourA : behaviourB;
+  },
+
+  getDimPercentageFromBehaviour(behaviour:SwitchBehaviour | Twilight):number{
+    return ((behaviour.behaviour.data.action.type === "BE_COLOR" || behaviour.behaviour.data.action.type === "SET_COLOR_WHEN_TURNED_ON"))? behaviour.behaviour.data.action.data.brightness: behaviour.behaviour.data.action.data;
   },
 
   /** Prioritizes Behaviours based on SwitchBehaviour overlapping rules.
@@ -180,7 +188,30 @@ export const BehaviourAggregatorUtil = {
     if (updateState.type === "COLOR" && deviceState.type == "COLORABLE") {
       deviceState.hue = updateState.hue;
       deviceState.saturation = updateState.saturation;
+      deviceState.brightness = updateState.brightness;
+
+      if (updateState.brightness > 0) {
+        deviceState.on = true;
+      }
+
+      else {
+        deviceState.on = false;
+      }
     }
+    if (updateState.type === "COLOR_TEMPERATURE" && (deviceState.type == "COLORABLE_TEMPERATURE" ||  deviceState.type == "COLORABLE") ) {
+      deviceState.temperature = updateState.temperature;
+      deviceState.brightness = updateState.brightness;
+
+      if (updateState.brightness > 0) {
+        deviceState.on = true;
+      }
+      else {
+        deviceState.on = false;
+      }
+    }
+
+
+
 
     return deviceState;
   },
@@ -214,12 +245,29 @@ export const BehaviourAggregatorUtil = {
       else if (stateUpdate.type === "DIMMING") {
         returnType = (stateUpdate.value === deviceState.brightness)
       }
-      if (stateUpdate.type === "COLOR") {
+      else if (stateUpdate.type === "COLOR") {
         returnType = (stateUpdate.brightness === deviceState.brightness) && (stateUpdate.hue === deviceState.hue) && (stateUpdate.saturation === deviceState.saturation)
+      }
+      else if (stateUpdate.type === "COLOR_TEMPERATURE") {
+        returnType = (stateUpdate.brightness === deviceState.brightness) && (stateUpdate.temperature === deviceState.temperature)
       }
       else {
         throw "Unsupported behaviour."
       }
+    }
+      if (deviceState.type === "COLORABLE_TEMPERATURE") {
+        if (stateUpdate.type === "SWITCH") {
+          returnType = (stateUpdate.value === deviceState.on)
+        }
+        else if (stateUpdate.type === "DIMMING") {
+          returnType = (stateUpdate.value === deviceState.brightness)
+        }
+        else if (stateUpdate.type === "COLOR_TEMPERATURE") {
+          returnType = (stateUpdate.brightness === deviceState.brightness) && (stateUpdate.temperature === deviceState.temperature)
+        }
+        else {
+          throw "Unsupported behaviour."
+        }
     }
     return returnType;
   },
@@ -241,8 +289,31 @@ export const BehaviourAggregatorUtil = {
       state.hue = Math.min(MaxStateValue["hue"], Math.max(MinStateValue["hue"], state.hue))
       state.saturation = Math.min(MaxStateValue["saturation"], Math.max(MinStateValue["saturation"], state.saturation))
     }
+    if (state.type === "COLORABLE_TEMPERATURE") {
+      state.brightness = Math.min(MaxStateValue["brightness"], Math.max(MinStateValue["brightness"], state.brightness))
+    }
+  },
 
-
+  isBehaviourEqual(behaviourA:BehaviourWrapper,behaviourB:BehaviourWrapper){
+    if(behaviourA.type === behaviourB.type){
+      if(behaviourA.data.action.type === behaviourB.data.action.type){
+        if(typeof(behaviourA.data.action.data) === "object" && typeof(behaviourB.data.action.data) === "object"){
+          if(behaviourA.data.action.data.type === behaviourB.data.action.data.type){
+            if(behaviourA.data.action.data.type === "COLOR" && behaviourB.data.action.data.type === "COLOR"){
+              return (behaviourA.data.action.data.hue === behaviourB.data.action.data.hue
+                && behaviourA.data.action.data.saturation === behaviourB.data.action.data.saturation
+                && behaviourA.data.action.data.brightness === behaviourB.data.action.data.brightness)
+            } else if(behaviourA.data.action.data.type === "COLOR_TEMPERATURE" && behaviourB.data.action.data.type === "COLOR_TEMPERATURE"){
+              return (behaviourA.data.action.data.temperature === behaviourB.data.action.data.temperature
+                && behaviourA.data.action.data.brightness === behaviourB.data.action.data.brightness)
+            }
+          }
+        } else {
+          return behaviourA.data.action.data === behaviourB.data.action.data
+        }
+      }
+    }
+    return false;
   }
 
 }

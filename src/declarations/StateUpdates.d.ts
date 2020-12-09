@@ -28,8 +28,18 @@ interface colorCommand {
   brightness: number,
   saturation: number
 }
+/** Color temperature command
+ * @param temperature - Representation in Kelvin;
+ * @param brightness - Should have a range from 0 to 100;
+ */
+interface colorTemperatureCommand {
+  type: "COLOR_TEMPERATURE",
+  temperature: number,
+  brightness: number
+}
 
-type StateUpdate = switchCommand | dimmingCommand | colorCommand;
+
+type StateUpdate = switchCommand | dimmingCommand | colorCommand | colorTemperatureCommand;
 
 
 interface SwitchableState{
@@ -47,16 +57,25 @@ interface ColorableState{
   on: boolean,
   hue: number,
   brightness: number,
-  saturation: number
+  saturation: number,
+  temperature: number
 }
 
-type DeviceStates = SwitchableState | DimmableState | ColorableState
 
-type DeviceType = "SWITCHABLE" | "DIMMABLE" | "COLORABLE";
+interface ColorableTemperatureState{
+  type: "COLORABLE_TEMPERATURE",
+  on: boolean,
+  temperature: number,
+  brightness: number
+}
+
+type DeviceStates = SwitchableState | DimmableState | ColorableState | ColorableTemperatureState
+
+type DeviceType = "SWITCHABLE" | "DIMMABLE" | "COLORABLE" | "COLORABLE_TEMPERATURE";
 
 interface BehaviourValueRangeState{
   type: "RANGE"
-    value: number // 0 ... 100
+  value: number // 0 ... 100
 }
 
 interface BehaviourColorState{
@@ -65,5 +84,11 @@ interface BehaviourColorState{
   hue: number,
   saturation: number
 }
-type BehaviourStates = BehaviourValueRangeState | BehaviourColorState
+
+interface BehaviourTemperatureState{
+  type: "COLOR_TEMPERATURE",
+  brightness: number,
+  temperature: number
+}
+type BehaviourStates = BehaviourValueRangeState | BehaviourColorState | BehaviourTemperatureState
 

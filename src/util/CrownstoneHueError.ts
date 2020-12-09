@@ -11,6 +11,7 @@ export const ERROR_CODES = {
   412: "Something went wrong when trying to configure a light.",
   413: "Bridge can not be created, neither a ip address nor a bridge id is given.",
   422: "Light is not found on the bridge.",
+  433: "Device does not support given behaviour.",
   888: "Unknown action call to Hue Api.",
   999: "Unknown Error, see description."
 }

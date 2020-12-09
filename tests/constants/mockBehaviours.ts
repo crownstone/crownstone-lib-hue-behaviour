@@ -509,6 +509,31 @@ export const switchOn10AllDay: BehaviourWrapper = {
   "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
+export const colorOn10AllDay: BehaviourWrapper = {
+  "type": "BEHAVIOUR",
+  "data": {
+    "action": {"type": "BE_COLOR", "data": {type:"COLOR", brightness: 10, hue: 254, saturation: 100}},
+    "time": {
+      "type": "ALL_DAY"
+
+    },
+    "presence": {
+      "type": "IGNORE"
+    },
+  },
+  "activeDays": {
+    "Mon": true,
+    "Tue": true,
+    "Wed": true,
+    "Thu": true,
+    "Fri": true,
+    "Sat": true,
+    "Sun": true
+  },
+  "cloudId": "ACTUALCLOUDID-1349",
+  "deviceId": "5f4e47660bc0da0004b4fe16"
+}
+
 export const switchOn80Range13001500: BehaviourWrapper = {
   "type": "BEHAVIOUR",
   "data": {
@@ -534,6 +559,57 @@ export const switchOn80Range13001500: BehaviourWrapper = {
   "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
+export const colorOn80Range13001500: BehaviourWrapper = {
+  "type": "BEHAVIOUR",
+  "data": {
+    "action": {"type": "BE_COLOR", "data": {type:"COLOR", saturation: 100, hue:144, brightness: 80}},
+    "time": {
+      "type": "RANGE",
+      "from": {"type": "CLOCK", "data": {"hours": 13, "minutes": 0}},
+      "to": {"type": "CLOCK", "data": {"hours": 15, "minutes": 0}}
+
+    },
+    "presence": {"type": "IGNORE"}
+  },
+  "activeDays": {
+    "Mon": true,
+    "Tue": true,
+    "Wed": true,
+    "Thu": true,
+    "Fri": true,
+    "Sat": true,
+    "Sun": true
+  },
+  "cloudId": "CLOUDID-24125",
+  "deviceId": "5f4e47660bc0da0004b4fe16"
+}
+
+
+
+export const temp2400On60Range14001500: BehaviourWrapper = {
+  "type": "BEHAVIOUR",
+  "data": {
+    "action": {"type": "BE_COLOR", "data": {type:"COLOR_TEMPERATURE", temperature:2400, brightness: 60}},
+    "time": {
+      "type": "RANGE",
+      "from": {"type": "CLOCK", "data": {"hours": 14, "minutes": 0}},
+      "to": {"type": "CLOCK", "data": {"hours": 15, "minutes": 0}}
+
+    },
+    "presence": {"type": "IGNORE"}
+  },
+  "activeDays": {
+    "Mon": true,
+    "Tue": true,
+    "Wed": true,
+    "Thu": true,
+    "Fri": true,
+    "Sat": true,
+    "Sun": true
+  },
+  "cloudId": "CLOUDID-5125",
+  "deviceId": "5f4e47660bc0da0004b4fe16"
+}
 export const twilight70Range12001500: BehaviourWrapper = {
   "type": "TWILIGHT",
   "data": {

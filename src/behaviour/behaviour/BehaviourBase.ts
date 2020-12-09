@@ -43,12 +43,17 @@ export abstract class BehaviourBase {
       if (this.behaviour.data.action.type === "BE_ON" || this.behaviour.data.action.type === "DIM_WHEN_TURNED_ON") {
         return {type: "RANGE", value: this.behaviour.data.action.data};
       }
+      if(this.behaviour.data.action.type === "BE_COLOR" || this.behaviour.data.action.type === "SET_COLOR_WHEN_TURNED_ON"){
+        if(this.behaviour.data.action.data.type === "COLOR"){
+          return {type: "COLOR", brightness: this.behaviour.data.action.data.brightness, saturation: this.behaviour.data.action.data.saturation, hue: this.behaviour.data.action.data.hue};
+        }
+        if(this.behaviour.data.action.data.type === "COLOR_TEMPERATURE"){
+          return {type: "COLOR_TEMPERATURE", brightness: this.behaviour.data.action.data.brightness, temperature: this.behaviour.data.action.data.temperature};
+        }
+      }
     }
     else {
-
-      if (this.behaviour.data.action.type === "BE_ON" || this.behaviour.data.action.type === "DIM_WHEN_TURNED_ON") {
         return {type: "RANGE", value: 0};
-      }
     }
   }
 

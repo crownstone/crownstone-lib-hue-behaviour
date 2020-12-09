@@ -4,6 +4,7 @@
 import {eventBus} from "../src/util/EventBus";
 import {ON_PRESENCE_CHANGE} from "../src/constants/EventConstants";
 import {
+  colorOn10AllDay,
   switchOn10AllDay,
   switchOn20Between19002200, switchOn40WhenInRoom5n6,
   switchOn50Sphere,
@@ -190,5 +191,17 @@ describe('Scenarios', function () {
 
     behaviourAggregator.tick(Date.parse(new Date(2020, 9, 4, 20, 50).toString()));
     return expect(behaviourAggregator.getComposedState()).toStrictEqual({type: "RANGE" , value: 50 })
+  })
+
+  test("Color",()=>{
+    const behaviourAggregator = aggregatorCreator([colorOn10AllDay, switchOn50Sphere])
+    behaviourAggregator.tick(Date.parse(new Date(2020, 9, 4, 20, 30).toString()));
+    eventBus.emit(ON_PRESENCE_CHANGE, EVENT_ENTER_SPHERE);
+    behaviourAggregator.tick(Date.parse(new Date(2020, 9, 4, 20, 30).toString()));
+    expect(behaviourAggregator.getComposedState()).toStrictEqual({type:"RANGE", value: 50})
+    eventBus.emit(ON_PRESENCE_CHANGE, EVENT_LEAVE_SPHERE);
+    behaviourAggregator.tick(Date.parse(new Date(2020, 9, 4, 20, 40).toString()));
+    expect(behaviourAggregator.getComposedState()).toStrictEqual({type:"COLOR",  brightness: 10, hue: 254, saturation: 100})
+
   })
 });

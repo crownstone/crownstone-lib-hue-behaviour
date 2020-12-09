@@ -1,35 +1,35 @@
-interface HueStateBase {
-  on?: boolean,
-  bri?: number,
-  hue?: number,
-  sat?: number,
-  xy?: [number, number],
-  ct?: number,
-}
-
-interface HueLightState extends HueStateBase {
-  on: boolean
-}
-
-interface HueFullState extends HueLightState {
-  effect?: string,
-  alert?: string,
-  colormode?: string,
-  mode?: string,
-  reachable: boolean
-}
+// interface HueStateBase {
+//   on?: boolean,
+//   bri?: number,
+//   hue?: number,
+//   sat?: number,
+//   xy?: [number, number],
+//   ct?: number,
+// }
 //
-// interface StateUpdate extends HueStateBase {
+// interface HueLightState extends HueStateBase {
+//   on: boolean
+// }
+//
+// interface HueFullState extends HueLightState {
 //   effect?: string,
 //   alert?: string,
-//   bri_inc?: number;
-//   hue_inc?: number;
-//   sat_inc?: number;
-//   ct_inc?: number;
-//   xy_inc?: [number, number];
-//   transitiontime?: number
+//   colormode?: string,
+//   mode?: string,
+//   reachable: boolean
 // }
-
+// //
+// // interface StateUpdate extends HueStateBase {
+// //   effect?: string,
+// //   alert?: string,
+// //   bri_inc?: number;
+// //   hue_inc?: number;
+// //   sat_inc?: number;
+// //   ct_inc?: number;
+// //   xy_inc?: [number, number];
+// //   transitiontime?: number
+// // }
+//
 
 interface PresenceProfileLocation {
   type: "LOCATION"

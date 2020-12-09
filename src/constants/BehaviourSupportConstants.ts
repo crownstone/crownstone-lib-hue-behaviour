@@ -1,7 +1,7 @@
 export const SPHERE_DELAY = 5 * 60;
 
 
-export const EMPTY_RULE_DATA: HueBehaviour = {
+export const EMPTY_RULE_DATA: SwitchBehaviourData = {
   action: {type: "BE_ON", data: 100},
   time: {type: "ALL_DAY"},
   presence: {type: "IGNORE"},
