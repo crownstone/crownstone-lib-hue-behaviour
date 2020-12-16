@@ -52,7 +52,7 @@ crownstoneHueBehaviour.addDevice(device:DeviceBehaviourSupport);
 ```   
 If the uniqueId of the device is already used, it will throw an error with errorCode 500 and the uniqueId in the description.
 
-See Device support[TODO link] for more information about how to support a device.
+See [Device compatibility](/documentation/DeviceSupport.md) for more information about how to make a device compatible.
 
 #### Removing a device
 In order to remove a device, you call:
@@ -65,16 +65,16 @@ The id that is used, is the device's unique id.
 #### Adding/Updating a Behaviour
 To add or update a behaviour to the module, call:
 ```
-crownstoneHueBehaviour.setBehaviour(behaviour:HueBehaviourWrapper);
+crownstoneHueBehaviour.setBehaviour(deviceId:string,behaviour:HueBehaviourWrapper);
 ``` 
 See [HueBehaviourWrapper](/src/declarations/behaviourTypes.d.ts) for the format.
  
-This function will add/update the behaviour based on the ```cloudId``` and ```deviceId ``` variable inside the object. 
+This function will add/update the behaviour based on the ```cloudId``` variable inside the object. 
 Returning a true when done or false when there is no device corresponding the behaviour's deviceId.
 
 ##### Example
 ```
-await crownstoneHueBehaviour.setBehaviour({
+await crownstoneHueBehaviour.setBehaviour("AS:FD:52....",{
 				  "type": "BEHAVIOUR",
                     "data": {
                       "action": {"type": "BE_ON", "data": 100},
@@ -94,8 +94,7 @@ await crownstoneHueBehaviour.setBehaviour({
                       "Fri": true,
                       "Sat": true,
                       "Sun": true
-                    },
-				  deviceId: "AS:FD:52....",
+                    }, 
 				  cloudId:"ygD9z3FyKWqyOVb7xkJCC5v"
 				  })
 ```

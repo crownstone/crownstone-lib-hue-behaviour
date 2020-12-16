@@ -35,8 +35,12 @@ When a device is added, an aggregator will be wrapped with the device and, the a
 
 
 The only thing that remains is adding a behaviour to the system, this is done by calling:
+```crownstoneHueBehaviour.setBehaviour(deviceId:string,behaviour:HueBehaviourWrapper)```
+The deviceId should be the uniqueId of the device you'd like to add.
+
+Example:
 ```
-crownstoneHueBehaviour.setBehaviour({
+crownstoneHueBehaviour.setBehaviour("AS:FD:52....",{
 				  "type": "BEHAVIOUR",
                     "data": {
                       "action": {"type": "BE_COLOR", "data": {
@@ -62,12 +66,10 @@ crownstoneHueBehaviour.setBehaviour({
                       "Fri": true,
                       "Sat": true,
                       "Sun": true
-                    },
-				  deviceId: "AS:FD:52....",
+                    }, 
 				  cloudId:"ygD9z3FyKWqyOVb7xkJCC5v"
 				  })
 ```
-The deviceId should be the uniqueId of the device you'd like to add.
 
 Repeat the above adding operation if a device has multiple behaviours.
 

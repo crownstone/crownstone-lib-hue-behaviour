@@ -29,7 +29,7 @@ The following is only for documentation purposes, with normal usage everything i
 
 `const switchBehaviour = new SwitchBehaviour(behaviour: HueBehaviourWrapperBehaviour, sphereLocation: SphereLocation)`
 
-Format data about `HueBehaviourWrapperBehaviour` and `HueBehaviourWrapperTwilight` can be found at [behaviourTypes.d.ts](/3src/declarations/behaviourTypes.d.ts). These are the set of rules that defines whether the behaviour should be active and what it should do.
+Format data about `HueBehaviourWrapperBehaviour` and `HueBehaviourWrapperTwilight` can be found at [behaviourTypes.d.ts](/src/declarations/behaviourTypes.d.ts). These are the set of rules that defines whether the behaviour should be active and what it should do.
 
 ### Tick
 
