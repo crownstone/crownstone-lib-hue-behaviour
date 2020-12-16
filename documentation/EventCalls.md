@@ -41,3 +41,5 @@ data: {
 
 ### ON_DUMB_HOUSE_MODE_SWITCH
 When dumb house mode is set, it emits an event call with the topic ```"onDumbHouseModeSwitch"``` and a data ```boolean```.
+### ON_SPHERE_CHANGE 
+When a sphere's location is changed, it emits an event with topic `"onSphereChange"` and a stringified data object as `{latitude: number, longitude: number}`.

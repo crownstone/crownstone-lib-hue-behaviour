@@ -1,13 +1,13 @@
 import {CrownstoneHueBehaviour} from "../dist/src";
 // import {CrownstoneHueBehaviour} from "crownstone-lib-hue-behaviour";
 
+const crownstoneHueBehaviour = new CrownstoneHueBehaviour();
+
 class ExampleDevice {
   state: { on: boolean, brightness: number, hue: number, saturation: number, temperature: number };
-  id: number
   callback;
 
   constructor() {
-    this.id = Date.now();
     this.state = {on: true, brightness: 100, hue: 412, saturation: 50, temperature: 1000}
   }
 
@@ -51,8 +51,8 @@ class ExampleDevice {
     console.log(state);
   }
 
-  getUniqueId() {
-    return "AB:" + this.id;
+  getUniqueId():string {
+    return "AB:CD:EF:GH:12:34";
   }
 
   getDeviceType(): string {
@@ -79,32 +79,36 @@ class ExampleDevice {
   }
 }
 
-const crownstoneHueBehaviour = new CrownstoneHueBehaviour();
 
-const device = new ExampleDevice() //Add your own supported device.
-crownstoneHueBehaviour.addDevice(device);
-crownstoneHueBehaviour.setBehaviour({
-  "type": "BEHAVIOUR",
-  "data": {
-    "action": {"type": "BE_COLOR", "data": {type: "COLOR", brightness: 42, hue: 254, saturation: 100}},
-    "time": {
-      "type": "ALL_DAY"
 
+function reactOnPresence():void{
+  const device = new ExampleDevice() //Add your own supported device.
+  crownstoneHueBehaviour.addDevice(device);
+  crownstoneHueBehaviour.setBehaviour({
+    "type": "BEHAVIOUR",
+    "data": {
+      "action": {"type": "BE_COLOR", "data": {type: "COLOR", brightness: 42, hue: 254, saturation: 100}},
+      "time": {
+        "type": "ALL_DAY"
+
+      },
+      "presence": {"type": "SOMEBODY", "data": {"type": "SPHERE"}, "delay": 300}
     },
-    "presence": {"type": "SOMEBODY", "data": {"type": "SPHERE"}, "delay": 300}
-  },
-  "activeDays": {
-    "Mon": true,
-    "Tue": true,
-    "Wed": true,
-    "Thu": true,
-    "Fri": true,
-    "Sat": true,
-    "Sun": true
-  },
-  "cloudId": "13sbsuqd52qyuhkfs5f4349",
-  "deviceId": device.getUniqueId() //
-})
-console.log("Behaviour set and ready to be activated by presence.")
-crownstoneHueBehaviour.presenceChange({type: "ENTER", data: {type: "SPHERE", profileIdx: 0}}); // User enters the sphere.
-console.log("Presence data passed")
+    "activeDays": {
+      "Mon": true,
+      "Tue": true,
+      "Wed": true,
+      "Thu": true,
+      "Fri": true,
+      "Sat": true,
+      "Sun": true
+    },
+    "cloudId": "13sbsuqd52qyuhkfs5f4349",
+    "deviceId": "AB:CD:EF:GH:12:34" // uniqueId of a device.
+  })
+  console.log("Behaviour set and ready to be activated by presence.")
+  crownstoneHueBehaviour.presenceChange({type: "ENTER", data: {type: "SPHERE", profileIdx: 0}}); // User enters the sphere.
+  console.log("Presence data passed")
+}
+
+reactOnPresence();
