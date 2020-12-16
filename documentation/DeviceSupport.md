@@ -27,11 +27,11 @@ This will function as an interface for passing state updates to your device, see
 #### `setStateUpdateCallback(callback:((state:StateUpdate) => void)):void`
 
 Used for setting a callback for state updates by the device. This is the interface to the behaviour aggregator for state updates.
-
+See the sections about sending updates under each device type.
 ### Device types
 There are 4 device types defined: `SWITCHABLE`, `DIMMABLE`, `COLORABLE` and `COLORABLE_TEMPERATURE`.`
 These types define what kind of device it is and helps the behaviour aggregator know which type of state updates can be send/received and which not. 
-There are two states formats, one for sending and receiving state updates and one for sending the full (initial) of the device.
+There are two states formats, one for sending and receiving state updates and one for sending the full (initial) state of the device.
 
 ### Switch devices
 A switch device is a device that can only turn on/off. These are devices of type `SWITCHABLE` and support the following states:
@@ -43,7 +43,7 @@ The behaviour aggregator will send out state updates of the following format:
     value: boolean
 }
 ```
-#### Sending Update
+#### Sending Updates
 The behaviour aggregator is able to receive state updates of the following format:
 ```
 {
@@ -71,7 +71,7 @@ The behaviour aggregator will send out state updates of the following format:
 }
 ```
 `value` is a value between `0` and `100` and represents the value in percentages, 0 equals off.
-#### Sending Update
+#### Sending Updates
 The behaviour aggregator is able to receive state updates of the following format:
 
 **Switch:**
@@ -143,7 +143,7 @@ Note that this does not change the color, so if the color is blue it will lower 
 
 `temperature` is the light temperature in kelvin and has no predefined maximum and minimum values.
 
-#### Sending Update
+#### Sending Updates
 The behaviour aggregator is able to receive state updates of the following format:
 
 **Switch:**
@@ -239,7 +239,7 @@ Note that this does not change the temperature color, it will only lower the bri
 
 `temperature` is the light temperature in kelvin and has no predefined maximum and minimum values.
 
-#### Sending Update
+#### Sending Updates
 The behaviour aggregator is able to receive state updates of the following format:
 
 **Switch:**
