@@ -69,7 +69,7 @@ interface ColorableTemperatureState{
   brightness: number
 }
 
-type DeviceStates = SwitchableState | DimmableState | ColorableState | ColorableTemperatureState
+type DeviceState = SwitchableState | DimmableState | ColorableState | ColorableTemperatureState
 
 type DeviceType = "SWITCHABLE" | "DIMMABLE" | "COLORABLE" | "COLORABLE_TEMPERATURE";
 
@@ -90,5 +90,5 @@ interface BehaviourTemperatureState{
   brightness: number,
   temperature: number
 }
-type BehaviourStates = BehaviourValueRangeState | BehaviourColorState | BehaviourTemperatureState
+type BehaviourState = BehaviourValueRangeState | BehaviourColorState | BehaviourTemperatureState
 

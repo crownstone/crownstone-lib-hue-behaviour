@@ -2,6 +2,7 @@ import {eventBus} from "./util/EventBus";
 import {ON_DUMB_HOUSE_MODE_SWITCH, ON_PRESENCE_CHANGE, ON_SPHERE_CHANGE} from "./constants/EventConstants";
 import {GenericUtil} from "./util/GenericUtil";
 import {DeviceBehaviourWrapper} from "./wrapper/DeviceBehaviourWrapper";
+import {CrownstoneHueError} from "./util/CrownstoneHueError";
 export const SPHERE_DEFAULT =  {latitude: 51.9233355, longitude: 4.469152};
 
 /**
@@ -110,6 +111,9 @@ export class CrownstoneHueBehaviour {
 
 
   addDevice(device: DeviceBehaviourSupport): DeviceBehaviourWrapper {
+    if(this.wrappers[device.getUniqueId()] !== undefined){
+      throw new CrownstoneHueError(500,device.getUniqueId());
+    }
     const deviceBehaviourWrapper = new DeviceBehaviourWrapper(device);
     deviceBehaviourWrapper.init();
     this.wrappers[device.getUniqueId()] = deviceBehaviourWrapper;

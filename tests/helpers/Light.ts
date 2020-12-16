@@ -185,7 +185,7 @@ export class mockWrapper {
     }
   }
 
-  async setStateUpdateCallback(callback: ((state: StateUpdate) => {})): Promise<void> {
+  async setStateUpdateCallback(callback: ((state: StateUpdate) => void)): Promise<void> {
     this.callback = callback;
     await this.light.setStateUpdateCallback(this.sendStateToBehaviour.bind(this));
   }

@@ -358,6 +358,9 @@ export class BehaviourSupport {
   }
 
   //########Getters###########
+  getBehaviour(){
+    return this.rule;
+  }
 
   getLocationIds(): number[] {
     if (this.rule.type === "BEHAVIOUR" && this.rule.data.presence.type !== "IGNORE") {

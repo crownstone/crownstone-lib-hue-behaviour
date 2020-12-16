@@ -12,10 +12,8 @@ interface TimeCompareResult {
 
 export const SWITCH_STATE_OVERRIDE = "SWITCH_STATE_OVERRIDE";
 export const DIM_STATE_OVERRIDE = "DIM_STATE_OVERRIDE";
-export const MULTI_STATE_OVERRIDE = "MULTI_STATE_OVERRIDE";
-export const HUE_STATE_OVERRIDE = "COLOR_STATE_OVERRIDE";
-export const SAT_STATE_OVERRIDE = "SAT_STATE_OVERRIDE";
-export const TEMPERATURE_STATE_OVERRIDE = "TEMPERATURE_STATE_OVERRIDE";
+export const COLOR_STATE_OVERRIDE = "COLOR_STATE_OVERRIDE";
+export const COLOR_TEMPERATURE_STATE_OVERRIDE = "COLOR_TEMPERATURE_STATE_OVERRIDE";
 export const NO_OVERRIDE = "NO_OVERRIDE";
 export const AGGREGATOR_ITERATION_RATE = 500;
 
@@ -171,7 +169,7 @@ export const BehaviourAggregatorUtil = {
    *
    * Returns deviceState with updateState values.
    */
-  addUpdateToState(deviceState: DeviceStates, updateState: StateUpdate): DeviceStates {
+  addUpdateToState(deviceState: DeviceState, updateState: StateUpdate): DeviceState {
     if (updateState.type === "SWITCH") {
       deviceState.on = updateState.value;
     }
@@ -217,7 +215,7 @@ export const BehaviourAggregatorUtil = {
   },
 
 
-  stateEqual(deviceState: DeviceStates, stateUpdate: StateUpdate): boolean {
+  stateEqual(deviceState: DeviceState, stateUpdate: StateUpdate): boolean {
     let returnType = false;
     if (deviceState.type === "SWITCHABLE") {
       if (stateUpdate.type === "SWITCH") {
@@ -273,7 +271,7 @@ export const BehaviourAggregatorUtil = {
   },
 
 
-  convertExceedingMinMaxValues(state: DeviceStates | StateUpdate): void {
+  convertExceedingMinMaxValues(state: DeviceState | StateUpdate): void {
     if (state.type === "SWITCH") {
       return
     }

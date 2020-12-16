@@ -2,12 +2,14 @@
 # Documentation - Event calls
 ## Overview
  - [Crownstone Hue Behaviour](/documentation/CrownstoneHueBehaviour.md) 
+ - [Device compatibility](/documentation/DeviceSupport.md)
  - [Errors](/documentation/Errors.md)
  - **Event calls**
- - [LightBehaviourWrapper](/documentation/LightBehaviourWrapper.md)
+ - [DeviceAggregatorWrapper](/documentation/DeviceBehaviourWrapper.md)
  - [Behaviour Aggregator](/documentation/BehaviourAggregator.md)
  - [SwitchBehaviour- & Twilight Prioritizer](/documentation/Prioritizer.md)
  - [Behaviours](/documentation/Behaviours.md)
+
 
 ## About
 The Crownstone Hue module uses some event calls for data transferring.

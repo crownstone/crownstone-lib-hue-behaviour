@@ -2,9 +2,9 @@
 ## Overview
  - **Crownstone Hue Behaviour**
 	- [Constructing](#Constructing) 
-	- [Adding/Removing Light objects](#addingremoving-light-objects)
-		- [Adding a light](#adding-a-light)
-		- [Removing a light](#removing-a-light)
+	- [Adding/Removing Device objects](#addingremoving-device-objects)
+		- [Adding a device](#adding-a-device)
+		- [Removing a device](#removing-a-device)
 	- [Adding/Updating/Removing Behaviours](#addingupdatingremoving-behaviours)
 		- [Adding/Updating a Behaviour](#addingupdating-a-behaviour) 
 		- [Removing a Behaviour](#removing-a-behaviour)
@@ -12,16 +12,18 @@
 	-  [Updating Sphere location](#updating-sphere-location)
 	-  [Switching Dumb house mode](#switching-dumb-house-mode)
 	-  [Stopping the module](#stopping-the-module)
-	-  [Obtaining Lights](#obtaining-lights) 
+	-  [Obtaining Devices](#obtaining-devices) 
+ - [Device compatibility](/documentation/DeviceSupport.md)
  - [Errors](/documentation/Errors.md)
  - [Event calls](/documentation/EventCalls.md)
- - [LightBehaviourWrapper](/documentation/LightBehaviourWrapper.md)
+ - [DeviceBehaviourWrapper](/documentation/DeviceBehaviourWrapper.md)
  - [Behaviour Aggregator](/documentation/BehaviourAggregator.md)
  - [SwitchBehaviour- & Twilight Prioritizer](/documentation/Prioritizer.md)
  - [Behaviours](/documentation/Behaviours.md)
 
 ## About
 The Crownstone Hue Behaviour class is the front of the module, it combines all its functions for easier usage.
+
 ## Usage 
 ### Import
 ```import {CrownstoneHueBehaviour} from {crownstone-lib-hue-behaviour}```
@@ -42,20 +44,22 @@ This information will be used for the time of sunrise and sunset.
 
 If no sphereLocation object is given, the latitude or longitude is missing, the location defaults to the Crownstone's office.
 
-### Adding/Removing Light objects
-#### Adding a light
-In order to add a light, call:
+### Adding/Removing Device objects
+#### Adding a device
+In order to add a device, call:
 ```
-await crownstoneHueBehaviour.addLight(light:Light);
-``` 
-The light object should be a CrownstoneHue Light objects, as this is the only thing it supports as of writing.
+crownstoneHueBehaviour.addDevice(device:DeviceBehaviourSupport);
+```   
+If the uniqueId of the device is already used, it will throw an error with errorCode 500 and the uniqueId in the description.
 
-#### Removing a light
-In order to remove a light, you call:
+See Device support[TODO link] for more information about how to support a device.
+
+#### Removing a device
+In order to remove a device, you call:
 ```
-crownstoneHueBehaviour.removeLight(lightId);
+crownstoneHueBehaviour.removeDevice(uniqueId:string);
 ``` 
-The id that is used, is the light's unique id. 
+The id that is used, is the device's unique id. 
 
 ### Adding/Updating/Removing Behaviours
 #### Adding/Updating a Behaviour
@@ -65,8 +69,8 @@ crownstoneHueBehaviour.setBehaviour(behaviour:HueBehaviourWrapper);
 ``` 
 See [HueBehaviourWrapper](/src/declarations/behaviourTypes.d.ts) for the format.
  
-This function will add/update the behaviour based on the ```cloudId``` and ```lightId ``` variable inside the object. 
-Returning a true when done or false when there is no light corresponding the behaviour's lightId.
+This function will add/update the behaviour based on the ```cloudId``` and ```deviceId ``` variable inside the object. 
+Returning a true when done or false when there is no device corresponding the behaviour's deviceId.
 
 ##### Example
 ```
@@ -91,7 +95,7 @@ await crownstoneHueBehaviour.setBehaviour({
                       "Sat": true,
                       "Sun": true
                     },
-				  lightId: "AS:FD:52....",
+				  deviceId: "AS:FD:52....",
 				  cloudId:"ygD9z3FyKWqyOVb7xkJCC5v"
 				  })
 ```
@@ -99,7 +103,7 @@ await crownstoneHueBehaviour.setBehaviour({
 #### Removing a Behaviour 
 To remove a behaviour from the module, call:
 ```
-crownstoneHueBehaviour.removeBehaviour(lightId,cloudId);
+crownstoneHueBehaviour.removeBehaviour(deviceId,cloudId);
 ``` 
 
 ### Updating user presence
@@ -160,13 +164,13 @@ crownstoneHueBehaviour.setSphereLocation(sphereLocation:SphereLocation);
 
 ```
 
-###  Switching Dumb house mode
+### Switching Dumb house mode
 To switch dumb house mode on or off, call:
 ```
 crownstoneHueBehaviour.setDumbHouseMode(on:boolean);
 ```
 On function call, it emits an event call to all BehaviourAggregators with the given value.
-When the value is true, behaviours do not manipulate the light's state.
+When the value is true, behaviours do not manipulate the device's state.
 
 ### Stopping the module
 To stop the module, call:
@@ -176,7 +180,7 @@ crownstoneHueBehaviour.stop();
 This will stop all timers and cleanup the eventbus.
 
 
-### Obtaining Lights
+### Obtaining Devices
 
-```getAllConnectedLights()```  will return a mapped list as `{[uniqueId: string]: Light}`, `uniqueId` represents the Light's uniqueId.
+```getAllDevices()```  will return a mapped list as `{[uniqueId: string]: DeviceBehaviourSupport}`, `uniqueId` represents the Device's uniqueId.
 

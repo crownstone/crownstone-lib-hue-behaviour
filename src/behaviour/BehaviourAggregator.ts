@@ -6,7 +6,9 @@ import {
   DIM_STATE_OVERRIDE,
   NO_OVERRIDE,
   AGGREGATOR_ITERATION_RATE,
-  SWITCH_STATE_OVERRIDE, HUE_STATE_OVERRIDE, SAT_STATE_OVERRIDE, MULTI_STATE_OVERRIDE, TEMPERATURE_STATE_OVERRIDE
+  SWITCH_STATE_OVERRIDE,
+  COLOR_TEMPERATURE_STATE_OVERRIDE,
+  COLOR_STATE_OVERRIDE
 } from "./BehaviourAggregatorUtil";
 import {TwilightPrioritizer} from "./TwilightPrioritizer";
 import {SwitchBehaviourPrioritizer} from "./SwitchBehaviourPrioritizer";
@@ -24,7 +26,7 @@ export class BehaviourAggregator {
   dumbHouseModeActive: boolean = false;
   aggregatedBehaviour: SwitchBehaviour | Twilight = undefined;
   timestamp = 0;
-  currentDeviceState: DeviceStates;  // State of the Device.
+  currentDeviceState: DeviceState;  // State of the Device.
   deviceType: DeviceType;  // State of the Device.
   override: string = NO_OVERRIDE;
   intervalId: Timeout;
@@ -90,28 +92,28 @@ export class BehaviourAggregator {
     this.switchBehaviourPrioritizer.removeBehaviour(cloudId);
   }
 
-  _checkIfSupportsBehaviour(behaviour:BehaviourWrapper) {
+  _checkIfSupportsBehaviour(behaviour: BehaviourWrapper) {
     if (this.deviceType === "SWITCHABLE") {
       if (behaviour.data.action.type !== "BE_ON") {
-        throw new CrownstoneHueError(433,`{cloudId: ${behaviour.cloudId}, deviceId: ${behaviour.deviceId}`)
+        throw new CrownstoneHueError(433, `{cloudId: ${behaviour.cloudId}, deviceId: ${behaviour.deviceId}`)
       }
     }
     if (this.deviceType === "DIMMABLE") {
       if (behaviour.data.action.type !== "DIM_WHEN_TURNED_ON" && behaviour.data.action.type !== "BE_ON") {
-        throw new CrownstoneHueError(433,`{cloudId: ${behaviour.cloudId}, deviceId: ${behaviour.deviceId}`)
+        throw new CrownstoneHueError(433, `{cloudId: ${behaviour.cloudId}, deviceId: ${behaviour.deviceId}`)
       }
     }
     if (this.deviceType === "COLORABLE") {
       if (behaviour.data.action.type !== "DIM_WHEN_TURNED_ON" && behaviour.data.action.type !== "BE_ON"
         && behaviour.data.action.type !== "SET_COLOR_WHEN_TURNED_ON" && behaviour.data.action.type !== "BE_COLOR") {
-        throw new CrownstoneHueError(433,`{cloudId: ${behaviour.cloudId}, deviceId: ${behaviour.deviceId}`)
+        throw new CrownstoneHueError(433, `{cloudId: ${behaviour.cloudId}, deviceId: ${behaviour.deviceId}`)
       }
     }
     if (this.deviceType === "COLORABLE_TEMPERATURE") {
       if ((behaviour.data.action.type !== "DIM_WHEN_TURNED_ON" && behaviour.data.action.type !== "BE_ON"
         && behaviour.data.action.type !== "SET_COLOR_WHEN_TURNED_ON" && behaviour.data.action.type !== "BE_COLOR")
-      || (typeof(behaviour.data.action.data) === "object" && behaviour.data.action.data.type !== "COLOR_TEMPERATURE") ) {
-        throw new CrownstoneHueError(433,`{cloudId: ${behaviour.cloudId}, deviceId: ${behaviour.deviceId}`)
+        || (typeof (behaviour.data.action.data) === "object" && behaviour.data.action.data.type !== "COLOR_TEMPERATURE")) {
+        throw new CrownstoneHueError(433, `{cloudId: ${behaviour.cloudId}, deviceId: ${behaviour.deviceId}`)
       }
     }
   }
@@ -217,11 +219,11 @@ export class BehaviourAggregator {
   }
 
   _createStateUpdate(): StateUpdate {
-    if(!this.aggregatedBehaviour){
-      if (this.deviceType === "SWITCHABLE"){
+    if (!this.aggregatedBehaviour) {
+      if (this.deviceType === "SWITCHABLE") {
         return SWITCH_OFF_COMMAND;
       }
-      if (this.deviceType === "DIMMABLE" || this.deviceType === "COLORABLE" || this.deviceType === "COLORABLE_TEMPERATURE" ){
+      if (this.deviceType === "DIMMABLE" || this.deviceType === "COLORABLE" || this.deviceType === "COLORABLE_TEMPERATURE") {
         return DIMMING_OFF_COMMAND
       }
     }
@@ -267,9 +269,10 @@ export class BehaviourAggregator {
       }
     }
   }
+
   _createColorTemperatureCommand(): StateUpdate {
     const composedState = this.aggregatedBehaviour.getComposedState()
-    if (composedState.type === "COLOR_TEMPERATURE" ) {
+    if (composedState.type === "COLOR_TEMPERATURE") {
       return {
         type: "COLOR_TEMPERATURE",
         temperature: composedState.temperature,
@@ -279,9 +282,9 @@ export class BehaviourAggregator {
   }
 
   async onStateChange(state: StateUpdate): Promise<void> {
-    if(!state){
+    if (!state) {
       return;
-     }
+    }
     BehaviourAggregatorUtil.convertExceedingMinMaxValues(state);
     if (!this.dumbHouseModeActive) {
       if (await this._onSwitchOnWithActiveBehaviour(state)) {
@@ -296,74 +299,49 @@ export class BehaviourAggregator {
    *
    * @param state
    */
-  _setOverrideOnDeviceStateChange(state: DeviceStates): void {
-    let activeOverride = [];
+  _setOverrideOnDeviceStateChange(state: DeviceState): void {
     if (this.switchBehaviourPrioritizer.prioritizedBehaviour !== undefined) {
       const composedState = this.getStateUpdate();
       if (state.type === "SWITCHABLE") {
         if (composedState.type === "SWITCH" && composedState.value !== state.on) {
-          activeOverride.push("SWITCH")
+          this.override = SWITCH_STATE_OVERRIDE
         }
       }
       else {
-        if (composedState.type === "SWITCH" && composedState.value !== state.on) {
-          activeOverride.push("SWITCH")
+        if ((composedState.type === "SWITCH" && composedState.value !== state.on) ||
+          composedState.type === "DIMMING" && (composedState.value < 100 && !state.on || composedState.value === 0 && state.on)) {
+          this.override = SWITCH_STATE_OVERRIDE
         }
-        if (composedState.type === "DIMMING" && (composedState.value < 100 && !state.on || composedState.value === 0 && state.on)) {
-          activeOverride.push("SWITCH")
-        }
-        if ((composedState.type === "COLOR" || composedState.type === "COLOR_TEMPERATURE")
+        else if ((composedState.type === "COLOR" || composedState.type === "COLOR_TEMPERATURE")
           && (composedState.brightness < 100 && !state.on || composedState.brightness === 0 && state.on)) {
-          activeOverride.push("SWITCH")
+          this.override = SWITCH_STATE_OVERRIDE
         }
-
-        if ((composedState.type === "COLOR" && composedState.brightness !== state.brightness) ||
+        else if ((composedState.type === "COLOR" && composedState.brightness !== state.brightness) ||
           (composedState.type === "COLOR_TEMPERATURE" && composedState.brightness !== state.brightness) ||
           (composedState.type === "DIMMING" && composedState.value !== state.brightness)) {
-          activeOverride.push("BRIGHTNESS")
+          this.override = DIM_STATE_OVERRIDE
         }
 
-        if (state.type === "COLORABLE") {
-          if ((composedState.type === "COLOR" && composedState.hue !== state.hue)) {
-            activeOverride.push("HUE")
-          }
-          if ((composedState.type === "COLOR" && composedState.saturation !== state.saturation)) {
-            activeOverride.push("SATURATION")
+        else if (state.type === "COLORABLE") {
+          if ((composedState.type === "COLOR" && composedState.hue !== state.hue) ||
+            (composedState.type === "COLOR" && composedState.saturation !== state.saturation)) {
+            this.override = COLOR_STATE_OVERRIDE
           }
         }
-        if (state.type === "COLORABLE_TEMPERATURE") {
+        else if (state.type === "COLORABLE_TEMPERATURE") {
           if (composedState.type === "COLOR_TEMPERATURE" && composedState.temperature !== state.temperature) {
-            activeOverride.push("TEMPERATURE")
+            this.override = COLOR_TEMPERATURE_STATE_OVERRIDE
           }
+        }
+        else {
+          this.override = NO_OVERRIDE
         }
       }
     }
-      if(activeOverride.length > 1){
-        this.override = MULTI_STATE_OVERRIDE;
-      } else if(activeOverride.length === 1){
-        switch (activeOverride[0]){
-          case "SWITCH":
-            this.override = SWITCH_STATE_OVERRIDE
-            break;
-          case "BRIGHTNESS":
-            this.override = DIM_STATE_OVERRIDE
-            break;
-          case "HUE":
-            this.override = HUE_STATE_OVERRIDE
-            break;
-          case "SATURATION":
-            this.override = SAT_STATE_OVERRIDE
-            break;
-          case "TEMPERATURE":
-            this.override = TEMPERATURE_STATE_OVERRIDE
-            break;
-
-        }
-      } else if(activeOverride.length === 0){
-        this.override = NO_OVERRIDE
-      }
+    else {
+      this.override = NO_OVERRIDE
+    }
   }
-
 
   /** If a Device turns manually on while behaviour is active, behaviour's state will be used as Device's state.
    *
@@ -383,13 +361,13 @@ export class BehaviourAggregator {
     return false;
   }
 
-  isDeviceOn():boolean{
+  isDeviceOn(): boolean {
     return (this.currentDeviceState.on)
   }
 
   _checkIfStateMatchesWithNewBehaviour(): void {
     if (this.aggregatedBehaviour === undefined) {
-      if (!this.isDeviceOn()){
+      if (!this.isDeviceOn()) {
         this.override = NO_OVERRIDE
       }
     }
@@ -404,7 +382,7 @@ export class BehaviourAggregator {
     if (this.override === NO_OVERRIDE) {
       if (this.aggregatedBehaviour !== undefined && newBehaviour !== undefined
         && this.aggregatedBehaviour.behaviour.cloudId === newBehaviour.cloudId
-        && !BehaviourAggregatorUtil.isBehaviourEqual(this.aggregatedBehaviour.behaviour,newBehaviour)) {
+        && !BehaviourAggregatorUtil.isBehaviourEqual(this.aggregatedBehaviour.behaviour, newBehaviour)) {
         this.aggregatedBehaviour = undefined; //Reset so it's getting changed in next loop iteration.
       }
     }

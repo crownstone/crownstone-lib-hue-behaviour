@@ -32,13 +32,13 @@ export abstract class BehaviourBase {
    * Retrieves the SwitchBehaviour's composed state.
    *
    *
-   * @Returns a Hue Light state
+   * @Returns a BehaviourState
    */
-  getComposedState(): BehaviourStates {
+  getComposedState(): BehaviourState {
     return this._createComposedState();
   }
 
-  _createComposedState(): BehaviourStates {
+  _createComposedState(): BehaviourState {
     if (this.isActive) {
       if (this.behaviour.data.action.type === "BE_ON" || this.behaviour.data.action.type === "DIM_WHEN_TURNED_ON") {
         return {type: "RANGE", value: this.behaviour.data.action.data};

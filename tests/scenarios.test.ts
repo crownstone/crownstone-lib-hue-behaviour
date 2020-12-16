@@ -309,5 +309,34 @@ describe("Scenarios", () =>{
 
     expect(behaviourAggregator.override === "NO_OVERRIDE")
   })
+
+  test("Scenario 9, Color and dimming",async ()=>{
+    const light = new mockLight("5f4e47660bc0da0004b4fe16",0,{on:false, bri:100,hue: 4255, sat:254,ct:300},"Extended color light")
+    const wrapper = new mockWrapper(light)
+    const behaviourAggregator = new BehaviourAggregator(wrapper.setState.bind(wrapper),wrapper.getState());
+    wrapper.setStateUpdateCallback(behaviourAggregator.onStateChange.bind(behaviourAggregator))
+    behaviourAggregator.setBehaviour(<BehaviourWrapperBehaviour>colorOn80Range13001500,SPHERE_LOCATION);
+    behaviourAggregator.setBehaviour(<BehaviourWrapperBehaviour>switchOn70Range1310sunset,SPHERE_LOCATION)
+
+    Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 13, 0).toString()));
+    await behaviourAggregator._loop();
+    //End setup
+    expect(behaviourAggregator.currentDeviceState).toMatchObject({type:"COLORABLE",on:true,brightness:80});
+    //User turns off light
+    light.apiState.on = false
+    await light.renewState();
+    expect(behaviourAggregator.currentDeviceState.on).toBeFalsy();
+    expect(behaviourAggregator.override === "SWITCH_STATE_OVERRIDE")
+    //User turns on light
+    light.apiState.on = true
+    await light.renewState();
+    expect(behaviourAggregator.currentDeviceState).toMatchObject({type:"COLORABLE",on:true,brightness:80});
+    expect(behaviourAggregator.override === "NO_OVERRIDE")
+    Date.now = jest.fn(() => Date.parse(new Date(2020, 9, 4, 13, 10).toString()));
+    await behaviourAggregator._loop();
+    await light.renewState();
+    expect(behaviourAggregator.currentDeviceState).toMatchObject({type:"COLORABLE",on:true,brightness:70});
+
+  })
 })
 

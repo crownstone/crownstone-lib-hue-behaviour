@@ -68,12 +68,12 @@ type EventUnsubscriber = () => void
 interface DeviceBehaviourSupport {
   receiveStateUpdate(state:StateUpdate): void
 
-  setStateUpdateCallback(callback:((state:StateUpdate) => {})): void
+  setStateUpdateCallback(callback:((state: StateUpdate) => void)): void
 
   getUniqueId(): string
 
   getDeviceType(): DeviceType
 
-  getState(): DeviceStates
+  getState(): DeviceState
 }
 

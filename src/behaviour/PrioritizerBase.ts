@@ -6,7 +6,7 @@ export class PrioritizerBase {
   behaviours: Twilight[] | SwitchBehaviour[] = [];
   prioritizedBehaviour: Twilight | SwitchBehaviour = undefined;
   timestamp = 0;
-  composedState: BehaviourStates;
+  composedState: BehaviourState;
 
   cleanup(): void {
     for (const behaviour of this.behaviours) {
@@ -38,7 +38,7 @@ export class PrioritizerBase {
   /** Returns the composed state of the active and prioritized behaviour.
    *
    */
-  getComposedState(): BehaviourStates {
+  getComposedState(): BehaviourState {
     return this.composedState;
   }
 }
