@@ -17,8 +17,7 @@ export const switchOnWhenAny1Home: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "CLOUDID-1124",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "CLOUDID-1124"
 }
 
 export const switchOn80WhenAny1Home: BehaviourWrapper = {
@@ -41,7 +40,6 @@ export const switchOn80WhenAny1Home: BehaviourWrapper = {
     "Sun": true
   },
   "cloudId": "CLOUDID-1125",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
 }
 
 export const switchOnOnlyAtWeekend: BehaviourWrapper = {
@@ -63,8 +61,7 @@ export const switchOnOnlyAtWeekend: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "CLOUDID-1126",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "CLOUDID-1126"
 }
 
 export const switchOnBetweenRangeWithSpherePresence: BehaviourWrapper = {
@@ -94,8 +91,7 @@ export const switchOnBetweenRangeWithSpherePresence: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "CLOUDID-1127",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "CLOUDID-1127"
 }
 
 
@@ -117,8 +113,7 @@ export const switchOnAllDayIgnorePresence: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "CLOUDID-1128",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "CLOUDID-1128"
 }
 
 
@@ -139,8 +134,7 @@ export const twilightDim50AllDay: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "CLOUD-ID-123123",
-  "deviceId": "5f4e47660bc0da0004b4fe16",
+  "cloudId": "CLOUD-ID-123123"
 }
 
 export const twilightDim50AllDayUpdated100: BehaviourWrapper = {
@@ -160,8 +154,7 @@ export const twilightDim50AllDayUpdated100: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "CLOUD-ID-123123",
-  "deviceId": "5f4e47660bc0da0004b4fe16",
+  "cloudId": "CLOUD-ID-123123"
 }
 
 export const twilight40BetweenSunriseSunset: BehaviourWrapper = {
@@ -183,8 +176,7 @@ export const twilight40BetweenSunriseSunset: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "CLOUDID-1129",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "CLOUDID-1129"
 }
 
 
@@ -207,8 +199,7 @@ export const twilight80BetweenSunriseSunset: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "CLOUDID-2120",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "CLOUDID-2120"
 }
 
 
@@ -231,8 +222,7 @@ export const twilight60BetweenRange: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "REALCLOUDID-1",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "REALCLOUDID-1"
 }
 export const switchOn100Range: BehaviourWrapper = {
   "type": "BEHAVIOUR",
@@ -255,8 +245,7 @@ export const switchOn100Range: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "CLOUDID-2121",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "CLOUDID-2121"
 }
 
 
@@ -281,8 +270,7 @@ export const switchOn70Range1310sunset: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "CLOUDID-2122",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "CLOUDID-2122"
 }
 
 
@@ -307,8 +295,7 @@ export const switchOn30Range: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "CLOUDID-2123",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "CLOUDID-2123"
 }
 
 
@@ -333,8 +320,7 @@ export const switchOn50Range23500500: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "ACTUALCLOUDID-3",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "ACTUALCLOUDID-3"
 }
 
 
@@ -357,8 +343,7 @@ export const switchOnAllDayRoom1: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "ACTUALCLOUDID-6",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "ACTUALCLOUDID-6"
 }
 
 export const switchOn80AllDayRoom1n2: BehaviourWrapper = {
@@ -380,8 +365,7 @@ export const switchOn80AllDayRoom1n2: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "ACTUALCLOUDID-12",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "ACTUALCLOUDID-12"
 }
 
 export const switchOn60AllDayRoom3: BehaviourWrapper = {
@@ -403,8 +387,7 @@ export const switchOn60AllDayRoom3: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "ACTUALCLOUDID-9",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "ACTUALCLOUDID-9"
 }
 
 export const switchOn40WhenInRoom5n6: BehaviourWrapper = {
@@ -426,8 +409,7 @@ export const switchOn40WhenInRoom5n6: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "ACTUALCLOUDID-999",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "ACTUALCLOUDID-999"
 }
 
 export const switchOn50Sphere: BehaviourWrapper = {
@@ -451,8 +433,7 @@ export const switchOn50Sphere: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "ACTUALCLOUDID-169",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "ACTUALCLOUDID-169"
 }
 
 
@@ -479,8 +460,7 @@ export const switchOn20Between19002200: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "ACTUALCLOUDID-129",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "ACTUALCLOUDID-129"
 }
 
 
@@ -505,8 +485,7 @@ export const switchOn10AllDay: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "ACTUALCLOUDID-149",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "ACTUALCLOUDID-149"
 }
 
 export const colorOn10AllDay: BehaviourWrapper = {
@@ -530,8 +509,7 @@ export const colorOn10AllDay: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "ACTUALCLOUDID-1349",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "ACTUALCLOUDID-1349"
 }
 
 export const switchOn80Range13001500: BehaviourWrapper = {
@@ -555,8 +533,7 @@ export const switchOn80Range13001500: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "CLOUDID-2125",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "CLOUDID-2125"
 }
 
 export const colorOn80Range13001500: BehaviourWrapper = {
@@ -580,8 +557,7 @@ export const colorOn80Range13001500: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "CLOUDID-24125",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "CLOUDID-24125"
 }
 
 
@@ -607,8 +583,7 @@ export const temp2400On60Range14001500: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "CLOUDID-5125",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "CLOUDID-5125"
 }
 export const twilight70Range12001500: BehaviourWrapper = {
   "type": "TWILIGHT",
@@ -630,6 +605,5 @@ export const twilight70Range12001500: BehaviourWrapper = {
     "Sat": true,
     "Sun": true
   },
-  "cloudId": "CLOUDID-2126",
-  "deviceId": "5f4e47660bc0da0004b4fe16"
+  "cloudId": "CLOUDID-2126"
 }

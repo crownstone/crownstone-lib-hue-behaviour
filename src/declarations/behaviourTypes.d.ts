@@ -119,8 +119,7 @@ type BehaviourWrapper =  BehaviourWrapperTwilight | BehaviourWrapperBehaviour
 interface BehaviourWrapperBehaviour {
   type: "BEHAVIOUR"
   data: SwitchBehaviourData
-  activeDays: ActiveDays,
-  deviceId: string,
+  activeDays: ActiveDays, 
   cloudId: string
 }
 
@@ -129,7 +128,6 @@ interface BehaviourWrapperTwilight {
   type: "TWILIGHT"
   data: TwilightData
   activeDays: ActiveDays,
-  deviceId: string,
   cloudId: string
 }
 

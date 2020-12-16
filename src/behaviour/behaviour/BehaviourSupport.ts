@@ -65,10 +65,6 @@ export class BehaviourSupport {
     return this;
   }
 
-  setDeviceId(value: string) {
-    this.rule.deviceId = value;
-    return this;
-  }
 
   setDimPercentage(value: number): BehaviourSupport {
     if(this.rule.data.action.type === "BE_ON" || this.rule.data.action.type === "DIM_WHEN_TURNED_ON"){

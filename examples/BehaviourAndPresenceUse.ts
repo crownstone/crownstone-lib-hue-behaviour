@@ -6,8 +6,10 @@ const crownstoneHueBehaviour = new CrownstoneHueBehaviour();
 class ExampleDevice {
   state: { on: boolean, brightness: number, hue: number, saturation: number, temperature: number };
   callback;
+  uniqueId:string
 
-  constructor() {
+  constructor(uniqueId:string) {
+    this.uniqueId = uniqueId;
     this.state = {on: true, brightness: 100, hue: 412, saturation: 50, temperature: 1000}
   }
 
@@ -82,9 +84,9 @@ class ExampleDevice {
 
 
 function reactOnPresence():void{
-  const device = new ExampleDevice() //Add your own supported device.
+  const device = new ExampleDevice("AB:CD:EF:GH:12:34") //Add your own supported device.
   crownstoneHueBehaviour.addDevice(device);
-  crownstoneHueBehaviour.setBehaviour({
+  crownstoneHueBehaviour.setBehaviour("AB:CD:EF:GH:12:34",{
     "type": "BEHAVIOUR",
     "data": {
       "action": {"type": "BE_COLOR", "data": {type: "COLOR", brightness: 42, hue: 254, saturation: 100}},
@@ -103,8 +105,7 @@ function reactOnPresence():void{
       "Sat": true,
       "Sun": true
     },
-    "cloudId": "13sbsuqd52qyuhkfs5f4349",
-    "deviceId": "AB:CD:EF:GH:12:34" // uniqueId of a device.
+    "cloudId": "13sbsuqd52qyuhkfs5f4349"
   })
   console.log("Behaviour set and ready to be activated by presence.")
   crownstoneHueBehaviour.presenceChange({type: "ENTER", data: {type: "SPHERE", profileIdx: 0}}); // User enters the sphere.

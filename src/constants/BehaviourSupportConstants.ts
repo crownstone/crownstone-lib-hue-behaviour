@@ -15,7 +15,6 @@ export const EMPTY_RULE: BehaviourWrapper = {
   type: "BEHAVIOUR",
   activeDays: {...EMPTY_RULE_ACTIVE_DAYS},
   data: {...EMPTY_RULE_DATA},
-  cloudId: "ci" + Date.now(),
-  deviceId: "22:FF:DD:TT:AA:CC:GG"
+  cloudId: "ci" + Date.now()
 
 }
