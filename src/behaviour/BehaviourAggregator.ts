@@ -95,25 +95,25 @@ export class BehaviourAggregator {
   _checkIfSupportsBehaviour(behaviour: BehaviourWrapper) {
     if (this.deviceType === "SWITCHABLE") {
       if (behaviour.data.action.type !== "BE_ON") {
-        throw new CrownstoneHueError(433, `{cloudId: ${behaviour.cloudId}, deviceId: ${behaviour.deviceId}`)
+        throw new CrownstoneHueError(433, `{cloudId: ${behaviour.cloudId}`)
       }
     }
     if (this.deviceType === "DIMMABLE") {
       if (behaviour.data.action.type !== "DIM_WHEN_TURNED_ON" && behaviour.data.action.type !== "BE_ON") {
-        throw new CrownstoneHueError(433, `{cloudId: ${behaviour.cloudId}, deviceId: ${behaviour.deviceId}`)
+        throw new CrownstoneHueError(433, `{cloudId: ${behaviour.cloudId}`)
       }
     }
     if (this.deviceType === "COLORABLE") {
       if (behaviour.data.action.type !== "DIM_WHEN_TURNED_ON" && behaviour.data.action.type !== "BE_ON"
         && behaviour.data.action.type !== "SET_COLOR_WHEN_TURNED_ON" && behaviour.data.action.type !== "BE_COLOR") {
-        throw new CrownstoneHueError(433, `{cloudId: ${behaviour.cloudId}, deviceId: ${behaviour.deviceId}`)
+        throw new CrownstoneHueError(433, `{cloudId: ${behaviour.cloudId}`)
       }
     }
     if (this.deviceType === "COLORABLE_TEMPERATURE") {
       if ((behaviour.data.action.type !== "DIM_WHEN_TURNED_ON" && behaviour.data.action.type !== "BE_ON"
         && behaviour.data.action.type !== "SET_COLOR_WHEN_TURNED_ON" && behaviour.data.action.type !== "BE_COLOR")
         || (typeof (behaviour.data.action.data) === "object" && behaviour.data.action.data.type !== "COLOR_TEMPERATURE")) {
-        throw new CrownstoneHueError(433, `{cloudId: ${behaviour.cloudId}, deviceId: ${behaviour.deviceId}`)
+        throw new CrownstoneHueError(433, `{cloudId: ${behaviour.cloudId}`)
       }
     }
   }

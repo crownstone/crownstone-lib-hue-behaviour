@@ -46,10 +46,10 @@ export class CrownstoneHueBehaviour {
 
   /** Adds/Updates the new behaviour on its device.
    * Passes the active presence events to the new behaviour.
-   * @param deviceId
+   * @param deviceId - uniqueId of the device
    * @param behaviour
    */
-  setBehaviour(deviceId,behaviour: BehaviourWrapper): boolean { 
+  setBehaviour(deviceId:string,behaviour: BehaviourWrapper): boolean {
       if (this.wrappers[deviceId] !== undefined) {
         this._setBehaviour(this.wrappers[deviceId], GenericUtil.deepCopy(behaviour));
         return true;
