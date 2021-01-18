@@ -13,8 +13,6 @@ export const SPHERE_DEFAULT =  {latitude: 51.9233355, longitude: 4.469152};
  * @param wrappers - List of a wrapped device and behaviours
  *
  */
-
-
 export class CrownstoneHueBehaviour {
   wrappers: { [uniqueId: string]: DeviceBehaviourWrapper } = {};
   sphereLocation: SphereLocation;
@@ -28,14 +26,16 @@ export class CrownstoneHueBehaviour {
     this.sphereLocation = sphereLocation;
   }
 
-  /** Call to change/set new Sphere location
+  /**
+   * Call to change/set new Sphere location
    */
   setSphereLocation(sphereLocation: SphereLocation): void {
     this.sphereLocation = sphereLocation;
     eventBus.emit(ON_SPHERE_CHANGE, sphereLocation)
   }
 
-  /** Call to turn on/off Dumb house mode.
+  /**
+   * Call to turn on/off Dumb house mode.
    *
    * @param on - Boolean whether Dumb house mode should be on or off.
    */
@@ -44,12 +44,13 @@ export class CrownstoneHueBehaviour {
     this.dumbHouseModeActive = on;
   }
 
-  /** Adds/Updates the new behaviour on its device.
+  /**
+   * Adds/Updates the new behaviour on its device.
    * Passes the active presence events to the new behaviour.
    * @param deviceId - uniqueId of the device
    * @param behaviour
    */
-  setBehaviour(deviceId:string,behaviour: BehaviourWrapper): boolean {
+  setBehaviour(deviceId: string, behaviour: BehaviourWrapper): boolean {
       if (this.wrappers[deviceId] !== undefined) {
         this._setBehaviour(this.wrappers[deviceId], GenericUtil.deepCopy(behaviour));
         return true;
@@ -74,8 +75,9 @@ export class CrownstoneHueBehaviour {
     }
   };
 
-  /** Use when a user enters or leaves a room or sphere.
-   *  Saves the event for when a new behaviour is added.
+  /**
+   * Use when a user enters or leaves a room or sphere.
+   * Saves the event for when a new behaviour is added.
    * @param presenceEvent
    */
   presenceChange(presenceEvent: PresenceEvent): void {
@@ -129,8 +131,8 @@ export class CrownstoneHueBehaviour {
   }
 
 
-  /** Returns a map of all connected devices by uniqueId
-
+  /**
+   * Returns a map of all connected devices by uniqueId
    */
   getAllDevices(): { [uniqueId: string]: DeviceBehaviourSupport } {
     let devices = {}
