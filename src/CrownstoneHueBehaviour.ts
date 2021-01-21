@@ -10,7 +10,6 @@ export const SPHERE_DEFAULT =  {latitude: 51.9233355, longitude: 4.469152};
  *
  *
  * @param sphereLocation - Longitude and Latitude of the location of where the Sphere is.
- * @param wrappers - List of a wrapped device and behaviours
  *
  */
 export class CrownstoneHueBehaviour {
