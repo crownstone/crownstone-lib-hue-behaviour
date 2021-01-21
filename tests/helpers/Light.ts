@@ -56,10 +56,9 @@ export class mockLight {
     return this.type;
   }
 
-  getState() {
+  getCurrentState() {
     return {...this.state};
   }
-
   setStateUpdateCallback(callback: (state) => {}): void {
     this.stateUpdateCallback = callback;
   }
@@ -92,7 +91,7 @@ export class mockWrapper {
   callback;
 
   constructor(light) {
-    this.state = light.getState();
+    this.state = light.getCurrentState();
     this.light = light
   }
 
