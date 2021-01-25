@@ -2,16 +2,16 @@ import {BehaviourUtil} from "./BehaviourUtil";
 import {EMPTY_RULE, SPHERE_DELAY} from "../../constants/BehaviourSupportConstants"
 
 export class BehaviourSupport {
-  rule: HueBehaviourWrapper;
+  rule: BehaviourWrapper;
 
-  constructor(behaviour: HueBehaviourWrapper = EMPTY_RULE) {
+  constructor(behaviour: BehaviourWrapper = EMPTY_RULE) {
     this.rule = {...behaviour}
   }
 
   //########Setters###########
   setTypeBehaviour(): BehaviourSupport {
     this.rule.type = "BEHAVIOUR"
-    this.rule.data.action.type = "BE_ON";
+    this.rule.data.action = {type: "BE_ON", data: 100};
     if (!("presence" in this.rule.data)) {
       this.rule.type["Presence"] = {}
       this.setTimeAllDay();
@@ -21,9 +21,42 @@ export class BehaviourSupport {
 
   setTypeTwilight(): BehaviourSupport {
     this.rule.type = "BEHAVIOUR";
-    this.rule.data.action.type = "DIM_WHEN_TURNED_ON";
+    this.rule.data.action = {type: "DIM_WHEN_TURNED_ON", data: 100};
     delete this.rule.data["presence"];
     delete this.rule.data["endCondition"];
+    return this;
+  }
+
+  setColorable(hue: number, saturation: number, brightness: number) {
+    if (this.rule.type === "BEHAVIOUR") {
+      this.rule.data.action = {
+        type: "BE_COLOR",
+        data: {type: "COLOR", hue: hue, saturation: saturation, brightness: brightness}
+      }
+    }
+    else if (this.rule.type === "TWILIGHT") {
+      this.rule.data.action = {
+        type: "SET_COLOR_WHEN_TURNED_ON",
+        data: {type: "COLOR", hue: hue, saturation: saturation, brightness: brightness}
+      }
+    }
+    return this;
+  }
+
+  setColorableTemperature(temperature: number, brightness: number) {
+    if (this.rule.type === "BEHAVIOUR") {
+      this.rule.data.action = {
+        type: "BE_COLOR",
+        data: {type: "COLOR_TEMPERATURE", temperature: temperature, brightness: brightness}
+      }
+    }
+    else if (this.rule.type === "TWILIGHT") {
+      this.rule.data.action = {
+        type: "SET_COLOR_WHEN_TURNED_ON",
+        data: {type: "COLOR_TEMPERATURE", temperature: temperature, brightness: brightness}
+      }
+
+    }
     return this;
   }
 
@@ -32,18 +65,14 @@ export class BehaviourSupport {
     return this;
   }
 
-  setLightId(value: string) {
-    this.rule.lightId = value;
-    return this;
-  }
-
-  setActionState(value: number): BehaviourSupport {
-    this.rule.data.action.data = value;
-    return this;
-  }
 
   setDimPercentage(value: number): BehaviourSupport {
-    this.rule.data.action.data = value;
+    if(this.rule.data.action.type === "BE_ON" || this.rule.data.action.type === "DIM_WHEN_TURNED_ON"){
+      this.rule.data.action.data = value;
+
+    } else if (this.rule.data.action.type === "BE_COLOR" || this.rule.data.action.type === "SET_COLOR_WHEN_TURNED_ON"){
+      this.rule.data.action.data.brightness = value;
+    }
     return this;
   }
 
@@ -325,6 +354,9 @@ export class BehaviourSupport {
   }
 
   //########Getters###########
+  getBehaviour(){
+    return this.rule;
+  }
 
   getLocationIds(): number[] {
     if (this.rule.type === "BEHAVIOUR" && this.rule.data.presence.type !== "IGNORE") {
@@ -489,12 +521,41 @@ export class BehaviourSupport {
     return ("presence" in this.rule.data && "delay" in this.rule.data.presence) ? this.rule.data.presence.delay : -1;
   }
 
-  willDim(): boolean {
-    return this.rule.data.action.data < 100;
+
+  isColor(){
+   return (typeof(this.rule.data.action.data) !== "number" && this.rule.data.action.data.type === "COLOR")
+  }
+
+  isColorTemperature(){
+    return (typeof(this.rule.data.action.data) !== "number" && this.rule.data.action.data.type === "COLOR_TEMPERATURE")
+  }
+
+  isDimmable(): boolean {
+    return this.rule.data.action.data < 100 || (typeof(this.rule.data.action.data) !== "number" && "brightness" in this.rule.data.action.data);
+  }
+
+  getTemperature() {
+    if ((this.rule.data.action.type === "BE_COLOR" || this.rule.data.action.type === "SET_COLOR_WHEN_TURNED_ON")
+      && this.rule.data.action.data.type === "COLOR_TEMPERATURE") {
+      return this.rule.data.action.data;
+    }
+  }
+
+  getColor() {
+    if ((this.rule.data.action.type === "BE_COLOR" || this.rule.data.action.type === "SET_COLOR_WHEN_TURNED_ON")
+      && this.rule.data.action.data.type === "COLOR") {
+      return this.rule.data.action.data;
+    }
   }
 
   getDimPercentage(): number {
-    return this.rule.data.action.data;
+    if (this.rule.data.action.type === "BE_ON" || this.rule.data.action.type === "DIM_WHEN_TURNED_ON") {
+      return this.rule.data.action.data;
+
+    }
+    else {
+      return this.rule.data.action.data.brightness;
+    }
   }
 
   getTime(): Time {

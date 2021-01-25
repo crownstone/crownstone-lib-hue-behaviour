@@ -10,7 +10,7 @@ export class SwitchBehaviour extends BehaviourBase implements SwitchBehaviourInt
   lastPresenceUpdate: number = 0;
   unsubscribePresenceChangeEvent: EventUnsubscriber
 
-  constructor(behaviour: HueBehaviourWrapperBehaviour, sphereLocation: SphereLocation) {
+  constructor(behaviour: BehaviourWrapperBehaviour, sphereLocation: SphereLocation) {
     super(behaviour, sphereLocation);
     this.unsubscribePresenceChangeEvent = eventBus.subscribe(ON_PRESENCE_CHANGE, this.onPresenceDetect.bind(this));
   }

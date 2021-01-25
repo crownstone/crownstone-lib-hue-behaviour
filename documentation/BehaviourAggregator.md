@@ -2,13 +2,11 @@
 
 ## Overview
 
-- [Crownstone Hue](/documentation/CrownstoneHueBehaviour.md)
-- [Discovery](/documentation/Discovery.md)
-- [Bridge](/documentation/Bridge.md)
-- [Light](/documentation/Light.md)
+- [Crownstone Hue Behaviour](/documentation/CrownstoneHueBehaviour.md)
+- [Device compatibility](/documentation/DeviceSupport.md)
 - [Errors](/documentation/Errors.md)
 - [Event calls](/documentation/EventCalls.md) 
-- [LightBehaviourWrapper](/documentation/LightBehaviourWrapper.md)
+- [DeviceAggregatorWrapper](/documentation/DeviceBehaviourWrapper.md)
 - **Behaviour Aggregator**
   - [Constructing](#constructing)
   - [Initialization](#initialization)
@@ -16,22 +14,21 @@
   - [Dumb house mode](#dumb-house-mode)
   - [Cleanup](#cleanup)
   - [Adding/Updating/Removing behaviours](#addingupdatingremoving-behaviours)
-  - [Getting the composed state](#getting-the-composed-state)
+  - [Getting the state update](#getting-the-state-update)
 - [SwitchBehaviour- & Twilight Prioritizer](/documentation/Prioritizer.md)
-- [Behaviours](/documentation/Behaviours.md)
+- [Behaviours](/documentation/Behaviours.md) 
 
 ## About
 
-The behaviour aggregator is the part of the module that sends the new state to the light through a callback when a new behaviour activates, it also handles the overrides and conflicts between a prioritized behaviour and a prioritized twilight.
+The behaviour aggregator is the part of the module that sends the new state to the device through a callback when a new behaviour activates, it also handles the overrides and conflicts between a prioritized behaviour and a prioritized twilight.
 
 When initialized, every 500ms a timestamp is sent to its `twilightPrioritizer` and `switchBehaviourPrioritizer`, a call is made to the behaviour handler and when dumb house mode is activated, an override handler is being called.
-The behaviour handler chooses the aggregated behaviour between twilight and switchbehaviour and updates the light state based on a set of rules.
+The behaviour handler chooses the aggregated behaviour between twilight and switchbehaviour and updates the device state based on a set of rules.
 
-When it receives a light state change calls, it checks for overrides.
+When it receives a device state change call, it checks for overrides.
 
 ## Usage
-
-Everything is handled by the module itself, though its public functionalities are defined below.
+The following is only for documentation purposes, with normal usage everything is handled by the module.
 
 ### Constructing
 
@@ -39,11 +36,11 @@ Everything is handled by the module itself, though its public functionalities ar
 
 `callback` is used to pass the new state when a behaviour activates.
 
-`State` is the current state of the light on initialization.
+`State` is the current state of the device on initialization.
 
 **Example:**
 
-`new BehaviourAggregator(async (value:StateUpdate)=>{ await light.setState(value)},light.getState())`
+`new BehaviourAggregator(async (value:StateUpdate)=>{ await device.setState(value)},device.getState())`
 
 ### Initialization
 
@@ -52,27 +49,27 @@ To initialize the aggregator, call:
 `behaviourAggregator.init()`
 
 This will start an interval that calls every 500ms a loop function.
-The rate is defined as `AGGREGATOR_POLLING_RATE` and exists in [BehaviourAggregatorUtil.ts](/src/behaviour/BehaviourAggregatorUtil.ts)
+The rate is defined as `AGGREGATOR_ITERATION_RATE` and exists in [BehaviourAggregatorUtil.ts](/src/behaviour/BehaviourAggregatorUtil.ts).
 
 ### On state change
 
-When a light state has changed and it has to be passed to the aggregator, call:
+When a device state has changed and it has to be passed to the aggregator, call:
 
-`await behaviourAggregator.onStateChange(state: HueFullState)`
+`await behaviourAggregator.onStateChange(state: StateUpdate)`
 
-In the module, this is used as the light state changed callback for the Light object.
+For example, in the crownstone-lib-hue library, a callback from the light is used on a state change.
 
 ### Dumb house mode
 
 The dumb house mode is switched on or off by event call `ON_DUMB_HOUSE_MODE_SWITCH`.
 
-When activated, behaviours won't send a new state to the light when activating.
+When activated, behaviours won't send a new state to the device when activating.
 
 ### Cleanup
 
 To clean up the behaviourAggregator, call:
 
-`behaviourAggrgator.cleanup()`
+`behaviourAggregator.cleanup()`
 
 This removes the subscription from the event bus, stops the interval and calls the cleanup function of `switchBehaviourAggregator`
 
@@ -84,12 +81,13 @@ This is done by using one of the following functions:
 `setBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): number` - This returns the behaviour's index position in the array.
  
 
-`updateBehaviour(behaviour: HueBehaviourWrapper): void`
+`removeBehaviour(cloudId: string): void`
 
-### Getting the composed state
+### Getting the state update
 
-To get the composed state, call:
+To get the state update, call:
 
-`behaviourAggregator.getComposedState()`
+`behaviourAggregator.getStateUpdate()`
 
-This will return the state of what the aggregator thinks the light state has to be according to the behaviour rules, ignoring overrides.
+This will returns a state update based on what the aggregator thinks the device state has to be according to the behaviour rules, ignoring overrides.
+Note, if for example you use a color light and a dimming behaviour is active, it will only send a dimming state update.

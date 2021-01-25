@@ -4,7 +4,7 @@ import {BehaviourBase} from "./BehaviourBase";
 
 export class Twilight extends BehaviourBase {
 
-  constructor(behaviour: HueBehaviourWrapperTwilight, sphereLocation: SphereLocation) {
+  constructor(behaviour: BehaviourWrapperTwilight, sphereLocation: SphereLocation) {
     super(behaviour, sphereLocation);
   }
 

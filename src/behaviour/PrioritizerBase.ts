@@ -6,7 +6,7 @@ export class PrioritizerBase {
   behaviours: Twilight[] | SwitchBehaviour[] = [];
   prioritizedBehaviour: Twilight | SwitchBehaviour = undefined;
   timestamp = 0;
-  composedState: HueLightState;
+  composedState: BehaviourState;
 
   cleanup(): void {
     for (const behaviour of this.behaviours) {
@@ -14,7 +14,7 @@ export class PrioritizerBase {
     }
   }
 
-  setBehaviour(behaviour: HueBehaviourWrapper,sphereLocation): number {
+  setBehaviour(behaviour: BehaviourWrapper,sphereLocation): number {
     throw("setBehaviour has to be overloaded!")
   }
 
@@ -38,7 +38,7 @@ export class PrioritizerBase {
   /** Returns the composed state of the active and prioritized behaviour.
    *
    */
-  getComposedState(): HueLightState {
+  getComposedState(): BehaviourState {
     return this.composedState;
   }
 }

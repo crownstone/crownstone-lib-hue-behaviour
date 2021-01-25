@@ -5,16 +5,17 @@ import {
   BehaviourAggregatorUtil,
   DIM_STATE_OVERRIDE,
   NO_OVERRIDE,
-  AGGREGATOR_POLLING_RATE,
-  SWITCH_STATE_OVERRIDE
+  AGGREGATOR_ITERATION_RATE,
+  SWITCH_STATE_OVERRIDE,
+  COLOR_TEMPERATURE_STATE_OVERRIDE,
+  COLOR_STATE_OVERRIDE
 } from "./BehaviourAggregatorUtil";
 import {TwilightPrioritizer} from "./TwilightPrioritizer";
 import {SwitchBehaviourPrioritizer} from "./SwitchBehaviourPrioritizer";
 import {Twilight} from "./behaviour/Twilight";
 import Timeout = NodeJS.Timeout;
-import {BehaviourUtil} from "./behaviour/BehaviourUtil";
-import {lightUtil} from "../util/LightUtil";
-import {GenericUtil} from "../util/GenericUtil";
+import {DIMMING_OFF_COMMAND, SWITCH_OFF_COMMAND, SWITCH_ON_COMMAND} from "../constants/StateConstants";
+import {CrownstoneHueError} from "..";
 
 
 export class BehaviourAggregator {
@@ -25,26 +26,32 @@ export class BehaviourAggregator {
   dumbHouseModeActive: boolean = false;
   aggregatedBehaviour: SwitchBehaviour | Twilight = undefined;
   timestamp = 0;
-  currentDeviceState: HueLightState;  // State of the Device.
+  currentDeviceState: DeviceState;  // State of the Device.
+  deviceType: DeviceType;  // State of the Device.
   override: string = NO_OVERRIDE;
   intervalId: Timeout;
   updateStateCallback: (state) => {};
 
   constructor(callback, state) {
     this.updateStateCallback = callback;
-    this.currentDeviceState = GenericUtil.deepCopy(state);
+    this.deviceType = state.type;
+    BehaviourAggregatorUtil.convertExceedingMinMaxValues(state);
+    this.currentDeviceState = state;
     this.unsubscribeDumbHouseModeEvent = eventBus.subscribe(ON_DUMB_HOUSE_MODE_SWITCH, this.onDumbHouseModeSwitch.bind(this));
   }
+
 
   /** Starts the aggregator's loop.
    *
    */
   init(): void {
-    if (this.initialized) { return; }
+    if (this.initialized) {
+      return;
+    }
     this.initialized = true;
-      this.intervalId = setInterval(async () => {
-        await this._loop();
-      }, AGGREGATOR_POLLING_RATE);
+    this.intervalId = setInterval(async () => {
+      await this._loop();
+    }, AGGREGATOR_ITERATION_RATE);
   }
 
   /** Cleans up the subscriptions from the eventbus for the aggregator and it's behaviours.
@@ -57,7 +64,7 @@ export class BehaviourAggregator {
     this.twilightPrioritizer.cleanup();
   }
 
-  async _loop():Promise<void> {
+  async _loop(): Promise<void> {
     this.timestamp = Date.now();
     this.switchBehaviourPrioritizer.tick(this.timestamp);
     this.twilightPrioritizer.tick(this.timestamp);
@@ -69,8 +76,9 @@ export class BehaviourAggregator {
   }
 
 
-  setBehaviour(behaviour: HueBehaviourWrapper, sphereLocation: SphereLocation): number {
+  setBehaviour(behaviour: BehaviourWrapper, sphereLocation: SphereLocation): number {
     this._checkIfBehaviourIsActive(behaviour);
+    this._checkIfSupportsBehaviour(behaviour);
     if (behaviour.type === "BEHAVIOUR") {
       return this.switchBehaviourPrioritizer.setBehaviour(behaviour, sphereLocation);
     }
@@ -84,12 +92,38 @@ export class BehaviourAggregator {
     this.switchBehaviourPrioritizer.removeBehaviour(cloudId);
   }
 
+  _checkIfSupportsBehaviour(behaviour: BehaviourWrapper) {
+    if (this.deviceType === "SWITCHABLE") {
+      if (behaviour.data.action.type !== "BE_ON") {
+        throw new CrownstoneHueError(433, `{cloudId: ${behaviour.cloudId}`)
+      }
+    }
+    if (this.deviceType === "DIMMABLE") {
+      if (behaviour.data.action.type !== "DIM_WHEN_TURNED_ON" && behaviour.data.action.type !== "BE_ON") {
+        throw new CrownstoneHueError(433, `{cloudId: ${behaviour.cloudId}`)
+      }
+    }
+    if (this.deviceType === "COLORABLE") {
+      if (behaviour.data.action.type !== "DIM_WHEN_TURNED_ON" && behaviour.data.action.type !== "BE_ON"
+        && behaviour.data.action.type !== "SET_COLOR_WHEN_TURNED_ON" && behaviour.data.action.type !== "BE_COLOR") {
+        throw new CrownstoneHueError(433, `{cloudId: ${behaviour.cloudId}`)
+      }
+    }
+    if (this.deviceType === "COLORABLE_TEMPERATURE") {
+      if ((behaviour.data.action.type !== "DIM_WHEN_TURNED_ON" && behaviour.data.action.type !== "BE_ON"
+        && behaviour.data.action.type !== "SET_COLOR_WHEN_TURNED_ON" && behaviour.data.action.type !== "BE_COLOR")
+        || (typeof (behaviour.data.action.data) === "object" && behaviour.data.action.data.type !== "COLOR_TEMPERATURE")) {
+        throw new CrownstoneHueError(433, `{cloudId: ${behaviour.cloudId}`)
+      }
+    }
+  }
+
 
   onDumbHouseModeSwitch(data: boolean): void {
     this.dumbHouseModeActive = data;
   }
 
-  _getAggregatedBehaviour():SwitchBehaviour|Twilight {
+  _getAggregatedBehaviour(): SwitchBehaviour | Twilight {
     if (this.twilightPrioritizer.prioritizedBehaviour === undefined && this.switchBehaviourPrioritizer.prioritizedBehaviour === undefined) {
       return undefined;
     }
@@ -104,7 +138,7 @@ export class BehaviourAggregator {
     }
   }
 
-  async _handleBehaviours():Promise<void> {
+  async _handleBehaviours(): Promise<void> {
     const oldBehaviour = this.aggregatedBehaviour;
     const newBehaviour = this._getAggregatedBehaviour();
     this.aggregatedBehaviour = newBehaviour;
@@ -139,7 +173,7 @@ export class BehaviourAggregator {
    * @param behaviour
    */
   async _TwilightHandling(behaviour: Twilight): Promise<void> {
-    if (this.currentDeviceState.on && this.currentDeviceState.bri > BehaviourUtil.mapBehaviourActionToHue(behaviour.behaviour.data.action.data)) {
+    if (this.currentDeviceState.on && "brightness" in this.currentDeviceState && this.currentDeviceState.brightness > behaviour.behaviour.data.action.data) {
       await this._activateNewBehaviour();
     }
   }
@@ -147,7 +181,7 @@ export class BehaviourAggregator {
   /** Checks if all behaviours are inactive and then removes override.
    * prioritizedBehaviour will be undefined when all are inactive.
    */
-  _checkIfAllBehavioursAreInactive():void {
+  _checkIfAllBehavioursAreInactive(): void {
     if (this.switchBehaviourPrioritizer.prioritizedBehaviour === undefined) {
       this.override = NO_OVERRIDE;
     }
@@ -165,53 +199,147 @@ export class BehaviourAggregator {
 
   }
 
-  async _activateNewBehaviour():Promise<void> {
+  async _activateNewBehaviour(): Promise<void> {
     if (!this.dumbHouseModeActive) {
       await this._setDeviceState();
     }
   }
 
-  async _setDeviceState():Promise<void> {
-    const state = this.getComposedState()
-    this.currentDeviceState = GenericUtil.deepCopy(state);
-
+  async _setDeviceState(): Promise<void> {
+    let state = this.getStateUpdate();
+    this.currentDeviceState = BehaviourAggregatorUtil.addUpdateToState(this.currentDeviceState, state);
     await this.updateStateCallback(state);
   }
 
   /** Returns the composed state of the active and prioritized behaviour.
    *
    */
-  getComposedState(): HueLightState {
-    return this.aggregatedBehaviour && this.aggregatedBehaviour.getComposedState() || {on: false};
+  getStateUpdate(): StateUpdate {
+    return this._createStateUpdate();
   }
 
+  _createStateUpdate(): StateUpdate {
+    if (!this.aggregatedBehaviour) {
+      if (this.deviceType === "SWITCHABLE") {
+        return SWITCH_OFF_COMMAND;
+      }
+      if (this.deviceType === "DIMMABLE" || this.deviceType === "COLORABLE" || this.deviceType === "COLORABLE_TEMPERATURE") {
+        return DIMMING_OFF_COMMAND
+      }
+    }
+    if (this.deviceType === "SWITCHABLE") {
+      return this._createSwitchCommand();
+    }
+    if (this.deviceType === "DIMMABLE") {
+      return this._createDimmingCommand();
+    }
+    if (this.deviceType === "COLORABLE") {
+      return this._createDimmingCommand() || this._createColorCommand() || this._createColorTemperatureCommand()
+    }
+    if (this.deviceType === "COLORABLE_TEMPERATURE") {
+      return this._createDimmingCommand() || this._createColorTemperatureCommand()
+    }
+  }
 
-  async onStateChange(state: HueFullState):Promise<void> {
+  _createSwitchCommand(): StateUpdate {
+    const composedState = this.aggregatedBehaviour.getComposedState()
+    if (composedState.type === "RANGE" && composedState.value === 100) {
+      return SWITCH_ON_COMMAND;
+    }
+    else if (composedState.type === "RANGE" && composedState.value < 100 && this.deviceType === "SWITCHABLE") {
+      return SWITCH_OFF_COMMAND;
+    }
+  }
+
+  _createDimmingCommand(): StateUpdate {
+    const composedState = this.aggregatedBehaviour.getComposedState()
+    if (composedState.type === "RANGE") {
+      return {type: "DIMMING", value: composedState.value}
+    }
+  }
+
+  _createColorCommand(): StateUpdate {
+    const composedState = this.aggregatedBehaviour.getComposedState()
+    if (composedState.type === "COLOR") {
+      return {
+        type: "COLOR",
+        brightness: composedState.brightness,
+        hue: composedState.hue,
+        saturation: composedState.saturation
+      }
+    }
+  }
+
+  _createColorTemperatureCommand(): StateUpdate {
+    const composedState = this.aggregatedBehaviour.getComposedState()
+    if (composedState.type === "COLOR_TEMPERATURE") {
+      return {
+        type: "COLOR_TEMPERATURE",
+        temperature: composedState.temperature,
+        brightness: composedState.brightness,
+      }
+    }
+  }
+
+  async onStateChange(state: StateUpdate): Promise<void> {
+    if (!state) {
+      return;
+    }
+    BehaviourAggregatorUtil.convertExceedingMinMaxValues(state);
     if (!this.dumbHouseModeActive) {
       if (await this._onSwitchOnWithActiveBehaviour(state)) {
         return;
       }
     }
-
-    this._setOverrideOnDeviceStateChange(state)
-    this.currentDeviceState = BehaviourUtil.mapStateObjectToTheOther(state, this.currentDeviceState);
+    this.currentDeviceState = BehaviourAggregatorUtil.addUpdateToState(this.currentDeviceState, state);
+    this._setOverrideOnDeviceStateChange(this.currentDeviceState)
   }
 
   /** Sets the override variable based on passed Device state.
    *
    * @param state
    */
-  _setOverrideOnDeviceStateChange(state): void {
-    const composedState = this.getComposedState();
-    if (composedState.on !== state.on && this.switchBehaviourPrioritizer.prioritizedBehaviour !== undefined) {
-      this.override = SWITCH_STATE_OVERRIDE;
+  _setOverrideOnDeviceStateChange(state: DeviceState): void {
+    if (this.switchBehaviourPrioritizer.prioritizedBehaviour !== undefined) {
+      const composedState = this.getStateUpdate();
+      if (state.type === "SWITCHABLE") {
+        if (composedState.type === "SWITCH" && composedState.value !== state.on) {
+          this.override = SWITCH_STATE_OVERRIDE
+        }
+      }
+      else {
+        if ((composedState.type === "SWITCH" && composedState.value !== state.on) ||
+          composedState.type === "DIMMING" && (composedState.value < 100 && !state.on || composedState.value === 0 && state.on)) {
+          this.override = SWITCH_STATE_OVERRIDE
+        }
+        else if ((composedState.type === "COLOR" || composedState.type === "COLOR_TEMPERATURE")
+          && (composedState.brightness < 100 && !state.on || composedState.brightness === 0 && state.on)) {
+          this.override = SWITCH_STATE_OVERRIDE
+        }
+        else if ((composedState.type === "COLOR" && composedState.brightness !== state.brightness) ||
+          (composedState.type === "COLOR_TEMPERATURE" && composedState.brightness !== state.brightness) ||
+          (composedState.type === "DIMMING" && composedState.value !== state.brightness)) {
+          this.override = DIM_STATE_OVERRIDE
+        }
 
-    }
-    else if (composedState.on === state.on && composedState.bri !== state.bri && this.switchBehaviourPrioritizer.prioritizedBehaviour !== undefined) {
-      this.override = DIM_STATE_OVERRIDE;
+        else if (state.type === "COLORABLE") {
+          if ((composedState.type === "COLOR" && composedState.hue !== state.hue) ||
+            (composedState.type === "COLOR" && composedState.saturation !== state.saturation)) {
+            this.override = COLOR_STATE_OVERRIDE
+          }
+        }
+        else if (state.type === "COLORABLE_TEMPERATURE") {
+          if (composedState.type === "COLOR_TEMPERATURE" && composedState.temperature !== state.temperature) {
+            this.override = COLOR_TEMPERATURE_STATE_OVERRIDE
+          }
+        }
+        else {
+          this.override = NO_OVERRIDE
+        }
+      }
     }
     else {
-      this.override = NO_OVERRIDE;
+      this.override = NO_OVERRIDE
     }
   }
 
@@ -221,34 +349,40 @@ export class BehaviourAggregator {
    *
    * @returns True Device state is changed
    */
-  async _onSwitchOnWithActiveBehaviour(state: HueFullState): Promise<boolean> {
+  async _onSwitchOnWithActiveBehaviour(state: StateUpdate): Promise<boolean> {
     //Device gets turned on, behaviour still active
-    if (this.aggregatedBehaviour !== undefined && !this.currentDeviceState.on && state.on) {
-      await this._setDeviceState();
-      this.override = NO_OVERRIDE;
-      return true;
+    if (state.type === "SWITCH") {
+      if (this.aggregatedBehaviour !== undefined && !this.isDeviceOn() && state.value) {
+        await this._setDeviceState();
+        this.override = NO_OVERRIDE;
+        return true;
+      }
     }
     return false;
   }
 
-  _checkIfStateMatchesWithNewBehaviour():void {
+  isDeviceOn(): boolean {
+    return (this.currentDeviceState.on)
+  }
+
+  _checkIfStateMatchesWithNewBehaviour(): void {
     if (this.aggregatedBehaviour === undefined) {
-      if (!this.currentDeviceState.on) {
+      if (!this.isDeviceOn()) {
         this.override = NO_OVERRIDE
       }
     }
     else {
-      if (lightUtil.stateEqual(this.currentDeviceState, this.aggregatedBehaviour.getComposedState())) {
+      if (BehaviourAggregatorUtil.stateEqual(this.currentDeviceState, this.getStateUpdate())) {
         this.override = NO_OVERRIDE
       }
     }
   }
 
-  _checkIfBehaviourIsActive(newBehaviour:HueBehaviourWrapper):void {
+  _checkIfBehaviourIsActive(newBehaviour: BehaviourWrapper): void {
     if (this.override === NO_OVERRIDE) {
       if (this.aggregatedBehaviour !== undefined && newBehaviour !== undefined
         && this.aggregatedBehaviour.behaviour.cloudId === newBehaviour.cloudId
-        && this.aggregatedBehaviour.behaviour.data.action.data != newBehaviour.data.action.data) {
+        && !BehaviourAggregatorUtil.isBehaviourEqual(this.aggregatedBehaviour.behaviour, newBehaviour)) {
         this.aggregatedBehaviour = undefined; //Reset so it's getting changed in next loop iteration.
       }
     }

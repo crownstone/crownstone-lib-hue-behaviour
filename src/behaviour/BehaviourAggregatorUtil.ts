@@ -1,6 +1,8 @@
 import {SwitchBehaviour} from "./behaviour/SwitchBehaviour";
 import {BehaviourSupport} from "./behaviour/BehaviourSupport";
 import {Twilight} from "./behaviour/Twilight";
+import {MaxStateValue, MinStateValue} from "../constants/StateConstants";
+import {hueStateVariables} from "../constants/HueConstants";
 
 
 interface TimeCompareResult {
@@ -10,8 +12,10 @@ interface TimeCompareResult {
 
 export const SWITCH_STATE_OVERRIDE = "SWITCH_STATE_OVERRIDE";
 export const DIM_STATE_OVERRIDE = "DIM_STATE_OVERRIDE";
+export const COLOR_STATE_OVERRIDE = "COLOR_STATE_OVERRIDE";
+export const COLOR_TEMPERATURE_STATE_OVERRIDE = "COLOR_TEMPERATURE_STATE_OVERRIDE";
 export const NO_OVERRIDE = "NO_OVERRIDE";
-export const AGGREGATOR_POLLING_RATE = 500;
+export const AGGREGATOR_ITERATION_RATE = 500;
 
 export const BehaviourAggregatorUtil = {
 
@@ -76,7 +80,11 @@ export const BehaviourAggregatorUtil = {
    * @returns Behaviour with lowest percentage.
    */
   compareByDimPercentage(behaviourA: SwitchBehaviour | Twilight, behaviourB: SwitchBehaviour | Twilight): SwitchBehaviour | Twilight {
-    return (behaviourA.behaviour.data.action.data <= behaviourB.behaviour.data.action.data) ? behaviourA : behaviourB;
+   return (this.getDimPercentageFromBehaviour(behaviourA) <= this.getDimPercentageFromBehaviour(behaviourB)) ? behaviourA : behaviourB;
+  },
+
+  getDimPercentageFromBehaviour(behaviour:SwitchBehaviour | Twilight):number{
+    return ((behaviour.behaviour.data.action.type === "BE_COLOR" || behaviour.behaviour.data.action.type === "SET_COLOR_WHEN_TURNED_ON"))? behaviour.behaviour.data.action.data.brightness: behaviour.behaviour.data.action.data;
   },
 
   /** Prioritizes Behaviours based on SwitchBehaviour overlapping rules.
@@ -151,7 +159,159 @@ export const BehaviourAggregatorUtil = {
     else {
       return this.filterBehaviours(twilights);
     }
-  }
+  },
 
+
+  /** Maps the state update to the actual state.
+   *
+   * @param deviceState
+   * @param updateState
+   *
+   * Returns deviceState with updateState values.
+   */
+  addUpdateToState(deviceState: DeviceState, updateState: StateUpdate): DeviceState {
+    if (updateState.type === "SWITCH") {
+      deviceState.on = updateState.value;
+    }
+    if (updateState.type === "DIMMING" && deviceState.type !== "SWITCHABLE") {
+      deviceState.brightness = updateState.value;
+
+      if (updateState.value > 0) {
+        deviceState.on = true;
+      }
+      else {
+        deviceState.on = false;
+      }
+    }
+    if (updateState.type === "COLOR" && deviceState.type == "COLORABLE") {
+      deviceState.hue = updateState.hue;
+      deviceState.saturation = updateState.saturation;
+      deviceState.brightness = updateState.brightness;
+
+      if (updateState.brightness > 0) {
+        deviceState.on = true;
+      }
+
+      else {
+        deviceState.on = false;
+      }
+    }
+    if (updateState.type === "COLOR_TEMPERATURE" && (deviceState.type == "COLORABLE_TEMPERATURE" ||  deviceState.type == "COLORABLE") ) {
+      deviceState.temperature = updateState.temperature;
+      deviceState.brightness = updateState.brightness;
+
+      if (updateState.brightness > 0) {
+        deviceState.on = true;
+      }
+      else {
+        deviceState.on = false;
+      }
+    }
+
+
+
+
+    return deviceState;
+  },
+
+
+  stateEqual(deviceState: DeviceState, stateUpdate: StateUpdate): boolean {
+    let returnType = false;
+    if (deviceState.type === "SWITCHABLE") {
+      if (stateUpdate.type === "SWITCH") {
+        returnType = (stateUpdate.value === deviceState.on)
+      }
+      else {
+        throw "Unsupported behaviour."
+      }
+    }
+    if (deviceState.type === "DIMMABLE") {
+      if (stateUpdate.type === "SWITCH") {
+        returnType = (stateUpdate.value === deviceState.on)
+      }
+      else if (stateUpdate.type === "DIMMING") {
+        returnType = (stateUpdate.value === deviceState.brightness && deviceState.on)
+      }
+      else {
+        throw "Unsupported behaviour."
+      }
+    }
+    if (deviceState.type === "COLORABLE") {
+      if (stateUpdate.type === "SWITCH") {
+        returnType = (stateUpdate.value === deviceState.on)
+      }
+      else if (stateUpdate.type === "DIMMING") {
+        returnType = (stateUpdate.value === deviceState.brightness)
+      }
+      else if (stateUpdate.type === "COLOR") {
+        returnType = (stateUpdate.brightness === deviceState.brightness) && (stateUpdate.hue === deviceState.hue) && (stateUpdate.saturation === deviceState.saturation)
+      }
+      else if (stateUpdate.type === "COLOR_TEMPERATURE") {
+        returnType = (stateUpdate.brightness === deviceState.brightness) && (stateUpdate.temperature === deviceState.temperature)
+      }
+      else {
+        throw "Unsupported behaviour."
+      }
+    }
+      if (deviceState.type === "COLORABLE_TEMPERATURE") {
+        if (stateUpdate.type === "SWITCH") {
+          returnType = (stateUpdate.value === deviceState.on)
+        }
+        else if (stateUpdate.type === "DIMMING") {
+          returnType = (stateUpdate.value === deviceState.brightness)
+        }
+        else if (stateUpdate.type === "COLOR_TEMPERATURE") {
+          returnType = (stateUpdate.brightness === deviceState.brightness) && (stateUpdate.temperature === deviceState.temperature)
+        }
+        else {
+          throw "Unsupported behaviour."
+        }
+    }
+    return returnType;
+  },
+
+
+  convertExceedingMinMaxValues(state: DeviceState | StateUpdate): void {
+    if (state.type === "SWITCH") {
+      return
+    }
+    ;
+    if (state.type === "DIMMING") {
+      state.value = Math.min(MaxStateValue["brightness"], Math.max(MinStateValue["brightness"], state.value))
+    }
+    if (state.type === "DIMMABLE") {
+      state.brightness = Math.min(MaxStateValue["brightness"], Math.max(MinStateValue["brightness"], state.brightness))
+    }
+    if (state.type === "COLORABLE") {
+      state.brightness = Math.min(MaxStateValue["brightness"], Math.max(MinStateValue["brightness"], state.brightness))
+      state.hue = Math.min(MaxStateValue["hue"], Math.max(MinStateValue["hue"], state.hue))
+      state.saturation = Math.min(MaxStateValue["saturation"], Math.max(MinStateValue["saturation"], state.saturation))
+    }
+    if (state.type === "COLORABLE_TEMPERATURE") {
+      state.brightness = Math.min(MaxStateValue["brightness"], Math.max(MinStateValue["brightness"], state.brightness))
+    }
+  },
+
+  isBehaviourEqual(behaviourA:BehaviourWrapper,behaviourB:BehaviourWrapper){
+    if(behaviourA.type === behaviourB.type){
+      if(behaviourA.data.action.type === behaviourB.data.action.type){
+        if(typeof(behaviourA.data.action.data) === "object" && typeof(behaviourB.data.action.data) === "object"){
+          if(behaviourA.data.action.data.type === behaviourB.data.action.data.type){
+            if(behaviourA.data.action.data.type === "COLOR" && behaviourB.data.action.data.type === "COLOR"){
+              return (behaviourA.data.action.data.hue === behaviourB.data.action.data.hue
+                && behaviourA.data.action.data.saturation === behaviourB.data.action.data.saturation
+                && behaviourA.data.action.data.brightness === behaviourB.data.action.data.brightness)
+            } else if(behaviourA.data.action.data.type === "COLOR_TEMPERATURE" && behaviourB.data.action.data.type === "COLOR_TEMPERATURE"){
+              return (behaviourA.data.action.data.temperature === behaviourB.data.action.data.temperature
+                && behaviourA.data.action.data.brightness === behaviourB.data.action.data.brightness)
+            }
+          }
+        } else {
+          return behaviourA.data.action.data === behaviourB.data.action.data
+        }
+      }
+    }
+    return false;
+  }
 
 }

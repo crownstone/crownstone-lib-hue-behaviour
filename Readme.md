@@ -1,17 +1,16 @@
-# Crownstone Hue module
-This is the behaviour part of the Crownstone Hue module, it will handle all the behaviour related calls. Currently, the module is semi-independent from the Hue side as it still needs the light objects to send and receive light state info.
-# Work in Progress
-Module is still a W.I.P., thus imports aren't correctly specified yet and some parts are prone to change.
-
+# crownstone-lib-hue-behaviour
+This module handles all parts related for activation of a behaviour and supports any device that follows the compatibility guidelines.
 ## Documentation
 ### Overview 
- - [Crownstone Hue Behaviour](/documentation/CrownstoneHueBehaviour.md) 
+ - [Crownstone Hue Behaviour](/documentation/CrownstoneHueBehaviour.md)  
+ - [Device compatibility](/documentation/DeviceSupport.md)
  - [Errors](/documentation/Errors.md)
  - [Event calls](/documentation/EventCalls.md) 
- - [LightBehaviourWrapper](/documentation/LightBehaviourWrapper.md)
+ - [DeviceAggregatorWrapper](/documentation/DeviceBehaviourWrapper.md)
  - [Behaviour Aggregator](/documentation/BehaviourAggregator.md)
  - [SwitchBehaviour- & Twilight Prioritizer](/documentation/Prioritizer.md)
  - [Behaviours](/documentation/Behaviours.md)
+
 
 ### Installation
 
@@ -19,12 +18,7 @@ Module is still a W.I.P., thus imports aren't correctly specified yet and some p
 ```import {CrownstoneHueBehaviour} from {crownstone-lib-hue-behaviour}```
 
 ### Usage
-#### Dependancy
-CrownstoneHueBehaviour is currently dependent on a Light from the CrownstoneHue module. 
-
 #### Getting Started 
-Note that you should have the CrownstoneHue module set-up, as it will need its lights to work. See its documentation here...(todo link)
-
 To get started with the module, construct the CrownstoneHueBehaviour class. This can be done as followed:
 ```
 const crownstoneHueBehaviour = new CrownstoneHueBehaviour({latitude: 51.916064, longitude: 4.472683})  
@@ -33,18 +27,29 @@ const crownstoneHueBehaviour = new CrownstoneHueBehaviour()
 ```
 With no location data given, it defaults to Crownstone's office location.
 
-Next up is to add lights to the system, this can be done by calling:
+Next up is to add a compatible device to the system, this can be done by calling:
 ```
-await crownstoneHueBehaviour.addLight(light:Light)
-```
-As of writing, the system only supports light objects from the CrownstoneHue module.
+crownstoneHueBehaviour.addDevice(device:DeviceBehaviourSupport)
+``` 
+When a device is added, an aggregator will be wrapped with the device and, the aggregator is ready to send data to- and receive data from the device.
 
-Next in line is adding a behaviour to the system, this is done by calling:
+
+The only thing that remains is adding a behaviour to the system, this is done by calling:
+```crownstoneHueBehaviour.setBehaviour(deviceId:string,behaviour:HueBehaviourWrapper)```
+The deviceId should be the uniqueId of the device you'd like to add.
+
+Example:
 ```
-await crownstoneHueBehaviour.setBehaviour({
+crownstoneHueBehaviour.setBehaviour("AS:FD:52....",{
 				  "type": "BEHAVIOUR",
                     "data": {
-                      "action": {"type": "BE_ON", "data": 100},
+                      "action": {"type": "BE_COLOR", "data": {
+                                "type": "COLOR"    
+                                "brightness": 100,
+                                "hue": 241,
+                                "saturation": 50
+                                }
+                      },
                       "time": {
                         "type": "RANGE",
                         "from": {"type": "CLOCK", "data": {"hours": 13, "minutes": 20}},
@@ -61,19 +66,17 @@ await crownstoneHueBehaviour.setBehaviour({
                       "Fri": true,
                       "Sat": true,
                       "Sun": true
-                    },
-				  lightId: "AS:FD:52....",
+                    }, 
 				  cloudId:"ygD9z3FyKWqyOVb7xkJCC5v"
 				  })
 ```
-The lightId should be the uniqueId of the light you'd like to add.
 
-Repeat the above adding operation if a light has multiple behaviours.
+Repeat the above adding operation if a device has multiple behaviours.
 
+After a behaviour is added, the system is ready and will act based on time and data given.
 
-When a behaviour is added, the behaviour and light are linked with each other and it is ready to send data to- and receive data from the light.
+For more information, see [CrownstoneHueBehaviour](/documentation/CrownstoneHueBehaviour.md) and see [Device compatibility](/documentation/DeviceSupport.md) on which data to expect and on how to make a device compatible.
 
-For more information, see [CrownstoneHueBehaviour](/documentation/CrownstoneHueBehaviour.md)
 
 #### Passing data
 The module has a few functions you can call for passing data.

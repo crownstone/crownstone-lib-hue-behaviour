@@ -9,7 +9,7 @@ export class SwitchBehaviourPrioritizer extends PrioritizerBase {
 
 
 
-  setBehaviour(behaviour: HueBehaviourWrapperBehaviour, sphereLocation: SphereLocation): number {
+  setBehaviour(behaviour: BehaviourWrapperBehaviour, sphereLocation: SphereLocation): number {
     for (let i = 0; i < this.behaviours.length; i++) {
       if (this.behaviours[i].behaviour.cloudId === behaviour.cloudId) {
         this.behaviours[i].behaviour = behaviour;
@@ -45,7 +45,7 @@ export class SwitchBehaviourPrioritizer extends PrioritizerBase {
       }
     });
     this.prioritizedBehaviour = BehaviourAggregatorUtil.getPrioritizedBehaviour(activeBehaviours);
-    this.composedState = (this.prioritizedBehaviour) ? this.prioritizedBehaviour.getComposedState() : {on: false};
+    this.composedState = (this.prioritizedBehaviour) ? this.prioritizedBehaviour.getComposedState() :  undefined
   }
 }
 

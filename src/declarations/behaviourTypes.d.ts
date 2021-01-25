@@ -78,46 +78,61 @@ interface ActiveDays {
 
 
 // TYPE: behaviour
-interface HueBehaviour {
-  action: {
-    type: "BE_ON",
-    data: number, // 0 .. 1
-  },
+interface SwitchBehaviourData {
+  action:BehaviourAction,
   time: Time,
   presence: Presence,
   endCondition?: EndCondition
 }
 
 // TYPE: TWILIGHT
-interface HueTwilight {
-  action: {
-    type: "DIM_WHEN_TURNED_ON",
-    data: number,
-  },
-  time: Time,
+interface TwilightData {
+  action: TwilightAction,
+  time: Time
 }
 
-type HueBehaviourWrapper = HueBehaviourWrapperTwilight | HueBehaviourWrapperBehaviour
 
-interface HueBehaviourWrapperBehaviour {
+type BehaviourAction = ActionSwitch | ActionColorSwitch
+type TwilightAction = ActionTwilight | ActionColorTwilight
+
+
+interface ActionSwitch {
+  type: "BE_ON",
+  data: number // 0 .. 100
+}
+interface ActionTwilight {
+  type: "DIM_WHEN_TURNED_ON",
+  data: number
+}
+
+type ActionColorTwilight = { type:"SET_COLOR_WHEN_TURNED_ON", data: ColorData }
+
+type ActionColorSwitch   = { type:"BE_COLOR", data: ColorData }
+
+type ColorData = ColorTemperatureData | ColorStateData
+
+type ColorTemperatureData = { type: "COLOR_TEMPERATURE", temperature: number, brightness: number } // temperature in kelvin.
+type ColorStateData = { type: "COLOR", hue: number, saturation: number, brightness: number } // hue 0..360 saturation 0..100 brightness 0..100
+
+type BehaviourWrapper =  BehaviourWrapperTwilight | BehaviourWrapperBehaviour
+
+interface BehaviourWrapperBehaviour {
   type: "BEHAVIOUR"
-  data: HueBehaviour
-  activeDays: ActiveDays,
-  lightId: string,
+  data: SwitchBehaviourData
+  activeDays: ActiveDays, 
   cloudId: string
 }
 
 
-interface HueBehaviourWrapperTwilight {
+interface BehaviourWrapperTwilight {
   type: "TWILIGHT"
-  data: HueTwilight
+  data: TwilightData
   activeDays: ActiveDays,
-  lightId: string,
   cloudId: string
 }
 
 interface BehaviourBaseInterface {
-  behaviour: HueBehaviourWrapper;
+  behaviour: BehaviourWrapper;
   isActive: boolean;
   timestamp: number | null;
   sphereLocation: SphereLocation

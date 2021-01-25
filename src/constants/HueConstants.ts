@@ -1,5 +1,3 @@
-export const APP_NAME: string = 'Hub';
-export const DEVICE_NAME: string = 'Hub1';
 
 export const maxValueOfStates = {
   'hue': 65535,
@@ -36,11 +34,8 @@ export const hueStateVariables = {
   ...minMaxValueStates
 }
 
-export const DISCOVERY_URL = "https://discovery.meethue.com/";
-
 export const LIGHT_POLLING_RATE = 500;
 
 export const RECONNECTION_TIMEOUT_TIME = 10000;
 
-export const SPHERE_DEFAULT =  {latitude: 51.9233355, longitude: 4.469152};
 

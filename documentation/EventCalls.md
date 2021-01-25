@@ -2,12 +2,14 @@
 # Documentation - Event calls
 ## Overview
  - [Crownstone Hue Behaviour](/documentation/CrownstoneHueBehaviour.md) 
+ - [Device compatibility](/documentation/DeviceSupport.md)
  - [Errors](/documentation/Errors.md)
  - **Event calls**
- - [LightBehaviourWrapper](/documentation/LightBehaviourWrapper.md)
+ - [DeviceAggregatorWrapper](/documentation/DeviceBehaviourWrapper.md)
  - [Behaviour Aggregator](/documentation/BehaviourAggregator.md)
  - [SwitchBehaviour- & Twilight Prioritizer](/documentation/Prioritizer.md)
  - [Behaviours](/documentation/Behaviours.md)
+
 
 ## About
 The Crownstone Hue module uses some event calls for data transferring.
@@ -39,3 +41,5 @@ data: {
 
 ### ON_DUMB_HOUSE_MODE_SWITCH
 When dumb house mode is set, it emits an event call with the topic ```"onDumbHouseModeSwitch"``` and a data ```boolean```.
+### ON_SPHERE_CHANGE 
+When a sphere's location is changed, it emits an event with topic `"onSphereChange"` and a stringified data object as `{latitude: number, longitude: number}`.

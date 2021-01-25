@@ -3,9 +3,10 @@
 ## Overview
 
 - [Crownstone Hue Behaviour](/documentation/CrownstoneHueBehaviour.md)
+- [Device compatibility](/documentation/DeviceSupport.md)
 - [Errors](/documentation/Errors.md)
 - [Event calls](/documentation/EventCalls.md) 
-- [LightBehaviourWrapper](/documentation/LightBehaviourWrapper.md)
+- [DeviceAggregatorWrapper](/documentation/DeviceBehaviourWrapper.md)
 - [Behaviour Aggregator](/documentation/BehaviourAggregator.md)
 - [SwitchBehaviour- & Twilight Prioritizer](/documentation/Prioritizer.md)
 - **Behaviours**
@@ -21,13 +22,7 @@
 Behaviours are a fundamental part of the module, these contain the set of behaviour rules for light to determine when to activate and how to act. Each behaviour is independent and is separated as `Twilight` and `SwitchBehaviour`, representing their type. A behaviour's active state is based on a check. This check is done by comparing the current data with the data of the behaviour rules.
 
 ## Usage
-
-### Import
-
-`import {Twilight} from {.}`  
-
-`import {SwitchBehaviour} from {.}`
-
+The following is only for documentation purposes, with normal usage everything is handled by the module.
 ### Constructing
 
 `const twilight = new Twilight(behaviour: HueBehaviourWrapperTwilight, sphereLocation: SphereLocation)`
@@ -38,7 +33,7 @@ Format data about `HueBehaviourWrapperBehaviour` and `HueBehaviourWrapperTwiligh
 
 ### Tick
 
-The behaviour will check whether or not it has to be active by calling:
+The behaviour will check whether it has to be active by calling:
 
 `*.tick(timestamp:number)`
 
@@ -56,15 +51,17 @@ In the module, a presence is passed with an `ON_PRESENCE_CHANGE` event call.
 
 ### Checking if the behaviour is active
 
-A Behaviour uses a variable boolean to show that itself is active.
+A Behaviour uses a variable boolean to show that it is active.
 
-Use `*.isActive` to check whether or not the behaviour is active.
+Use `*.isActive` to check whether the behaviour is active.
 
 ### Getting the composed state
 
 To get the composed state based on the behaviour rules and active state, call:
 
 `*.getComposedState()`
+This returns the supposed composed state as a `BehaviourState`,
+
 
 ### Cleanup
 

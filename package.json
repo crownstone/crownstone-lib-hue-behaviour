@@ -1,19 +1,16 @@
 {
-  "name": "huemodule",
+  "name": "crownstone-lib-hue-behaviour",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "start": "tsc --watch",
     "test": "jest"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Joey Ouwens",
+  "license": "MIT",
   "dependencies": {
-    "@types/node-hue-api": "^2.3.1",
-    "node-fetch": "^2.6.1",
-    "node-hue-api": "^4.0.9",
     "suncalc": "^1.8.0"
   },
   "devDependencies": {

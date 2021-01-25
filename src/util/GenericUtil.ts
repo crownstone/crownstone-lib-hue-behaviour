@@ -55,5 +55,45 @@ export const GenericUtil = {
       default:
         throw new CrownstoneHueError(999, err.message);
     }
+  },
+  isEqual(objA:any,objB:any):boolean{
+  if (objA instanceof Array) {
+    if(!(objB instanceof Array)){
+      return false;
+    }
+    if(objA.length !== objB.length){
+      return false;
+    }
+
+    for (let i = 0, len = objA.length; i < len; i++) {
+      if (typeof (objA[i]) === "object" && typeof (objB[i]) === "object") {
+        if (!this.isEqual(objA[i], objB[i])) {
+          return false;
+        }
+      }
+      else if (objA[i] !== objB[i]) {
+        return false;
+      }
+    }
+    return true;
   }
+  if (objA instanceof Object) {
+    if(!(objB instanceof Object)){
+      return false;
+    }
+    for (const key of Object.keys(objA)){
+      if (typeof (objA[key]) === "object" && typeof (objB[key]) === "object") {
+        if (!this.isEqual(objA[key], objB[key])) {
+          return false;
+        }
+      }
+      else if (objA[key] !== objB[key]) {
+        return false;
+      }
+    }
+    return true;
+  }
+  return (objA === objB);
+}
+
 }
